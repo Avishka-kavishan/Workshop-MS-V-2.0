@@ -1,0 +1,282 @@
+/**
+ * Ministry of Education Sri Lanka (Head 126)
+ * Treasury Standard Budget Vote Numbers, Programmes, Projects & Expenditure Object Codes.
+ * Used by Planning Division (PPB) to assign official vote heads to Annual Implementation Plans (AIP).
+ */
+
+export interface MoeStandardVote {
+  voteNumber: string;
+  programmeCode: string;
+  programmeName: string;
+  projectCode: string;
+  projectName: string;
+  objectCode: string;
+  objectDescription: string;
+  fundingSource: string;
+  category: 'Capital' | 'Recurrent';
+  recommendedForBranches: string[];
+  description: string;
+}
+
+export const MOE_STANDARD_VOTE_NUMBERS: MoeStandardVote[] = [
+  {
+    voteNumber: '126-02-03-2502',
+    programmeCode: '02',
+    programmeName: 'Development Activities (Primary, Secondary & Digital Education)',
+    projectCode: '03',
+    projectName: 'Information & Communication Technology in Education',
+    objectCode: '2502',
+    objectDescription: 'Acquisition of Machinery, Equipment & Digital Tools',
+    fundingSource: 'Treasury Consolidated Fund',
+    category: 'Capital',
+    recommendedForBranches: ['org-moe-ict'],
+    description: 'ICT Labs, Smart Classrooms, Server Infrastructure & School Digital Connectivity',
+  },
+  {
+    voteNumber: '126-02-03-2104',
+    programmeCode: '02',
+    programmeName: 'Development Activities',
+    projectCode: '03',
+    projectName: 'Information & Communication Technology in Education',
+    objectCode: '2104',
+    objectDescription: 'Training, Workshops & Capacity Development',
+    fundingSource: 'Treasury Consolidated Fund',
+    category: 'Recurrent',
+    recommendedForBranches: ['org-moe-ict'],
+    description: 'Teacher ICT Competency, Digital Content Creation & LMS Administration Workshops',
+  },
+  {
+    voteNumber: '126-02-04-2104',
+    programmeCode: '02',
+    programmeName: 'Development Activities',
+    projectCode: '04',
+    projectName: 'Education Quality Development & Institutional Assurance (EQD)',
+    objectCode: '2104',
+    objectDescription: 'Training, Workshops & Capacity Development',
+    fundingSource: 'Treasury Consolidated Fund',
+    category: 'Recurrent',
+    recommendedForBranches: ['org-moe-eqd', 'org-moe-qa', 'org-moe-div-eqd'],
+    description: 'Quality Assurance, School Supervision, Assessment Evaluation & Inspectorate Training',
+  },
+  {
+    voteNumber: '126-02-04-2502',
+    programmeCode: '02',
+    programmeName: 'Development Activities',
+    projectCode: '04',
+    projectName: 'Education Quality Development & Institutional Assurance (EQD)',
+    objectCode: '2502',
+    objectDescription: 'Acquisition of Machinery & Educational Systems',
+    fundingSource: 'Treasury Consolidated Fund',
+    category: 'Capital',
+    recommendedForBranches: ['org-moe-eqd', 'org-moe-qa', 'org-moe-div-eqd'],
+    description: 'Standardized Assessment Platforms, Educational Testing Tools & Analytics Hardware',
+  },
+  {
+    voteNumber: '126-02-02-2104',
+    programmeCode: '02',
+    programmeName: 'Development Activities',
+    projectCode: '02',
+    projectName: 'Curriculum Development & Educational Research',
+    objectCode: '2104',
+    objectDescription: 'Training, Workshops & Capacity Development',
+    fundingSource: 'Treasury Consolidated Fund',
+    category: 'Recurrent',
+    recommendedForBranches: ['org-moe-curriculum', 'org-nie'],
+    description: 'National Curriculum Framework Reforms, Syllabus Workshops & Teacher Guides',
+  },
+  {
+    voteNumber: '126-02-02-1409',
+    programmeCode: '02',
+    programmeName: 'Development Activities',
+    projectCode: '02',
+    projectName: 'Curriculum Development & Educational Research',
+    objectCode: '1409',
+    objectDescription: 'Instructional & Educational Support Materials',
+    fundingSource: 'Treasury Consolidated Fund',
+    category: 'Recurrent',
+    recommendedForBranches: ['org-moe-curriculum', 'org-moe-publications'],
+    description: 'School Textbooks, Supplementary Learning Kits & Braille Materials',
+  },
+  {
+    voteNumber: '126-02-05-2104',
+    programmeCode: '02',
+    programmeName: 'Development Activities',
+    projectCode: '05',
+    projectName: 'Teacher Education & Human Resource Development',
+    objectCode: '2104',
+    objectDescription: 'Training, Workshops & Capacity Development',
+    fundingSource: 'Treasury Consolidated Fund',
+    category: 'Recurrent',
+    recommendedForBranches: ['org-moe-teacher', 'org-moe-ncoe'],
+    description: 'Pre-service NCoE Teacher Trainee Training & In-service Teacher Upgrading',
+  },
+  {
+    voteNumber: '126-02-06-2502',
+    programmeCode: '02',
+    programmeName: 'Development Activities',
+    projectCode: '06',
+    projectName: 'School Infrastructure & Physical Facilities',
+    objectCode: '2502',
+    objectDescription: 'Acquisition of Buildings & Infrastructure Facilities',
+    fundingSource: 'Treasury Consolidated Fund',
+    category: 'Capital',
+    recommendedForBranches: ['org-moe-infra', 'org-moe-school-works'],
+    description: 'Science Labs, Library Buildings, Sanitary Units & Primary Classroom Blocks',
+  },
+  {
+    voteNumber: '126-02-06-2401',
+    programmeCode: '02',
+    programmeName: 'Development Activities',
+    projectCode: '06',
+    projectName: 'School Infrastructure & Physical Facilities',
+    objectCode: '2401',
+    objectDescription: 'Maintenance & Rehabilitation of Physical Assets',
+    fundingSource: 'Treasury Consolidated Fund',
+    category: 'Capital',
+    recommendedForBranches: ['org-moe-infra'],
+    description: 'Emergency Roof Repairs, Electrical Rewiring & School Structural Maintenance',
+  },
+  {
+    voteNumber: '126-02-07-1501',
+    programmeCode: '02',
+    programmeName: 'Development Activities',
+    projectCode: '07',
+    projectName: 'Student Welfare, Nutrition & Scholarships',
+    objectCode: '1501',
+    objectDescription: 'Transfers to Households (Nutritional & Welfare Grants)',
+    fundingSource: 'Treasury Consolidated Fund',
+    category: 'Recurrent',
+    recommendedForBranches: ['org-moe-welfare', 'org-moe-nutrition'],
+    description: 'National Morning School Meal Programme, Free Uniform Vouchers & Bursaries',
+  },
+  {
+    voteNumber: '126-01-01-1101',
+    programmeCode: '01',
+    programmeName: 'General Administration & Institutional Support',
+    projectCode: '01',
+    projectName: 'Ministerial Direction & General Field Supervisory Services',
+    objectCode: '1101',
+    objectDescription: 'Domestic Travelling & Field Inspection',
+    fundingSource: 'Treasury Consolidated Fund',
+    category: 'Recurrent',
+    recommendedForBranches: ['org-moe-planning', 'org-moe-admin'],
+    description: 'Field Monitoring Visits, District Planning Conventions & Regional Audits',
+  },
+  {
+    voteNumber: '126-01-01-1201',
+    programmeCode: '01',
+    programmeName: 'General Administration & Institutional Support',
+    projectCode: '01',
+    projectName: 'Ministerial Direction & General Services',
+    objectCode: '1201',
+    objectDescription: 'Stationery, Office Consumables & Operational Telecommunications',
+    fundingSource: 'Treasury Consolidated Fund',
+    category: 'Recurrent',
+    recommendedForBranches: ['org-moe-planning', 'org-moe-admin'],
+    description: 'Central Planning Operations, Circular Publishing & Data Management',
+  },
+  {
+    voteNumber: '126-02-01-2502',
+    programmeCode: '02',
+    programmeName: 'Development Activities',
+    projectCode: '01',
+    projectName: 'Provincial Education Assistance Grants',
+    objectCode: '2502',
+    objectDescription: 'Capital Transfers to Provincial Educational Administrations',
+    fundingSource: 'Treasury Consolidated Fund',
+    category: 'Capital',
+    recommendedForBranches: ['org-prov-western-ed', 'org-prov-central-ed', 'org-prov-southern-ed'],
+    description: 'Decentralized Provincial Primary School Assistance & Zonal IT Centre Enhancements',
+  },
+  {
+    voteNumber: '126-02-03-2502-WB',
+    programmeCode: '02',
+    programmeName: 'Development Activities',
+    projectCode: '03',
+    projectName: 'Information & Communication Technology in Education',
+    objectCode: '2502',
+    objectDescription: 'Foreign Funded Project Assets',
+    fundingSource: 'World Bank (General Education Modernization Project - GEMP)',
+    category: 'Capital',
+    recommendedForBranches: ['org-moe-ict'],
+    description: 'GEMP World Bank Supported Digital Smart Education Initiative',
+  },
+  {
+    voteNumber: '126-02-05-2104-ADB',
+    programmeCode: '02',
+    programmeName: 'Development Activities',
+    projectCode: '05',
+    projectName: 'Teacher Education & Human Resource Development',
+    objectCode: '2104',
+    objectDescription: 'Foreign Funded Capacity Development',
+    fundingSource: 'ADB (Education Sector Development Programme - ESDP)',
+    category: 'Recurrent',
+    recommendedForBranches: ['org-moe-teacher', 'org-moe-curriculum'],
+    description: 'ADB-ESDP Advanced STEM Teacher Pedagogy & Master Trainer Accreditation',
+  },
+  {
+    voteNumber: '126-02-08-2502',
+    programmeCode: '02',
+    programmeName: 'Development Activities',
+    projectCode: '08',
+    projectName: 'Department of Examinations (DoE) Assessment & Testing Systems',
+    objectCode: '2502',
+    objectDescription: 'Acquisition of High-Speed Optical Scanners & Examination Cloud Infrastructure',
+    fundingSource: 'Treasury Consolidated Fund',
+    category: 'Capital',
+    recommendedForBranches: ['org-doe-tech', 'org-doe-eval', 'org-doe-confidential'],
+    description: 'National Examination Cloud Portal, Computerized Marking Center Hardware & Optical Barcode Scanners',
+  },
+  {
+    voteNumber: '126-02-08-2104',
+    programmeCode: '02',
+    programmeName: 'Development Activities',
+    projectCode: '08',
+    projectName: 'Department of Examinations (DoE) Assessment & Testing Systems',
+    objectCode: '2104',
+    objectDescription: 'Training, Examiner Standardization & Capacity Workshops',
+    fundingSource: 'Treasury Consolidated Fund',
+    category: 'Recurrent',
+    recommendedForBranches: ['org-doe-eval', 'org-doe-confidential', 'org-doe-admin'],
+    description: 'GCE A/L & O/L Chief Examiner Panels, Evaluation Moderation Workshops & Marking Center Briefings',
+  },
+  {
+    voteNumber: '126-02-08-1409',
+    programmeCode: '02',
+    programmeName: 'Development Activities',
+    projectCode: '08',
+    projectName: 'Department of Examinations (DoE) Assessment & Testing Systems',
+    objectCode: '1409',
+    objectDescription: 'Confidential Testing Supplies & Question Formulation',
+    fundingSource: 'Treasury Consolidated Fund',
+    category: 'Recurrent',
+    recommendedForBranches: ['org-doe-confidential', 'org-doe-eval'],
+    description: 'Confidential Question Bank Generation, Psychometric Moderation & Specialized Test Materials',
+  },
+];
+
+/**
+ * Return details of a vote number or fallback structure
+ */
+export function getVoteDetails(voteNumber: string): MoeStandardVote {
+  const clean = String(voteNumber || '').trim();
+  const match = MOE_STANDARD_VOTE_NUMBERS.find((v) => v.voteNumber.toLowerCase() === clean.toLowerCase());
+  if (match) return match;
+
+  // Synthesize from vote number parts e.g. 126-02-03-2502
+  const parts = clean.split('-');
+  const objectCode = parts[3] || '2502';
+  return {
+    voteNumber: clean || '126-02-03-2502',
+    programmeCode: parts[1] || '02',
+    programmeName: 'Development Activities',
+    projectCode: parts[2] || '03',
+    projectName: 'Educational Development Project',
+    objectCode,
+    objectDescription: objectCode === '2104' ? 'Training & Capacity Development' : 'Capital Asset Acquisition',
+    fundingSource: clean.includes('WB') ? 'World Bank' : clean.includes('ADB') ? 'ADB-ESDP' : 'Treasury Consolidated Fund',
+    category: objectCode.startsWith('1') || objectCode === '2104' ? 'Recurrent' : 'Capital',
+    recommendedForBranches: [],
+    description: `Official Treasury Budget Vote Head: ${clean}`,
+  };
+}

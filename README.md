@@ -1,13 +1,7 @@
-<<<<<<< HEAD
 # Integrated Planning & Monitoring Information System (MoE-IPMIS)
 *Ministry of Education - Sri Lanka*
 
 A national-level enterprise web application built with **Next.js 14**, **TypeScript**, and **Government Design System**, unifying **Branch-level Budgetary Planning (Stage 1)**, **Ministry Budget Formulation & Speech Inputs (Stage 2)**, **Annual Implementation Plan (AIP)**, **Capacity Building / Workshops**, and **Multi-Tier Field Monitoring**.
-=======
-# Workshop Management System (Ministry of Education - Sri Lanka)
-
-A standalone parallel web application built with **Next.js 14**, **TypeScript**, and **Vanilla CSS Design System**, designed for workshop planning, participant management, and organizational hierarchy lifecycle approvals across all educational administrative tiers.
->>>>>>> origin/Workshop-MS-V-2.0
 
 > **Future Integration Note**: Designed with clean domain separation so it can be seamlessly embedded into the **Budget Management System as the Workshop Management module** without redesigning the core workflow or schemas.
 
@@ -63,7 +57,6 @@ The system enforces strict hierarchy-based access control and target organizatio
 
 ---
 
-<<<<<<< HEAD
 ## 🔑 Four Main User Types & System Credentials
 
 Default password for all accounts: `123` (or `password123`)
@@ -106,22 +99,6 @@ Default password for all accounts: `123` (or `password123`)
 | **Mathematics Division** | `maths` | `maths.officer` | MOE Officer / Planner |
 | **Health & Nutrition Division** | `health` | `health.officer` | MOE Officer / Planner |
 | **Curriculum Development** | `curriculum` | `curriculum.officer` | MOE Officer / Planner |
-=======
-## 🔑 Demo Credentials
-
-Default password for all demo accounts: `password123`
-
-| Username | Role | Organization Unit | Hierarchy Level |
-| :--- | :--- | :--- | :--- |
-| `admin` | System Administrator | Ministry of Education | National (All Levels) |
-| `ict.officer` | MOE Officer | MOE - ICT Branch | Level 1 – MOE Branch |
-| `ict.director` | MOE Director | MOE - ICT Branch | Level 1 – MOE Branch |
-| `planning.director` | MOE Director | MOE - Planning Branch | Level 1 – MOE Branch |
-| `sp.director` | Provincial Director | Southern Province Dept. of Education | Level 2 – Province |
-| `galle.director` | Zonal Director | Galle Zonal Education Office | Level 3 – Zone |
-| `galle.coordinator` | Workshop Coordinator | Galle Zonal Education Office | Level 3 – Zone |
-| `colombo.director` | Zonal Director | Colombo Zonal Education Office | Level 3 – Zone |
->>>>>>> origin/Workshop-MS-V-2.0
 
 ---
 
@@ -176,7 +153,6 @@ npm run dev
 
 Open [http://localhost:3000](http://localhost:3000) in your browser.
 
-<<<<<<< HEAD
 ---
 
 ## 📚 System Specifications, FRS, SRS & Architecture Documentation
@@ -202,10 +178,3 @@ The complete engineering documentation suite conforming to IEEE Std 830-1998, Mo
 - **Multi-Tier Live Updating Engine**: Cross-tab real-time event synchronization via `BroadcastChannel` API and storage fallbacks (`src/lib/broadcastSync.ts`), 12-second background polling without layout shift, and tab focus resync.
 - **Modernized Global Header & Navigation**: Slim 44px sticky navigation bar with clickable breadcrumb navigation drawer, top-right user profile capsule (`Welcome, MOE ICT Branch (ICT)`), and high-visibility active red notification bell with radar ping.
 
-
-"# Workshop-MS-V-2.0" 
-"# Workshop-MS-V-2.0" 
-"# Workshop-MS-V-2.0" 
-=======
->>>>>>> origin/Workshop-MS-V-2.0
-"# Workshop-MS-V-2.0" 

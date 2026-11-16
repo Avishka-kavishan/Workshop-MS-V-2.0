@@ -1,0 +1,1208 @@
+'use client';
+
+import React, { useState } from 'react';
+import Link from 'next/link';
+import { useSession } from 'next-auth/react';
+import TileActionMenu, { TileExportData } from '@/components/dashboard/TileActionMenu';
+import {
+  SRI_LANKA_MONITORING_PROVINCES,
+  getTrafficLight,
+  ProvinceMonitoringData,
+  ZoneMonitoringData,
+  DivisionMonitoringData,
+} from '@/lib/trafficLightUtils';
+import {
+  SRI_LANKA_ADM0_PATH,
+  SRI_LANKA_GEO_PROVINCE_PATHS,
+  SRI_LANKA_GEO_PINS,
+} from '@/lib/geoBoundariesSriLanka';
+
+export type ProvinceData = ProvinceMonitoringData;
+
+export interface RegionalMapProps {
+  workshops?: any[];
+  provincesData?: ProvinceMonitoringData[];
+  onSelectProvince?: (prov: ProvinceMonitoringData) => void;
+}
+
+type DrillLevel = 'province' | 'zone' | 'division';
+
+// ══════════════════════════════════════════════════════════════════════════════
+// 9 SRI LANKA PROVINCES - GEOGRAPHICALLY AUTHENTIC TESSELLATING SVG PATHS
+// ViewBox: 0 0 240 360 (Normalized coordinate system)
+// Seamless boundary matching: adjacent provinces share exact boundary coordinates.
+// ══════════════════════════════════════════════════════════════════════════════
+export const SRI_LANKA_PROVINCE_PATHS: Record<string, string> = {
+  // Northern Province (NP) - Jaffna, Kilinochchi, Mannar, Mullaitivu, Vavuniya
+  'org-prov-northern':
+    'M 112 18 C 122 18, 130 28, 130 36 C 132 50, 142 68, 148 88 L 126 90 L 100 92 L 72 94 L 52 95 C 50 80, 60 55, 75 30 C 88 18, 102 18, 112 18 Z',
+
+  // North Central Province (NC) - Anuradhapura, Polonnaruwa
+  'org-prov-north-central':
+    'M 72 94 L 100 92 L 126 90 L 148 88 C 145 105, 142 125, 145 145 L 142 160 L 118 160 L 95 158 L 76 135 L 72 94 Z',
+
+  // North Western Province (NW) - Puttalam, Kurunegala
+  'org-prov-north-western':
+    'M 52 95 L 72 94 L 76 135 L 95 158 L 102 192 L 98 215 L 60 218 C 54 195, 48 160, 48 140 C 48 120, 50 105, 52 95 Z',
+
+  // Eastern Province (EP) - Trincomalee, Batticaloa, Ampara
+  'org-prov-eastern':
+    'M 148 88 C 158 100, 168 115, 172 135 C 178 155, 182 185, 182 215 C 180 235, 176 255, 168 275 L 152 235 L 144 195 L 142 160 C 142 140, 145 115, 148 88 Z',
+
+  // Central Province (CP) - Matale, Kandy, Nuwara Eliya
+  'org-prov-central':
+    'M 95 158 L 118 160 L 142 160 L 144 195 L 132 228 L 108 232 L 98 215 L 102 192 L 95 158 Z',
+
+  // Western Province (WP) - Gampaha, Colombo, Kalutara
+  'org-prov-western':
+    'M 60 218 L 98 215 L 92 252 L 85 278 L 62 282 C 58 262, 58 240, 60 218 Z',
+
+  // Sabaragamuwa Province (SAB) - Kegalle, Ratnapura
+  'org-prov-sabaragamuwa':
+    'M 98 215 L 108 232 L 126 252 L 124 288 L 102 290 L 85 278 L 92 252 L 98 215 Z',
+
+  // Uva Province (UVA) - Badulla, Monaragala
+  'org-prov-uva':
+    'M 132 228 L 144 195 L 152 235 L 168 275 L 146 298 L 124 288 L 126 252 L 132 228 Z',
+
+  // Southern Province (SP) - Galle, Matara, Hambantota
+  'org-prov-southern':
+    'M 62 282 L 85 278 L 102 290 L 124 288 L 146 298 L 168 275 C 158 298, 142 320, 128 332 C 112 342, 94 344, 82 334 C 70 322, 64 300, 62 282 Z',
+};
+
+function RegionalMap({ workshops = [], provincesData, onSelectProvince }: RegionalMapProps) {
+  const { data: session } = useSession();
+  const isLoggedIn = Boolean(session?.user);
+  const [provinces, setProvinces] = useState<ProvinceMonitoringData[]>(() => provincesData || SRI_LANKA_MONITORING_PROVINCES);
+  const [hoveredProvince, setHoveredProvince] = useState<ProvinceMonitoringData | null>(null);
+  const [activeDrillProvince, setActiveDrillProvince] = useState<ProvinceMonitoringData | null>(null);
+  const [activeDrillZone, setActiveDrillZone] = useState<ZoneMonitoringData | null>(null);
+  const [activeDrillDivision, setActiveDrillDivision] = useState<DivisionMonitoringData | null>(null);
+  const [drillLevel, setDrillLevel] = useState<DrillLevel>('province');
+
+  // Traffic light band filter: 'All' | '100%' | '90-99%' | '80-89%' | '70-79%' | '50-69%' | '<50%'
+  const [bandFilter, setBandFilter] = useState<'All' | '100%' | '90-99%' | '80-89%' | '70-79%' | '50-69%' | '<50%'>('All');
+  
+  // View mode: 'map' or 'table'
+  const [viewMode, setViewMode] = useState<'map' | 'table'>('map');
+
+  React.useEffect(() => {
+    if (provincesData && provincesData.length > 0) {
+      setProvinces(provincesData);
+      return;
+    }
+    fetch('/api/system/telemetry')
+      .then((res) => res.json())
+      .then((data) => {
+        if (data?.provinces && Array.isArray(data.provinces) && data.provinces.length > 0) {
+          setProvinces(data.provinces);
+        }
+      })
+      .catch(() => {});
+  }, [provincesData]);
+
+  const filteredProvinces = provinces.filter((p) => {
+    if (bandFilter === 'All') return true;
+    const tl = getTrafficLight(p.progressPct);
+    return tl.band === bandFilter;
+  });
+
+  const openDrillDown = (prov: ProvinceMonitoringData) => {
+    setActiveDrillProvince(prov);
+    setActiveDrillZone(prov.zones[0] || null);
+    setActiveDrillDivision(prov.zones[0]?.divisions[0] || null);
+    setDrillLevel('province');
+    if (onSelectProvince) onSelectProvince(prov);
+  };
+
+  const closeDrillDown = () => {
+    setActiveDrillProvince(null);
+    setActiveDrillZone(null);
+    setActiveDrillDivision(null);
+    setDrillLevel('province');
+  };
+
+  const activeProv = hoveredProvince;
+
+  const tileExportData: TileExportData = {
+    filename: 'MoE_Province_Wise_Progress_2026',
+    reportTitle: 'Province-Wise Administrative Coverage & Progress',
+    subtitle: 'National Education Administration - 9 Provincial Education Departments',
+    headers: ['Province Code', 'Province Name', 'Capital / HQ', 'Physical Progress (%)', 'Budget Utilization (%)', 'Workshops Count', 'Activities Count', 'Provincial Director', 'RAG Status'],
+    rows: provinces.map((p) => [
+      p.code,
+      p.name,
+      p.capital || 'Provincial Capital',
+      `${p.progressPct}%`,
+      p.budgetAllocatedMn > 0 ? `${Math.round((p.budgetSpentMn / p.budgetAllocatedMn) * 100)}%` : '31%',
+      p.workshopsCount || 20,
+      p.activitiesCount || 15,
+      p.directorName || 'Provincial Director of Education',
+      p.progressPct >= 70 ? 'Green (On Track)' : p.progressPct >= 50 ? 'Amber (Needs Attention)' : 'Red (Delayed / Critical)',
+    ]),
+    summaryStats: [
+      { label: 'Provinces Active', value: '9 / 9', highlight: true },
+      { label: 'Highest Performing', value: 'Western (88%)' },
+      { label: 'Priority Attention', value: 'Northern (44%)' },
+      { label: 'Average Coverage', value: '64.8%' },
+    ],
+    copySummaryText: `MoE Province-Wise Progress:\n` + provinces.map((p) => `${p.code} (${p.name}): ${p.progressPct}%`).join(' | '),
+  };
+
+  return (
+    <div
+      style={{
+        background: '#FFFFFF',
+        borderRadius: '16px',
+        border: '1px solid #E2E8F0',
+        padding: '0.55rem 0.75rem',
+        boxShadow: '0 4px 16px rgba(0, 0, 0, 0.04)',
+        display: 'flex',
+        flexDirection: 'column',
+        height: '100%',
+        minHeight: 0,
+        position: 'relative',
+        transition: 'box-shadow 0.2s ease, border-color 0.2s ease',
+      }}
+    >
+      {/* ──── Header ──── */}
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.55rem', flexWrap: 'wrap', gap: '0.5rem' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+          <div>
+            <h3 style={{ margin: 0, fontSize: '1rem', fontWeight: 800, color: '#0F172A', letterSpacing: '-0.01em' }}>
+              Province-Wise Progress
+            </h3>
+          </div>
+        </div>
+
+        {/* Right side up corner: View Mode Toggle & Tile Actions */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.45rem' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '2px', background: '#F1F5F9', padding: '3px', borderRadius: '8px' }}>
+            <button
+              type="button"
+              onClick={() => setViewMode('map')}
+              style={{
+                padding: '0.2rem 0.55rem',
+                borderRadius: '6px',
+                fontSize: '0.72rem',
+                fontWeight: 700,
+                border: 'none',
+                cursor: 'pointer',
+                background: viewMode === 'map' ? '#FFFFFF' : 'transparent',
+                color: viewMode === 'map' ? '#0F172A' : '#64748B',
+                boxShadow: viewMode === 'map' ? '0 1px 3px rgba(0,0,0,0.1)' : 'none',
+                transition: 'all 0.15s ease',
+              }}
+            >
+              Map
+            </button>
+            <button
+              type="button"
+              onClick={() => setViewMode('table')}
+              style={{
+                padding: '0.2rem 0.55rem',
+                borderRadius: '6px',
+                fontSize: '0.72rem',
+                fontWeight: 700,
+                border: 'none',
+                cursor: 'pointer',
+                background: viewMode === 'table' ? '#FFFFFF' : 'transparent',
+                color: viewMode === 'table' ? '#0F172A' : '#64748B',
+                boxShadow: viewMode === 'table' ? '0 1px 3px rgba(0,0,0,0.1)' : 'none',
+                transition: 'all 0.15s ease',
+              }}
+            >
+              Table
+            </button>
+          </div>
+          <TileActionMenu
+            tileTitle="Province-Wise Progress"
+            exportData={tileExportData}
+            position="right"
+          />
+        </div>
+      </div>
+
+      {/* ──── Map View ──── */}
+      {viewMode === 'map' && (
+        <div
+          style={{
+            flex: 1,
+            minHeight: 0,
+            position: 'relative',
+            background: 'linear-gradient(180deg, #F0F9FF 0%, #E6F3FA 100%)',
+            borderRadius: '12px',
+            border: '1px solid #BAE6FD',
+            padding: '0.5rem',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            overflow: 'hidden',
+          }}
+        >
+          {/* ──── Top Left: Cartographic North Arrow Indicator ──── */}
+          <div
+            style={{
+              position: 'absolute',
+              top: '10px',
+              left: '10px',
+              zIndex: 5,
+              background: 'rgba(255, 255, 255, 0.95)',
+              backdropFilter: 'blur(8px)',
+              border: '1px solid #BAE6FD',
+              borderRadius: '8px',
+              padding: '4px 7px',
+              boxShadow: '0 2px 8px rgba(2, 132, 199, 0.08)',
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              justifyContent: 'center',
+              userSelect: 'none',
+              pointerEvents: 'none',
+            }}
+            title="Map Orientation: North"
+          >
+            <span style={{ fontSize: '0.66rem', fontWeight: 900, color: '#0F172A', lineHeight: 1, letterSpacing: '0.04em' }}>
+              N
+            </span>
+            <svg width="12" height="18" viewBox="0 0 12 18" fill="none" style={{ marginTop: '2px' }}>
+              <polygon points="6,0 0,8 6,6" fill="#0369A1" />
+              <polygon points="6,0 12,8 6,6" fill="#0284C7" />
+              <polygon points="6,6 0,8 6,18" fill="#CBD5E1" />
+              <polygon points="6,6 12,8 6,18" fill="#94A3B8" />
+            </svg>
+          </div>
+
+          {/* ──── Top Right: Dedicated Performance Legend Panel ──── */}
+          <div
+            style={{
+              position: 'absolute',
+              top: '10px',
+              right: '10px',
+              zIndex: 5,
+              width: '102px',
+              background: 'rgba(255, 255, 255, 0.95)',
+              backdropFilter: 'blur(8px)',
+              border: '1px solid #BAE6FD',
+              borderRadius: '10px',
+              padding: '0.55rem 0.65rem',
+              boxShadow: '0 2px 8px rgba(2, 132, 199, 0.08)',
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '4px',
+            }}
+          >
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderBottom: '1px solid #E2E8F0', paddingBottom: '3px', marginBottom: '3px' }}>
+              <span style={{ fontSize: '0.66rem', fontWeight: 800, color: '#0F172A', letterSpacing: '0.04em', textTransform: 'uppercase' }}>
+                Legend
+              </span>
+              {bandFilter !== 'All' && (
+                <button
+                  type="button"
+                  onClick={() => setBandFilter('All')}
+                  style={{
+                    border: 'none',
+                    background: '#0F172A',
+                    color: '#fff',
+                    borderRadius: '4px',
+                    fontSize: '0.56rem',
+                    fontWeight: 700,
+                    padding: '1px 4px',
+                    cursor: 'pointer',
+                  }}
+                  title="Reset filter"
+                >
+                  Reset
+                </button>
+              )}
+            </div>
+
+            {/* 6 Performance Tiers - Percentage Values Only */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
+              {[
+                { band: '100%', label: '100%', color: '#16A34A', desc: '100% Target Met' },
+                { band: '90-99%', label: '90–99%', color: '#65A30D', desc: '90–99% High Progress' },
+                { band: '80-89%', label: '80–89%', color: '#EAB308', desc: '80–89% Satisfactory' },
+                { band: '70-79%', label: '70–79%', color: '#F59E0B', desc: '70–79% Attention Needed' },
+                { band: '50-69%', label: '50–69%', color: '#F87171', desc: '50–69% Underperforming' },
+                { band: '<50%', label: '< 50%', color: '#DC2626', desc: '< 50% Critical Deficit' },
+              ].map((tier) => {
+                const isSelected = bandFilter === tier.band;
+                return (
+                  <div
+                    key={tier.band}
+                    onClick={() => setBandFilter(bandFilter === tier.band ? 'All' : tier.band as any)}
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '7px',
+                      padding: '3px 5px',
+                      borderRadius: '5px',
+                      background: isSelected ? 'rgba(2, 132, 199, 0.12)' : 'transparent',
+                      border: isSelected ? '1px solid #0284C7' : '1px solid transparent',
+                      cursor: 'pointer',
+                      transition: 'all 0.15s ease',
+                    }}
+                    title={`Filter by: ${tier.desc}`}
+                  >
+                    <span
+                      style={{
+                        width: '8px',
+                        height: '8px',
+                        borderRadius: '50%',
+                        background: tier.color,
+                        flexShrink: 0,
+                        boxShadow: `0 0 3px ${tier.color}66`,
+                      }}
+                    />
+                    <span style={{ fontSize: '0.72rem', fontWeight: isSelected ? 800 : 700, color: isSelected ? '#0284C7' : '#334155', whiteSpace: 'nowrap' }}>
+                      {tier.label}
+                    </span>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* ──── Full Canvas Detailed Sri Lanka Map ──── */}
+          <div
+            style={{
+              width: '100%',
+              height: '100%',
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'center',
+              minHeight: 0,
+              minWidth: 0,
+              overflow: 'hidden',
+            }}
+          >
+            <svg
+              viewBox="10 0 220 370"
+              preserveAspectRatio="xMidYMid meet"
+              style={{
+                height: '100%',
+                maxHeight: '100%',
+                width: '100%',
+                maxWidth: '100%',
+                filter: 'drop-shadow(0 4px 14px rgba(2, 132, 199, 0.18))',
+              }}
+            >
+              {/* Official geoBoundaries ADM0 Coastline Backdrop */}
+              <path
+                d={SRI_LANKA_ADM0_PATH}
+                fill="rgba(186, 230, 253, 0.4)"
+                stroke="#0284C7"
+                strokeWidth="2.4"
+                strokeLinejoin="round"
+                filter="drop-shadow(0 2px 8px rgba(2, 132, 199, 0.2))"
+              />
+
+              {/* ── 9 Interactive Province geoBoundaries SVG Polygons ── */}
+              {provinces.map((prov) => {
+                const pathD = SRI_LANKA_GEO_PROVINCE_PATHS[prov.id] || SRI_LANKA_PROVINCE_PATHS[prov.id];
+                if (!pathD) return null;
+
+                const isMatch = bandFilter === 'All' || getTrafficLight(prov.progressPct).band === bandFilter;
+                const isHover = hoveredProvince?.id === prov.id;
+                const tl = getTrafficLight(prov.progressPct);
+
+                return (
+                  <path
+                    key={`poly-${prov.id}`}
+                    d={pathD}
+                    fill={isMatch ? tl.bg : '#CBD5E1'}
+                    fillOpacity={
+                      !isMatch
+                        ? 0.22
+                        : isHover
+                        ? 0.98
+                        : hoveredProvince
+                        ? 0.55
+                        : 0.88
+                    }
+                    stroke={isHover ? '#FFFFFF' : isMatch ? 'rgba(255, 255, 255, 0.9)' : 'rgba(255, 255, 255, 0.4)'}
+                    strokeWidth={isHover ? 2.6 : 1.2}
+                    strokeLinejoin="round"
+                    style={{
+                      cursor: 'pointer',
+                      transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
+                      filter: isHover
+                        ? 'drop-shadow(0 3px 8px rgba(0,0,0,0.4)) brightness(1.15)'
+                        : 'none',
+                    }}
+                    onMouseEnter={() => setHoveredProvince(prov)}
+                    onMouseLeave={() => setHoveredProvince(null)}
+                    onClick={() => openDrillDown(prov)}
+                  >
+                    <title>{`${prov.name} (${prov.code}) - ${prov.progressPct}% Target Completion`}</title>
+                  </path>
+                );
+              })}
+
+              {/* ── Interactive Status Pins & Codes for 9 Provinces ── */}
+              {provinces.map((prov) => {
+                const [px, py] = SRI_LANKA_GEO_PINS[prov.id] || prov.pin;
+                const isMatch = bandFilter === 'All' || getTrafficLight(prov.progressPct).band === bandFilter;
+                const isHover = hoveredProvince?.id === prov.id;
+                const tl = getTrafficLight(prov.progressPct);
+
+                return (
+                  <g
+                    key={`pin-${prov.id}`}
+                    style={{
+                      cursor: 'pointer',
+                      transition: 'transform 0.18s ease, opacity 0.2s ease',
+                      opacity: isMatch ? 1 : 0.25,
+                    }}
+                    transform={isHover ? `translate(${px}, ${py - 4}) scale(1.18) translate(-${px}, -${py})` : ''}
+                    onMouseEnter={() => setHoveredProvince(prov)}
+                    onMouseLeave={() => setHoveredProvince(null)}
+                    onClick={() => openDrillDown(prov)}
+                  >
+                    {/* Pulsing Outer Ring */}
+                    {isMatch && (
+                      <circle cx={px} cy={py} r={isHover ? 13 : 9} fill={tl.bg} opacity={isHover ? 0.45 : 0.26}>
+                        <animate
+                          attributeName="r"
+                          values={`${isHover ? 11 : 8};${isHover ? 16 : 12};${isHover ? 11 : 8}`}
+                          dur="2.5s"
+                          repeatCount="indefinite"
+                        />
+                      </circle>
+                    )}
+
+                    {/* Teardrop SVG Drop Pin in Traffic Light Color */}
+                    <path
+                      d={`M ${px} ${py + 2} 
+                         C ${px - 6} ${py - 4}, ${px - 7} ${py - 12}, ${px} ${py - 14} 
+                         C ${px + 7} ${py - 12}, ${px + 6} ${py - 4}, ${px} ${py + 2} Z`}
+                      fill={isMatch ? tl.bg : '#94A3B8'}
+                      stroke="#FFFFFF"
+                      strokeWidth="1.6"
+                      filter="drop-shadow(0 2px 4px rgba(0,0,0,0.3))"
+                    />
+
+                    {/* Inner White Core Circle */}
+                    <circle cx={px} cy={py - 8} r="2.8" fill="#FFFFFF" />
+
+                    {/* Province Code Label */}
+                    <text
+                      x={px}
+                      y={py + 13}
+                      textAnchor="middle"
+                      fill="#0F172A"
+                      fontSize="7.5"
+                      fontWeight="800"
+                      fontFamily="system-ui, -apple-system, sans-serif"
+                      stroke="#FFFFFF"
+                      strokeWidth="0.6"
+                      paintOrder="stroke"
+                    >
+                      {prov.code}
+                    </text>
+                  </g>
+                );
+              })}
+            </svg>
+          </div>
+
+          {/* Floating Live Hover Tooltip Card */}
+          {activeProv && (
+            <div
+              style={{
+                position: 'absolute',
+                bottom: '8px',
+                left: '8px',
+                right: '180px',
+                background: 'rgba(15, 23, 42, 0.94)',
+                backdropFilter: 'blur(8px)',
+                color: '#FFFFFF',
+                borderRadius: '8px',
+                padding: '0.5rem 0.75rem',
+                fontSize: '0.74rem',
+                boxShadow: '0 4px 14px rgba(0,0,0,0.3)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                animation: 'fadeIn 0.15s ease',
+                zIndex: 10,
+                pointerEvents: 'none',
+              }}
+            >
+              <div>
+                <div style={{ fontWeight: 800, fontSize: '0.82rem', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                  <span>{activeProv.name} ({activeProv.code})</span>
+                  <span
+                    style={{
+                      fontSize: '0.64rem',
+                      padding: '0.1rem 0.4rem',
+                      borderRadius: '4px',
+                      background: getTrafficLight(activeProv.progressPct).bg,
+                      color: '#FFFFFF',
+                      fontWeight: 700,
+                    }}
+                  >
+                    {activeProv.progressPct}% • {getTrafficLight(activeProv.progressPct).label}
+                  </span>
+                </div>
+                <div style={{ color: '#94A3B8', fontSize: '0.68rem', marginTop: '2px' }}>
+                  Capital: <strong style={{ color: '#E2E8F0' }}>{activeProv.capital}</strong> • Focus: {activeProv.keyInitiative.slice(0, 36)}...
+                </div>
+              </div>
+              <div style={{ textAlign: 'right', flexShrink: 0, paddingLeft: '0.5rem' }}>
+                <span style={{ color: '#38BDF8', fontWeight: 800, fontSize: '0.72rem' }}>
+                  Click to Inspect ➔
+                </span>
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* ──── Table / Matrix View ──── */}
+      {viewMode === 'table' && (
+        <div style={{ flex: 1, minHeight: 0, overflowY: 'auto', border: '1px solid #E2E8F0', borderRadius: '10px' }}>
+          <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.76rem' }}>
+            <thead style={{ background: '#F8FAFC', position: 'sticky', top: 0, zIndex: 2 }}>
+              <tr style={{ borderBottom: '1px solid #E2E8F0', color: '#475569', textAlign: 'left' }}>
+                <th style={{ padding: '0.5rem 0.65rem', fontWeight: 700 }}>Province</th>
+                <th style={{ padding: '0.5rem 0.65rem', fontWeight: 700 }}>Status</th>
+                <th style={{ padding: '0.5rem 0.65rem', fontWeight: 700 }}>Progress</th>
+                <th style={{ padding: '0.5rem 0.65rem', fontWeight: 700, textAlign: 'right' }}>Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              {filteredProvinces.map((prov) => {
+                const tl = getTrafficLight(prov.progressPct);
+                return (
+                  <tr
+                    key={prov.id}
+                    style={{ borderBottom: '1px solid #F1F5F9' }}
+                  >
+                    <td style={{ padding: '0.5rem 0.65rem', fontWeight: 700, color: '#0F172A' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
+                        <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: tl.bg }} />
+                        <span>{prov.name}</span>
+                        <span style={{ fontSize: '0.66rem', color: '#64748B' }}>({prov.code})</span>
+                      </div>
+                    </td>
+                    <td style={{ padding: '0.5rem 0.65rem' }}>
+                      <span
+                        style={{
+                          display: 'inline-block',
+                          padding: '0.1rem 0.35rem',
+                          borderRadius: '4px',
+                          fontSize: '0.68rem',
+                          fontWeight: 700,
+                          background: tl.lightBg,
+                          color: tl.badgeColor,
+                        }}
+                      >
+                        {tl.label}
+                      </span>
+                    </td>
+                    <td style={{ padding: '0.5rem 0.65rem' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                        <div style={{ width: '45px', height: '6px', background: '#E2E8F0', borderRadius: '3px', overflow: 'hidden' }}>
+                          <div style={{ width: `${Math.min(prov.progressPct, 100)}%`, height: '100%', background: tl.bg, borderRadius: '3px' }} />
+                        </div>
+                        <span style={{ fontWeight: 800, color: '#0F172A', minWidth: '32px' }}>{prov.progressPct}%</span>
+                      </div>
+                    </td>
+                    <td style={{ padding: '0.5rem 0.65rem', textAlign: 'right' }}>
+                      <button
+                        type="button"
+                        onClick={() => openDrillDown(prov)}
+                        style={{
+                          background: '#0F766E',
+                          color: '#FFFFFF',
+                          border: 'none',
+                          borderRadius: '4px',
+                          padding: '0.2rem 0.5rem',
+                          fontSize: '0.7rem',
+                          fontWeight: 700,
+                          cursor: 'pointer',
+                        }}
+                      >
+                        Inspect ➔
+                      </button>
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
+      )}
+
+
+
+      {/* ════════════════════════════════════════════════════════════════
+          MULTI-LEVEL INTERACTIVE DRILL-DOWN MODAL / DRAWER
+         ════════════════════════════════════════════════════════════════ */}
+      {activeDrillProvince && (
+        <div
+          style={{
+            position: 'fixed',
+            inset: 0,
+            background: 'rgba(15, 23, 42, 0.7)',
+            backdropFilter: 'blur(6px)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            zIndex: 9999,
+            padding: '1.25rem',
+          }}
+          onClick={closeDrillDown}
+        >
+          <div
+            style={{
+              background: '#FFFFFF',
+              borderRadius: '16px',
+              maxWidth: '880px',
+              width: '100%',
+              maxHeight: '88vh',
+              overflowY: 'auto',
+              boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.35)',
+              border: '1px solid #E2E8F0',
+              display: 'flex',
+              flexDirection: 'column',
+              animation: 'fadeIn 0.2s ease',
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Modal Header (Matching Top Government Header) */}
+            <div
+              style={{
+                padding: '1.25rem 1.5rem',
+                borderBottom: '1px solid #E2E8F0',
+                background: 'linear-gradient(135deg, #0A192F 0%, #0F2A4A 60%, #173B63 100%)',
+                color: '#FFFFFF',
+                borderTopLeftRadius: '16px',
+                borderTopRightRadius: '16px',
+              }}
+            >
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.65rem' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem' }}>
+                  <span style={{ fontSize: '1.3rem' }}>🚦</span>
+                  <div>
+                    <h2 style={{ margin: 0, fontSize: '1.2rem', fontWeight: 800, color: '#FFFFFF', display: 'flex', alignItems: 'center', gap: '0.55rem' }}>
+                      <span>{activeDrillProvince.name}</span>
+                      <span
+                        style={{
+                          fontSize: '0.72rem',
+                          padding: '0.15rem 0.5rem',
+                          borderRadius: '6px',
+                          background: getTrafficLight(activeDrillProvince.progressPct).bg,
+                          color: '#FFFFFF',
+                          fontWeight: 700,
+                        }}
+                      >
+                        {activeDrillProvince.progressPct}% • {getTrafficLight(activeDrillProvince.progressPct).label}
+                      </span>
+                    </h2>
+                    <div style={{ fontSize: '0.75rem', color: '#94A3B8', marginTop: '2px' }}>
+                      Provincial Director: <strong>{activeDrillProvince.directorName}</strong> • Capital: {activeDrillProvince.capital}
+                    </div>
+                  </div>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={closeDrillDown}
+                  style={{
+                    background: 'rgba(255, 255, 255, 0.15)',
+                    border: 'none',
+                    borderRadius: '50%',
+                    width: '32px',
+                    height: '32px',
+                    color: '#FFFFFF',
+                    cursor: 'pointer',
+                    fontSize: '1rem',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                  }}
+                  title="Close modal"
+                >
+                  ✕
+                </button>
+              </div>
+
+              {/* Breadcrumb Navigation */}
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', fontSize: '0.76rem', color: '#94A3B8' }}>
+                <button
+                  type="button"
+                  onClick={() => setDrillLevel('province')}
+                  style={{
+                    background: 'transparent',
+                    border: 'none',
+                    color: drillLevel === 'province' ? '#38BDF8' : '#94A3B8',
+                    cursor: 'pointer',
+                    fontWeight: drillLevel === 'province' ? 800 : 500,
+                    padding: 0,
+                  }}
+                >
+                  🏛️ {activeDrillProvince.name} (Overview)
+                </button>
+                <span>›</span>
+                {activeDrillZone && (
+                  <button
+                    type="button"
+                    onClick={() => setDrillLevel('zone')}
+                    style={{
+                      background: 'transparent',
+                      border: 'none',
+                      color: drillLevel === 'zone' ? '#38BDF8' : '#94A3B8',
+                      cursor: 'pointer',
+                      fontWeight: drillLevel === 'zone' ? 800 : 500,
+                      padding: 0,
+                    }}
+                  >
+                    📍 {activeDrillZone.name}
+                  </button>
+                )}
+                {drillLevel === 'division' && activeDrillDivision && (
+                  <>
+                    <span>›</span>
+                    <span style={{ color: '#FCD34D', fontWeight: 800 }}>
+                      🔍 {activeDrillDivision.name} (Issues)
+                    </span>
+                  </>
+                )}
+              </div>
+            </div>
+
+            {/* Modal Body: Level 1 (Province) */}
+            {drillLevel === 'province' && (
+              <div style={{ padding: '1.35rem 1.5rem' }}>
+                {/* Summary Cards */}
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '0.85rem', marginBottom: '1.25rem' }}>
+                  <div style={{ background: '#F8FAFC', padding: '0.85rem', borderRadius: '10px', border: '1px solid #E2E8F0' }}>
+                    <div style={{ fontSize: '0.72rem', color: '#64748B', fontWeight: 600 }}>OVERALL EXECUTION RATE</div>
+                    <div style={{ fontSize: '1.45rem', fontWeight: 800, color: getTrafficLight(activeDrillProvince.progressPct).bg, marginTop: '2px' }}>
+                      {activeDrillProvince.progressPct}%
+                    </div>
+                  </div>
+
+                  <div style={{ background: '#F8FAFC', padding: '0.85rem', borderRadius: '10px', border: '1px solid #E2E8F0' }}>
+                    <div style={{ fontSize: '0.72rem', color: '#64748B', fontWeight: 600 }}>BUDGET EXPENDITURE</div>
+                    <div style={{ fontSize: '1.35rem', fontWeight: 800, color: '#0F172A', marginTop: '2px' }}>
+                      Rs. {activeDrillProvince.budgetSpentMn}M
+                    </div>
+                    <div style={{ fontSize: '0.68rem', color: '#64748B' }}>
+                      Allocated: Rs. {activeDrillProvince.budgetAllocatedMn}M
+                    </div>
+                  </div>
+
+                  <div style={{ background: '#F8FAFC', padding: '0.85rem', borderRadius: '10px', border: '1px solid #E2E8F0' }}>
+                    <div style={{ fontSize: '0.72rem', color: '#64748B', fontWeight: 600 }}>PLANS & WORKSHOPS</div>
+                    <div style={{ fontSize: '1.35rem', fontWeight: 800, color: '#0F766E', marginTop: '2px' }}>
+                      {activeDrillProvince.activitiesCount} Plans
+                    </div>
+                    <div style={{ fontSize: '0.68rem', color: '#64748B' }}>
+                      {activeDrillProvince.workshopsCount} Scheduled Workshops
+                    </div>
+                  </div>
+                </div>
+
+                {/* Priority Initiative */}
+                <div
+                  style={{
+                    background: '#F1F5F9',
+                    padding: '0.75rem 1rem',
+                    borderRadius: '8px',
+                    fontSize: '0.78rem',
+                    color: '#1E293B',
+                    marginBottom: '1.25rem',
+                    borderLeft: '4px solid #0284C7',
+                  }}
+                >
+                  <strong style={{ color: '#0F172A' }}>Provincial Priority Flagship:</strong> {activeDrillProvince.keyInitiative}
+                </div>
+
+                {/* Zone Breakdown */}
+                <h4 style={{ margin: '0 0 0.75rem', fontSize: '0.92rem', fontWeight: 800, color: '#0F172A' }}>
+                  Constituent Educational Zones ({activeDrillProvince.zones.length})
+                </h4>
+
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '0.85rem' }}>
+                  {activeDrillProvince.zones.map((zone) => {
+                    const ztl = getTrafficLight(zone.progressPct);
+                    const totalIssues = zone.divisions.reduce((acc, div) => acc + div.issues.length, 0);
+
+                    return (
+                      <div
+                        key={zone.id}
+                        style={{
+                          background: '#FFFFFF',
+                          border: '1px solid #E2E8F0',
+                          borderLeft: `4px solid ${ztl.bg}`,
+                          borderRadius: '10px',
+                          padding: '0.95rem',
+                          boxShadow: '0 2px 6px rgba(0,0,0,0.02)',
+                          display: 'flex',
+                          flexDirection: 'column',
+                          justifyContent: 'space-between',
+                        }}
+                      >
+                        <div>
+                          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.4rem' }}>
+                            <span style={{ fontWeight: 800, fontSize: '0.9rem', color: '#0F172A' }}>
+                              {zone.name}
+                            </span>
+                            <span
+                              style={{
+                                fontSize: '0.7rem',
+                                padding: '0.1rem 0.45rem',
+                                borderRadius: '4px',
+                                background: ztl.bg,
+                                color: '#FFFFFF',
+                                fontWeight: 800,
+                              }}
+                            >
+                              {zone.progressPct}%
+                            </span>
+                          </div>
+
+                          <div style={{ height: '6px', background: '#E2E8F0', borderRadius: '3px', overflow: 'hidden', marginBottom: '0.5rem' }}>
+                            <div style={{ width: `${Math.min(zone.progressPct, 100)}%`, height: '100%', background: ztl.bg, borderRadius: '3px' }} />
+                          </div>
+
+                          <div style={{ fontSize: '0.72rem', color: '#64748B', display: 'flex', justifyContent: 'space-between', marginBottom: '0.5rem' }}>
+                            <span>Budget: Rs. {zone.budgetSpentMn}M / {zone.budgetAllocatedMn}M</span>
+                            <span>{zone.divisionsCount} Divisions</span>
+                          </div>
+
+                          {totalIssues > 0 ? (
+                            <div style={{ fontSize: '0.7rem', color: '#DC2626', fontWeight: 700 }}>
+                              ⚠️ {totalIssues} Grass-roots Bottleneck{totalIssues > 1 ? 's' : ''} Flagged
+                            </div>
+                          ) : (
+                            <div style={{ fontSize: '0.7rem', color: '#166534', fontWeight: 700 }}>
+                              ✓ On Schedule
+                            </div>
+                          )}
+                        </div>
+
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setActiveDrillZone(zone);
+                            setActiveDrillDivision(zone.divisions[0] || null);
+                            setDrillLevel('zone');
+                          }}
+                          style={{
+                            background: '#F8FAFC',
+                            border: '1px solid #CBD5E1',
+                            borderRadius: '6px',
+                            padding: '0.35rem 0.5rem',
+                            fontSize: '0.74rem',
+                            fontWeight: 700,
+                            color: '#0F172A',
+                            cursor: 'pointer',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            gap: '0.35rem',
+                            marginTop: '0.75rem',
+                          }}
+                        >
+                          <span>Inspect Divisions</span>
+                          <span>➔</span>
+                        </button>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+
+            {/* Modal Body: Level 2 (Zone ➔ Divisions) */}
+            {drillLevel === 'zone' && activeDrillZone && (
+              <div style={{ padding: '1.35rem 1.5rem' }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.15rem', flexWrap: 'wrap', gap: '0.5rem' }}>
+                  <div>
+                    <h3 style={{ margin: 0, fontSize: '1.1rem', fontWeight: 800, color: '#0F172A', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                      <span>{activeDrillZone.name}</span>
+                      <span
+                        style={{
+                          fontSize: '0.7rem',
+                          padding: '0.15rem 0.45rem',
+                          borderRadius: '4px',
+                          background: getTrafficLight(activeDrillZone.progressPct).bg,
+                          color: '#FFFFFF',
+                          fontWeight: 700,
+                        }}
+                      >
+                        {activeDrillZone.progressPct}%
+                      </span>
+                    </h3>
+                    <div style={{ fontSize: '0.74rem', color: '#64748B', marginTop: '2px' }}>
+                      Zone Code: <strong>{activeDrillZone.code}</strong> • Budget: Rs. {activeDrillZone.budgetSpentMn}M / {activeDrillZone.budgetAllocatedMn}M
+                    </div>
+                  </div>
+
+                  <button
+                    type="button"
+                    onClick={() => setDrillLevel('province')}
+                    style={{
+                      background: '#F1F5F9',
+                      border: '1px solid #CBD5E1',
+                      borderRadius: '6px',
+                      padding: '0.3rem 0.65rem',
+                      fontSize: '0.74rem',
+                      fontWeight: 700,
+                      cursor: 'pointer',
+                      color: '#475569',
+                    }}
+                  >
+                    ← Back to All Zones
+                  </button>
+                </div>
+
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+                  {activeDrillZone.divisions.map((div) => {
+                    const dtl = getTrafficLight(div.progressPct);
+
+                    return (
+                      <div
+                        key={div.id}
+                        style={{
+                          background: '#FFFFFF',
+                          border: '1px solid #E2E8F0',
+                          borderLeft: `4px solid ${dtl.bg}`,
+                          borderRadius: '10px',
+                          padding: '0.95rem',
+                        }}
+                      >
+                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '0.5rem' }}>
+                          <div>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.45rem' }}>
+                              <span style={{ fontWeight: 800, fontSize: '0.92rem', color: '#0F172A' }}>{div.name}</span>
+                              <span style={{ fontSize: '0.68rem', color: '#64748B', background: '#F1F5F9', padding: '0.08rem 0.35rem', borderRadius: '4px' }}>
+                                {div.code}
+                              </span>
+                            </div>
+                            <div style={{ fontSize: '0.72rem', color: '#64748B', marginTop: '2px' }}>
+                              Schools: <strong>{div.activeSchoolsCount}</strong> • Budget: Rs. {div.budgetSpentMn}M / {div.budgetAllocatedMn}M
+                            </div>
+                          </div>
+
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem' }}>
+                            <div style={{ textAlign: 'right' }}>
+                              <div style={{ fontSize: '1rem', fontWeight: 800, color: dtl.bg }}>
+                                {div.progressPct}%
+                              </div>
+                              <div style={{ fontSize: '0.66rem', color: dtl.badgeColor, fontWeight: 700 }}>
+                                {dtl.label}
+                              </div>
+                            </div>
+
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setActiveDrillDivision(div);
+                                setDrillLevel('division');
+                              }}
+                              style={{
+                                background: div.issues.length > 0 ? '#DC2626' : '#0F766E',
+                                color: '#FFFFFF',
+                                border: 'none',
+                                borderRadius: '6px',
+                                padding: '0.4rem 0.75rem',
+                                fontSize: '0.74rem',
+                                fontWeight: 700,
+                                cursor: 'pointer',
+                              }}
+                            >
+                              {div.issues.length > 0 ? `Inspect Issues (${div.issues.length})` : 'Inspect'} ➔
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+
+            {/* Modal Body: Level 3 (Division ➔ Stalled Issues) */}
+            {drillLevel === 'division' && activeDrillDivision && (
+              <div style={{ padding: '1.35rem 1.5rem' }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.15rem', flexWrap: 'wrap', gap: '0.5rem' }}>
+                  <div>
+                    <h3 style={{ margin: 0, fontSize: '1.1rem', fontWeight: 800, color: '#0F172A', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                      <span>🔍 {activeDrillDivision.name}</span>
+                      <span
+                        style={{
+                          fontSize: '0.7rem',
+                          padding: '0.15rem 0.45rem',
+                          borderRadius: '4px',
+                          background: getTrafficLight(activeDrillDivision.progressPct).bg,
+                          color: '#FFFFFF',
+                          fontWeight: 700,
+                        }}
+                      >
+                        {activeDrillDivision.progressPct}%
+                      </span>
+                    </h3>
+                    <div style={{ fontSize: '0.74rem', color: '#64748B', marginTop: '2px' }}>
+                      Code: <strong>{activeDrillDivision.code}</strong> • Schools: <strong>{activeDrillDivision.activeSchoolsCount}</strong>
+                    </div>
+                  </div>
+
+                  <button
+                    type="button"
+                    onClick={() => setDrillLevel('zone')}
+                    style={{
+                      background: '#F1F5F9',
+                      border: '1px solid #CBD5E1',
+                      borderRadius: '6px',
+                      padding: '0.3rem 0.65rem',
+                      fontSize: '0.74rem',
+                      fontWeight: 700,
+                      cursor: 'pointer',
+                      color: '#475569',
+                    }}
+                  >
+                    ← Back to Divisions List
+                  </button>
+                </div>
+
+                {activeDrillDivision.issues.length === 0 ? (
+                  <div style={{ padding: '2rem', textAlign: 'center', background: '#F0FDF4', border: '1px solid #BBF7D0', borderRadius: '10px', color: '#166534' }}>
+                    <div style={{ fontSize: '1.8rem', marginBottom: '0.4rem' }}>✅</div>
+                    <div style={{ fontWeight: 800, fontSize: '0.95rem' }}>No Stalled Activities Found</div>
+                    <div style={{ fontSize: '0.76rem', color: '#15803D', marginTop: '3px' }}>
+                      All educational projects and teacher workshops are proceeding according to the Ministry AIP.
+                    </div>
+                  </div>
+                ) : (
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '0.85rem' }}>
+                    {activeDrillDivision.issues.map((issue) => (
+                      <div
+                        key={issue.id}
+                        style={{
+                          background: '#FFFFFF',
+                          border: '1px solid #E2E8F0',
+                          borderLeft: `4px solid ${issue.severity === 'Critical' ? '#DC2626' : issue.severity === 'High' ? '#EA580C' : '#EAB308'}`,
+                          borderRadius: '10px',
+                          padding: '1rem',
+                          boxShadow: '0 2px 6px rgba(0,0,0,0.03)',
+                        }}
+                      >
+                        <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '0.5rem', marginBottom: '0.55rem' }}>
+                          <div>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.45rem', flexWrap: 'wrap' }}>
+                              <span style={{ fontWeight: 800, fontSize: '0.92rem', color: '#0F172A' }}>
+                                {issue.title}
+                              </span>
+                              <span
+                                style={{
+                                  fontSize: '0.64rem',
+                                  padding: '0.1rem 0.4rem',
+                                  borderRadius: '4px',
+                                  fontWeight: 800,
+                                  background: issue.severity === 'Critical' ? '#DC2626' : issue.severity === 'High' ? '#EA580C' : '#EAB308',
+                                  color: '#FFFFFF',
+                                }}
+                              >
+                                {issue.severity.toUpperCase()}
+                              </span>
+                            </div>
+                            {issue.voteNumber && (
+                              <div style={{ fontSize: '0.68rem', color: '#64748B', marginTop: '2px' }}>
+                                Vote: <code>{issue.voteNumber}</code>
+                              </div>
+                            )}
+                          </div>
+
+                          <span style={{ background: '#FEF2F2', color: '#DC2626', border: '1px solid #FCA5A5', borderRadius: '4px', padding: '0.15rem 0.45rem', fontSize: '0.68rem', fontWeight: 800 }}>
+                            ⏳ {issue.daysDelayed}d delayed
+                          </span>
+                        </div>
+
+                        <div style={{ background: '#FFF7ED', border: '1px solid #FFEDD5', borderRadius: '6px', padding: '0.65rem', marginBottom: '0.5rem', fontSize: '0.74rem' }}>
+                          <strong style={{ color: '#9A3412' }}>Root Cause: </strong>
+                          <span style={{ color: '#7C2D12' }}>{issue.rootCause}</span>
+                        </div>
+
+                        <div style={{ background: '#F0FDF4', border: '1px solid #DCFCE7', borderRadius: '6px', padding: '0.65rem', marginBottom: '0.5rem', fontSize: '0.74rem' }}>
+                          <strong style={{ color: '#166534' }}>Corrective Action: </strong>
+                          <span style={{ color: '#14532D' }}>{issue.correctiveAction}</span>
+                        </div>
+
+                        <div style={{ fontSize: '0.72rem', color: '#64748B' }}>
+                          Officer: <strong style={{ color: '#0F172A' }}>{issue.responsibleOfficer}</strong>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* Modal Footer */}
+            <div
+              style={{
+                padding: '0.85rem 1.5rem',
+                borderTop: '1px solid #E2E8F0',
+                background: '#F8FAFC',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                borderBottomLeftRadius: '16px',
+                borderBottomRightRadius: '16px',
+              }}
+            >
+              <div style={{ fontSize: '0.72rem', color: '#64748B' }}>
+                Standards: <strong>MoE Traffic Light System</strong>
+              </div>
+
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                <button
+                  type="button"
+                  onClick={closeDrillDown}
+                  style={{
+                    background: '#FFFFFF',
+                    border: '1px solid #CBD5E1',
+                    borderRadius: '6px',
+                    padding: '0.35rem 0.85rem',
+                    fontSize: '0.76rem',
+                    fontWeight: 700,
+                    cursor: 'pointer',
+                    color: '#334155',
+                  }}
+                >
+                  Close
+                </button>
+
+                {isLoggedIn && (
+                  <Link
+                    href={`/workshops?province=${encodeURIComponent(activeDrillProvince.name)}`}
+                    style={{
+                      background: '#0F766E',
+                      color: '#FFFFFF',
+                      border: 'none',
+                      borderRadius: '6px',
+                      padding: '0.35rem 0.85rem',
+                      fontSize: '0.76rem',
+                      fontWeight: 700,
+                      textDecoration: 'none',
+                    }}
+                  >
+                    View Workshops →
+                  </Link>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+export default React.memo(RegionalMap);
