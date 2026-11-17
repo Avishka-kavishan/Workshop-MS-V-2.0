@@ -283,6 +283,112 @@ export default function AnnualPlanPage() {
   const [formIsAdjustedByPlanning, setFormIsAdjustedByPlanning] = useState(false);
   const [formOriginalProposedCost, setFormOriginalProposedCost] = useState('');
 
+  // User-Friendly UI State Enhancements
+  const [showLifecycleStages, setShowLifecycleStages] = useState(false);
+  const [showBranchTabs, setShowBranchTabs] = useState(true);
+  const [branchSearch, setBranchSearch] = useState('');
+  const [showMonthlyProgress, setShowMonthlyProgress] = useState(false);
+  const [showResponsibilityCard, setShowResponsibilityCard] = useState(false);
+  const [viewMode, setViewMode] = useState<'monthly' | 'quarterly'>('monthly');
+  const [decimalMode, setDecimalMode] = useState<'dual' | 'standard' | 'full'>('dual');
+
+  const formatMnValues = (val: number | string | null | undefined) => {
+    if (val === null || val === undefined || val === '') {
+      return { val2Dec: '-', valExact: '-', valRupees: 'Rs. 0.00', num: 0, isZero: true, hasExtraDecimals: false };
+    }
+    const n = parseAmountToMn(val);
+    if (isNaN(n) || n === 0) {
+      return { val2Dec: '0.00', valExact: '0.000000', valRupees: 'Rs. 0.00', num: 0, isZero: true, hasExtraDecimals: false };
+    }
+    const val2Dec = formatMillion(n, { minDecimals: 2, maxDecimals: 2 });
+    const valExact = formatMillion(n, { minDecimals: 6, maxDecimals: 6 });
+    const valRupees = formatRupees(n, true);
+    const hasExtraDecimals = Math.abs(n - parseFloat(val2Dec.replace(/,/g, ''))) > 0.000001;
+
+    return { val2Dec, valExact, valRupees, num: n, isZero: false, hasExtraDecimals };
+  };
+
+  const displayMn = (val: number | string | null | undefined, forceExact = false) => {
+    const { val2Dec, valExact, isZero } = formatMnValues(val);
+    if (val === null || val === undefined || val === '') return '-';
+    if (isZero) return '0.00';
+    if (forceExact || decimalMode === 'full') return valExact;
+    return val2Dec;
+  };
+
+  /**
+   * Render helper for table cells:
+   * Displays clean 2 decimals by default (e.g. 18.50, 1.54).
+   * In smaller font (or on hover), displays the exact 6-decimal precision (e.g. 18.500000, 1.541666).
+   * On mouse hover, shows full exact value tooltip with Rupee cents.
+   */
+  const renderMnCell = (
+    val: number | string | null | undefined,
+    options?: {
+      bold?: boolean;
+      color?: string;
+      align?: 'right' | 'center' | 'left';
+      prefix?: string;
+      suffix?: string;
+      alwaysShowSubtext?: boolean;
+    }
+  ) => {
+    if (val === null || val === undefined || val === '') return '-';
+    const { val2Dec, valExact, valRupees, isZero, hasExtraDecimals } = formatMnValues(val);
+    if (isZero) {
+      return (
+        <span
+          title="Exact: 0.000000 Mn (Rs. 0.00)"
+          style={{ color: '#94a3b8', fontSize: '0.75rem', cursor: 'help' }}
+        >
+          0.00
+        </span>
+      );
+    }
+
+    const align = options?.align || 'center';
+    const bold = options?.bold ?? true;
+    const color = options?.color || 'inherit';
+    const prefix = options?.prefix || '';
+    const suffix = options?.suffix || '';
+    const showSub = options?.alwaysShowSubtext || decimalMode === 'dual';
+
+    return (
+      <div
+        className="mn-hover-cell"
+        title={`Exact: ${valExact} Mn (${valRupees})`}
+        style={{
+          display: 'inline-flex',
+          flexDirection: 'column',
+          alignItems: align === 'right' ? 'flex-end' : align === 'center' ? 'center' : 'flex-start',
+          lineHeight: 1.15,
+          cursor: 'help',
+          width: '100%',
+        }}
+      >
+        <span style={{ fontWeight: bold ? 700 : 500, color, fontSize: '0.78rem' }}>
+          {prefix}{decimalMode === 'full' ? valExact : val2Dec}{suffix}
+        </span>
+        {showSub && decimalMode !== 'full' && (
+          <span
+            className="mn-subtext"
+            style={{
+              fontSize: '0.62rem',
+              color: hasExtraDecimals ? '#b45309' : '#64748b',
+              fontWeight: hasExtraDecimals ? 700 : 500,
+              fontFamily: 'monospace',
+              letterSpacing: '-0.02em',
+              lineHeight: 1,
+              marginTop: '1px',
+            }}
+          >
+            {valExact}
+          </span>
+        )}
+      </div>
+    );
+  };
+
   const handleTileClick = (filter: 'all' | 'completed' | 'in_progress' | 'scheduled' | 'high_budget') => {
     setActiveTileFilter((prev) => (prev === filter ? 'all' : filter));
   };
@@ -291,6 +397,12 @@ export default function AnnualPlanPage() {
   const branchProposedCount = useMemo(() => activities.filter((a) => !a.isAddedByPlanning).length, [activities]);
   const planningAddedCount = useMemo(() => activities.filter((a) => Boolean(a.isAddedByPlanning)).length, [activities]);
   const planningAdjustedCount = useMemo(() => activities.filter((a) => Boolean(a.isAdjustedByPlanning)).length, [activities]);
+
+  const filteredMoeBranches = useMemo(() => {
+    if (!branchSearch.trim()) return moeBranches;
+    const q = branchSearch.toLowerCase();
+    return moeBranches.filter((b) => b.name.toLowerCase().includes(q) || (b.code && b.code.toLowerCase().includes(q)));
+  }, [moeBranches, branchSearch]);
 
   // Filtered activities based on tile click and origin filter
   const displayedActivities = useMemo(() => {
@@ -1687,6 +1799,14 @@ export default function AnnualPlanPage() {
           font-weight: 700;
           color: #166534;
         }
+        .mn-hover-cell {
+          transition: background-color 0.15s ease, transform 0.1s ease;
+          border-radius: 4px;
+          padding: 1px 3px;
+        }
+        .mn-hover-cell:hover {
+          background-color: rgba(0, 83, 78, 0.09) !important;
+        }
         @media print {
           .no-print { display: none !important; }
           .app-sidebar, .app-header { display: none !important; }
@@ -1712,188 +1832,96 @@ export default function AnnualPlanPage() {
           alignItems: 'center',
           flexWrap: 'wrap',
           gap: '1rem',
-          marginBottom: '1.25rem',
+          marginBottom: '0.85rem',
         }}>
           <div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.25rem' }}>
-              <span style={{ fontSize: '1.75rem' }}>📅</span>
-              <h1 className="page-title" style={{ fontSize: '1.65rem', fontWeight: 800, color: '#7a1c2d', margin: 0 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.2rem' }}>
+              <span style={{ fontSize: '1.6rem' }}>📅</span>
+              <h1 className="page-title" style={{ fontSize: '1.5rem', fontWeight: 800, color: '#7a1c2d', margin: 0 }}>
                 Annual Implementation Plan (AIP)
               </h1>
             </div>
-            <p className="page-subtitle" style={{ margin: 0, fontSize: '0.875rem', color: '#6b7280' }}>
-              Ministry of Education Official Format • Implementation Matrix & Quarterly Targets
+            <p className="page-subtitle" style={{ margin: 0, fontSize: '0.82rem', color: '#6b7280' }}>
+              Ministry of Education Official Format • Implementation Matrix &amp; Quarterly Targets
             </p>
           </div>
 
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', flexWrap: 'wrap' }}>
-
-
-            {/* Year Selector */}
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', background: '#ffffff', padding: '4px 10px', borderRadius: '8px', border: '1px solid #d1d5db' }}>
-              <span style={{ fontSize: '0.8rem', fontWeight: 600, color: '#4b5563' }}>Year:</span>
-              <select
-                value={selectedYear}
-                onChange={(e) => setSelectedYear(e.target.value)}
-                style={{
-                  border: 'none',
-                  outline: 'none',
-                  fontSize: '0.9rem',
-                  fontWeight: 700,
-                  color: '#7a1c2d',
-                  background: 'transparent',
-                  cursor: 'pointer',
-                }}
-              >
-                <option value="2027">2027</option>
-                <option value="2026">2026</option>
-                <option value="2028">2028</option>
-              </select>
-            </div>
-
-            {/* Version / Amendment Selector */}
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', background: '#ffffff', padding: '4px 10px', borderRadius: '8px', border: '1px solid #d1d5db' }}>
-              <span style={{ fontSize: '0.8rem', fontWeight: 600, color: '#4b5563' }}>Plan / Revision:</span>
-              <SearchableSelect
-                value={selectedAmendmentNumber}
-                onChange={(e) => setSelectedAmendmentNumber(parseInt(e.target.value, 10))}
-                style={{ minWidth: '180px' }}
-              >
-                <option value={0}>📋 Original Plan</option>
-                {amendments.map((a) => (
-                  <option key={a.id} value={a.amendmentNumber}>
-                    🔄 Amendment 0{a.amendmentNumber}: {a.title} {a.deadline ? `(Due ${a.deadline})` : ''}
-                  </option>
-                ))}
-              </SearchableSelect>
-            </div>
-
-            {/* Planning Branch / Admin Tools */}
-            {isPrivileged && (
-              <>
-                <button
-                  onClick={handleOpenCallModal}
-                  style={{
-                    background: '#8D153A',
-                    color: '#ffffff',
-                    border: 'none',
-                    padding: '0.55rem 1rem',
-                    borderRadius: '8px',
-                    fontWeight: 700,
-                    fontSize: '0.85rem',
-                    cursor: 'pointer',
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '0.4rem',
-                    boxShadow: '0 2px 6px rgba(141, 21, 58, 0.25)',
-                  }}
-                  title="Initiate a new amendment cycle and broadcast notification to all branches"
-                >
-                  <span>📢</span> Call for Amendment
-                </button>
-
-                <button
-                  onClick={() => setIsTrackerModalOpen(true)}
-                  style={{
-                    background: '#ffffff',
-                    color: '#7a1c2d',
-                    border: '1px solid #7a1c2d',
-                    padding: '0.55rem 1rem',
-                    borderRadius: '8px',
-                    fontWeight: 700,
-                    fontSize: '0.85rem',
-                    cursor: 'pointer',
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '0.4rem',
-                  }}
-                  title="View submission progress of all branches for amendments"
-                >
-                  <span>📊</span> Submissions Tracker
-                </button>
-              </>
-            )}
-
-            {/* Planning Branch Approval Actions */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem', flexWrap: 'wrap' }}>
+            {/* Plan Approval / Status Pill */}
             {isPrivileged ? (
-              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap' }}>
-
-
-                {plan?.status === 'Submitted' ? (
-                  <>
-                    <button
-                      onClick={() => handleApproveOrReturnPlan('Approve')}
-                      disabled={isApproving}
-                      style={{
-                        background: '#166534',
-                        color: '#ffffff',
-                        border: 'none',
-                        padding: '0.55rem 1.15rem',
-                        borderRadius: '8px',
-                        fontWeight: 700,
-                        fontSize: '0.85rem',
-                        cursor: 'pointer',
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '0.4rem',
-                        boxShadow: '0 2px 6px rgba(22, 101, 52, 0.3)',
-                      }}
-                      title="Approve this implementation plan"
-                    >
-                      <span>✅</span> {isApproving ? 'Approving...' : 'Approve Plan'}
-                    </button>
-                    <button
-                      onClick={() => {
-                        const notes = prompt('Enter remarks/reason for returning this plan for revision:');
-                        if (notes !== null) handleApproveOrReturnPlan('Return', notes);
-                      }}
-                      disabled={isApproving}
-                      style={{
-                        background: '#fff',
-                        color: '#b91c1c',
-                        border: '1px solid #b91c1c',
-                        padding: '0.55rem 0.9rem',
-                        borderRadius: '8px',
-                        fontWeight: 700,
-                        fontSize: '0.85rem',
-                        cursor: 'pointer',
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '0.4rem',
-                      }}
-                      title="Return plan to branch for revision"
-                    >
-                      <span>↩️</span> Return for Revision
-                    </button>
-                  </>
-                ) : plan?.status === 'Approved' ? (
-                  <div style={{
-                    background: '#dcfce7',
-                    color: '#166534',
-                    border: '1px solid #86efac',
-                    padding: '0.5rem 0.9rem',
-                    borderRadius: '8px',
-                    fontWeight: 700,
-                    fontSize: '0.82rem',
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '0.35rem',
-                  }}>
-                    <span>✅</span> Approved Plan
-                  </div>
-                ) : null}
-              </div>
+              plan?.status === 'Submitted' ? (
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                  <button
+                    onClick={() => handleApproveOrReturnPlan('Approve')}
+                    disabled={isApproving}
+                    style={{
+                      background: '#166534',
+                      color: '#ffffff',
+                      border: 'none',
+                      padding: '0.45rem 1rem',
+                      borderRadius: '8px',
+                      fontWeight: 700,
+                      fontSize: '0.82rem',
+                      cursor: 'pointer',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '0.35rem',
+                      boxShadow: '0 2px 4px rgba(22, 101, 52, 0.25)',
+                    }}
+                    title="Approve this implementation plan"
+                  >
+                    <span>✅</span> {isApproving ? 'Approving...' : 'Approve Plan'}
+                  </button>
+                  <button
+                    onClick={() => {
+                      const notes = prompt('Enter remarks/reason for returning this plan for revision:');
+                      if (notes !== null) handleApproveOrReturnPlan('Return', notes);
+                    }}
+                    disabled={isApproving}
+                    style={{
+                      background: '#fff',
+                      color: '#b91c1c',
+                      border: '1px solid #b91c1c',
+                      padding: '0.45rem 0.8rem',
+                      borderRadius: '8px',
+                      fontWeight: 700,
+                      fontSize: '0.82rem',
+                      cursor: 'pointer',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '0.35rem',
+                    }}
+                    title="Return plan to branch for revision"
+                  >
+                    <span>↩️</span> Return for Revision
+                  </button>
+                </div>
+              ) : plan?.status === 'Approved' ? (
+                <div style={{
+                  background: '#dcfce7',
+                  color: '#166534',
+                  border: '1px solid #86efac',
+                  padding: '0.45rem 0.85rem',
+                  borderRadius: '8px',
+                  fontWeight: 700,
+                  fontSize: '0.8rem',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.35rem',
+                }}>
+                  <span>✅</span> Approved Plan
+                </div>
+              ) : null
             ) : (
-              /* Branch Officer Submit Button (Enabled for both Original Plan and Amendments) */
               plan?.status === 'Approved' ? (
                 <div style={{
                   background: '#dcfce7',
                   color: '#166534',
                   border: '1px solid #86efac',
-                  padding: '0.5rem 0.9rem',
+                  padding: '0.45rem 0.85rem',
                   borderRadius: '8px',
                   fontWeight: 700,
-                  fontSize: '0.82rem',
+                  fontSize: '0.8rem',
                   display: 'flex',
                   alignItems: 'center',
                   gap: '0.35rem',
@@ -1905,10 +1933,10 @@ export default function AnnualPlanPage() {
                   background: '#fef3c7',
                   color: '#92400e',
                   border: '1px solid #fde68a',
-                  padding: '0.5rem 0.9rem',
+                  padding: '0.45rem 0.85rem',
                   borderRadius: '8px',
                   fontWeight: 700,
-                  fontSize: '0.82rem',
+                  fontSize: '0.8rem',
                   display: 'flex',
                   alignItems: 'center',
                   gap: '0.35rem',
@@ -1922,21 +1950,159 @@ export default function AnnualPlanPage() {
                     background: '#166534',
                     color: '#ffffff',
                     border: 'none',
-                    padding: '0.55rem 1.15rem',
+                    padding: '0.45rem 1rem',
                     borderRadius: '8px',
                     fontWeight: 700,
-                    fontSize: '0.85rem',
+                    fontSize: '0.82rem',
                     cursor: 'pointer',
                     display: 'flex',
                     alignItems: 'center',
-                    gap: '0.4rem',
-                    boxShadow: '0 2px 6px rgba(22, 101, 52, 0.3)',
+                    gap: '0.35rem',
+                    boxShadow: '0 2px 4px rgba(22, 101, 52, 0.25)',
                   }}
                   title={`Submit to ${relevantPlanningBranch?.planningAuthorityLabel || 'Planning Branch'} for Approval`}
                 >
                   <span>📤</span> {selectedAmendmentNumber === 0 ? `Submit Plan to ${relevantPlanningBranch?.planningAuthorityLabel || 'Planning Branch'}` : `Submit Amendment 0${selectedAmendmentNumber}`}
                 </button>
               )
+            )}
+
+            {/* Primary Action Button: Add Activity */}
+            {(selectedAmendmentNumber === 0 ? plan?.status !== 'Approved' : isPrivileged) && (
+              <button
+                onClick={handleOpenAddModal}
+                style={{
+                  background: '#7a1c2d',
+                  color: '#ffffff',
+                  border: 'none',
+                  padding: '0.45rem 1rem',
+                  borderRadius: '8px',
+                  fontWeight: 700,
+                  fontSize: '0.84rem',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.35rem',
+                  boxShadow: '0 2px 5px rgba(122, 28, 45, 0.25)',
+                }}
+              >
+                <span>➕</span> Add Activity
+              </button>
+            )}
+
+            <TileActionMenu
+              tileTitle="Annual Implementation Plan (AIP)"
+              exportData={aipExportData}
+              onRefresh={() => loadPlanData(selectedBranchId, selectedAmendmentNumber)}
+              position="right"
+            />
+          </div>
+        </div>
+
+        {/* ── Toolbar Card (Selectors & Secondary Actions) ── */}
+        <div
+          className="no-print"
+          style={{
+            background: '#ffffff',
+            border: '1px solid #e2e8f0',
+            borderRadius: '10px',
+            padding: '0.65rem 1rem',
+            marginBottom: '1rem',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            flexWrap: 'wrap',
+            gap: '0.65rem',
+            boxShadow: '0 1px 3px rgba(0,0,0,0.03)',
+          }}
+        >
+          {/* Selectors Group */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem', flexWrap: 'wrap' }}>
+            {/* Year Selector */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', background: '#f8fafc', padding: '3px 8px', borderRadius: '6px', border: '1px solid #cbd5e1' }}>
+              <span style={{ fontSize: '0.76rem', fontWeight: 600, color: '#475569' }}>Year:</span>
+              <select
+                value={selectedYear}
+                onChange={(e) => setSelectedYear(e.target.value)}
+                style={{
+                  border: 'none',
+                  outline: 'none',
+                  fontSize: '0.85rem',
+                  fontWeight: 700,
+                  color: '#7a1c2d',
+                  background: 'transparent',
+                  cursor: 'pointer',
+                }}
+              >
+                <option value="2027">2027</option>
+                <option value="2026">2026</option>
+                <option value="2028">2028</option>
+              </select>
+            </div>
+
+            {/* Version / Amendment Selector */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', background: '#f8fafc', padding: '3px 8px', borderRadius: '6px', border: '1px solid #cbd5e1' }}>
+              <span style={{ fontSize: '0.76rem', fontWeight: 600, color: '#475569' }}>Plan / Revision:</span>
+              <SearchableSelect
+                value={selectedAmendmentNumber}
+                onChange={(e) => setSelectedAmendmentNumber(parseInt(e.target.value, 10))}
+                style={{ minWidth: '160px' }}
+              >
+                <option value={0}>📋 Original Plan</option>
+                {amendments.map((a) => (
+                  <option key={a.id} value={a.amendmentNumber}>
+                    🔄 Amendment 0{a.amendmentNumber}: {a.title} {a.deadline ? `(Due ${a.deadline})` : ''}
+                  </option>
+                ))}
+              </SearchableSelect>
+            </div>
+          </div>
+
+          {/* Action Buttons Group */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.45rem', flexWrap: 'wrap' }}>
+            {/* Planning Branch / Admin Tools */}
+            {isPrivileged && (
+              <>
+                <button
+                  onClick={handleOpenCallModal}
+                  style={{
+                    background: '#8D153A',
+                    color: '#ffffff',
+                    border: 'none',
+                    padding: '0.4rem 0.8rem',
+                    borderRadius: '6px',
+                    fontWeight: 700,
+                    fontSize: '0.78rem',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '0.3rem',
+                  }}
+                  title="Initiate a new amendment cycle and broadcast notification to all branches"
+                >
+                  <span>📢</span> Call for Amendment
+                </button>
+
+                <button
+                  onClick={() => setIsTrackerModalOpen(true)}
+                  style={{
+                    background: '#ffffff',
+                    color: '#7a1c2d',
+                    border: '1px solid #7a1c2d',
+                    padding: '0.4rem 0.8rem',
+                    borderRadius: '6px',
+                    fontWeight: 700,
+                    fontSize: '0.78rem',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '0.3rem',
+                  }}
+                  title="View submission progress of all branches for amendments"
+                >
+                  <span>📊</span> Submissions Tracker
+                </button>
+              </>
             )}
 
             {/* Import PPB Approved Activities Button */}
@@ -1949,15 +2115,14 @@ export default function AnnualPlanPage() {
                   background: '#00534E',
                   color: '#ffffff',
                   border: 'none',
-                  padding: '0.55rem 1.15rem',
-                  borderRadius: '8px',
+                  padding: '0.4rem 0.85rem',
+                  borderRadius: '6px',
                   fontWeight: 700,
-                  fontSize: '0.85rem',
+                  fontSize: '0.78rem',
                   cursor: 'pointer',
                   display: 'inline-flex',
                   alignItems: 'center',
-                  gap: '0.4rem',
-                  boxShadow: '0 2px 6px rgba(0, 83, 78, 0.25)',
+                  gap: '0.3rem',
                 }}
                 title="Import activities approved by Policy & Planning Branch (PPB) with assigned activity numbers and vote numbers"
               >
@@ -1978,16 +2143,15 @@ export default function AnnualPlanPage() {
                   style={{
                     background: plan?.isDispatchedToBranch ? '#ffffff' : '#00534E',
                     color: plan?.isDispatchedToBranch ? '#00534E' : '#ffffff',
-                    border: plan?.isDispatchedToBranch ? '1.5px solid #00534E' : 'none',
-                    padding: '0.55rem 1.15rem',
-                    borderRadius: '8px',
+                    border: plan?.isDispatchedToBranch ? '1px solid #00534E' : 'none',
+                    padding: '0.4rem 0.85rem',
+                    borderRadius: '6px',
                     fontWeight: 700,
-                    fontSize: '0.85rem',
+                    fontSize: '0.78rem',
                     cursor: 'pointer',
                     display: 'inline-flex',
                     alignItems: 'center',
-                    gap: '0.4rem',
-                    boxShadow: plan?.isDispatchedToBranch ? 'none' : '0 2px 6px rgba(0, 83, 78, 0.25)',
+                    gap: '0.3rem',
                   }}
                   title={`Dispatch official voted annual plan with vote numbers to ${branchInfo?.name || 'Branch'}`}
                 >
@@ -2002,15 +2166,14 @@ export default function AnnualPlanPage() {
                     background: '#6B21A8',
                     color: '#ffffff',
                     border: 'none',
-                    padding: '0.55rem 1rem',
-                    borderRadius: '8px',
+                    padding: '0.4rem 0.8rem',
+                    borderRadius: '6px',
                     fontWeight: 700,
-                    fontSize: '0.85rem',
+                    fontSize: '0.78rem',
                     cursor: 'pointer',
                     display: 'inline-flex',
                     alignItems: 'center',
-                    gap: '0.4rem',
-                    boxShadow: '0 2px 6px rgba(107, 33, 168, 0.25)',
+                    gap: '0.3rem',
                   }}
                   title="Add top-down government vision / planning directive activity directly into this branch plan"
                 >
@@ -2020,126 +2183,21 @@ export default function AnnualPlanPage() {
               </>
             )}
 
-            {/* Planning Branch: Send Amendment to this branch / Remove Amendment */}
-            {isPrivileged && selectedAmendmentNumber > 0 && plan?.status !== 'Submitted' && (
-              <>
-                <button
-                  type="button"
-                  onClick={handleDispatchAmendmentToBranch}
-                  disabled={isDispatching}
-                  style={{
-                    background: plan?.isDispatchedToBranch ? '#ffffff' : '#0284c7',
-                    color: plan?.isDispatchedToBranch ? '#0369a1' : '#ffffff',
-                    border: plan?.isDispatchedToBranch ? '1.5px solid #0284c7' : 'none',
-                    padding: '0.55rem 1.15rem',
-                    borderRadius: '8px',
-                    fontWeight: 700,
-                    fontSize: '0.85rem',
-                    cursor: isDispatching ? 'not-allowed' : 'pointer',
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    gap: '0.4rem',
-                    boxShadow: plan?.isDispatchedToBranch ? 'none' : '0 2px 6px rgba(2, 132, 199, 0.25)',
-                  }}
-                  title={`Send prepared Amendment 0${selectedAmendmentNumber} to ${branchInfo?.name || 'this branch'} so they can fill actual progress`}
-                >
-                  <span>{plan?.isDispatchedToBranch ? '📨' : '📤'}</span>
-                  <span>
-                    {isDispatching 
-                      ? 'Sending...' 
-                      : plan?.isDispatchedToBranch 
-                      ? `Re-send to ${branchInfo?.name?.replace(/^MOE\s+/i, '') || 'Branch'}` 
-                      : `Send Amendment to ${branchInfo?.name?.replace(/^MOE\s+/i, '') || 'Branch'}`}
-                  </span>
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => handleDeleteAmendment()}
-                  disabled={isDeletingAmendment}
-                  style={{
-                    background: '#ffffff',
-                    color: '#b91c1c',
-                    border: '1.5px solid #f87171',
-                    padding: '0.55rem 1rem',
-                    borderRadius: '8px',
-                    fontWeight: 700,
-                    fontSize: '0.85rem',
-                    cursor: isDeletingAmendment ? 'not-allowed' : 'pointer',
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    gap: '0.4rem',
-                  }}
-                  title={`Permanently remove Amendment 0${selectedAmendmentNumber}`}
-                >
-                  <span>🗑️</span>
-                  <span>{isDeletingAmendment ? 'Removing...' : 'Remove Amendment'}</span>
-                </button>
-              </>
-            )}
-
-            {/* Save Actual Progress Updates (for Amendments) */}
-            {selectedAmendmentNumber > 0 && plan?.status !== 'Submitted' && plan?.status !== 'Approved' && (
-              <button
-                type="button"
-                onClick={handleSaveAllProgress}
-                disabled={isSavingProgress}
-                style={{
-                  background: progressSavedSuccess ? '#15803d' : '#ffffff',
-                  color: progressSavedSuccess ? '#ffffff' : '#15803d',
-                  border: '2px solid #15803d',
-                  padding: '0.55rem 1.15rem',
-                  borderRadius: '8px',
-                  fontWeight: 700,
-                  fontSize: '0.85rem',
-                  cursor: 'pointer',
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: '0.4rem',
-                }}
-                title="Save all actual progress numbers entered in the green and peach columns"
-              >
-                {progressSavedSuccess ? '✅ Progress Saved!' : isSavingProgress ? '⏳ Saving...' : '💾 Save Progress Updates'}
-              </button>
-            )}
-
-            {/* Add Activity: In Original Plan, open to branch. In Amendments, only Planning/Admin can add new activity items */}
-            {(selectedAmendmentNumber === 0 ? plan?.status !== 'Approved' : isPrivileged) && (
-              <button
-                onClick={handleOpenAddModal}
-                style={{
-                  background: '#7a1c2d',
-                  color: '#ffffff',
-                  border: 'none',
-                  padding: '0.55rem 1.15rem',
-                  borderRadius: '8px',
-                  fontWeight: 700,
-                  fontSize: '0.875rem',
-                  cursor: 'pointer',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '0.4rem',
-                  boxShadow: '0 2px 6px rgba(122, 28, 45, 0.25)',
-                }}
-              >
-                <span>➕</span> Add Activity
-              </button>
-            )}
-
+            {/* Export buttons */}
             <button
               onClick={handleExportCSV}
               style={{
                 background: '#ffffff',
                 color: '#374151',
-                border: '1px solid #d1d5db',
-                padding: '0.55rem 1rem',
-                borderRadius: '8px',
+                border: '1px solid #cbd5e1',
+                padding: '0.4rem 0.75rem',
+                borderRadius: '6px',
                 fontWeight: 600,
-                fontSize: '0.875rem',
+                fontSize: '0.78rem',
                 cursor: 'pointer',
                 display: 'flex',
                 alignItems: 'center',
-                gap: '0.4rem',
+                gap: '0.3rem',
               }}
             >
               <span>📥</span> Export CSV
@@ -2150,28 +2208,20 @@ export default function AnnualPlanPage() {
               style={{
                 background: '#ffffff',
                 color: '#7a1c2d',
-                border: '1.5px solid #7a1c2d',
-                padding: '0.55rem 1rem',
-                borderRadius: '8px',
+                border: '1px solid #7a1c2d',
+                padding: '0.4rem 0.75rem',
+                borderRadius: '6px',
                 fontWeight: 700,
-                fontSize: '0.875rem',
+                fontSize: '0.78rem',
                 cursor: 'pointer',
                 display: 'flex',
                 alignItems: 'center',
-                gap: '0.4rem',
-                boxShadow: '0 2px 6px rgba(122, 28, 45, 0.15)',
+                gap: '0.3rem',
               }}
               title="Export official Landscape PDF optimized for paper saving, clear readability, and institutional hard copy filing"
             >
               <span>🖨️</span> Landscape PDF / Print
             </button>
-
-            <TileActionMenu
-              tileTitle="Annual Implementation Plan (AIP)"
-              exportData={aipExportData}
-              onRefresh={() => loadPlanData(selectedBranchId, selectedAmendmentNumber)}
-              position="right"
-            />
           </div>
         </div>
 
@@ -2184,7 +2234,7 @@ export default function AnnualPlanPage() {
             border: '1px solid #e2e8f0',
             boxShadow: '0 2px 6px rgba(0,0,0,0.03)',
             marginBottom: '1rem',
-            padding: '0.75rem 1rem',
+            padding: '0.6rem 1rem',
           }}
         >
           <div
@@ -2192,12 +2242,12 @@ export default function AnnualPlanPage() {
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'space-between',
-              marginBottom: '0.65rem',
+              marginBottom: showLifecycleStages ? '0.65rem' : '0',
               flexWrap: 'wrap',
               gap: '0.5rem',
             }}
           >
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap' }}>
               <span style={{ fontSize: '1.1rem' }}>🔄</span>
               <span style={{ fontSize: '0.82rem', fontWeight: 800, color: '#1e293b', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
                 AIP Official 6-Stage Process Lifecycle Sequence
@@ -2205,6 +2255,19 @@ export default function AnnualPlanPage() {
               <span style={{ fontSize: '0.72rem', color: '#64748b', fontWeight: 600 }}>
                 • National Education Planning Standard
               </span>
+              {!showLifecycleStages && (
+                <span style={{
+                  fontSize: '0.72rem',
+                  fontWeight: 700,
+                  color: '#166534',
+                  background: '#dcfce7',
+                  padding: '2px 8px',
+                  borderRadius: '12px',
+                  border: '1px solid #bbf7d0',
+                }}>
+                  {currentStageStatus.stage4.complete ? 'Stage 4: Dispatched & Voted' : currentStageStatus.stage3.complete ? 'Stage 3: PPB Approved' : currentStageStatus.stage1.complete ? 'Stage 1: Submitted' : 'Stage 1: Proposals Active'}
+                </span>
+              )}
             </div>
 
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap' }}>
@@ -2251,10 +2314,27 @@ export default function AnnualPlanPage() {
                   <span>{isConsolidated ? 'Consolidated Active' : 'View Ministry Consolidation'}</span>
                 </button>
               )}
+              <button
+                type="button"
+                onClick={() => setShowLifecycleStages(!showLifecycleStages)}
+                style={{
+                  background: '#f8fafc',
+                  border: '1px solid #cbd5e1',
+                  color: '#475569',
+                  padding: '2px 8px',
+                  borderRadius: '6px',
+                  fontSize: '0.72rem',
+                  fontWeight: 700,
+                  cursor: 'pointer',
+                }}
+              >
+                {showLifecycleStages ? '▲ Hide Stages' : '▼ Show All 6 Stages'}
+              </button>
             </div>
           </div>
 
           {/* Stepper Grid (6 Steps in 1 Row) */}
+          {showLifecycleStages && (
           <div
             style={{
               display: 'grid',
@@ -2425,6 +2505,7 @@ export default function AnnualPlanPage() {
               </div>
             </a>
           </div>
+          )}
         </div>
 
         {/* ── Google Sheets-Style Branch Sheet Tab Bar (Planning Branch & Admin Master Mode) ── */}
@@ -2440,7 +2521,7 @@ export default function AnnualPlanPage() {
             {/* Header / Sub-title bar */}
             <div style={{
               background: '#f8fafc',
-              padding: '0.6rem 1rem',
+              padding: '0.5rem 1rem',
               borderBottom: '1px solid #e2e8f0',
               display: 'flex',
               justifyContent: 'space-between',
@@ -2450,7 +2531,7 @@ export default function AnnualPlanPage() {
             }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                 <span style={{ fontSize: '1rem' }}>📑</span>
-                <span style={{ fontWeight: 800, fontSize: '0.875rem', color: '#1e293b' }}>
+                <span style={{ fontWeight: 800, fontSize: '0.85rem', color: '#1e293b' }}>
                   Branch Sheets (Workbook Tabs)
                 </span>
                 <span style={{
@@ -2465,124 +2546,159 @@ export default function AnnualPlanPage() {
                 </span>
               </div>
 
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                <input
+                  type="text"
+                  placeholder="🔍 Filter branch..."
+                  value={branchSearch}
+                  onChange={(e) => setBranchSearch(e.target.value)}
+                  style={{
+                    padding: '3px 8px',
+                    fontSize: '0.75rem',
+                    border: '1px solid #cbd5e1',
+                    borderRadius: '6px',
+                    width: '150px',
+                    outline: 'none',
+                    background: '#ffffff',
+                  }}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowBranchTabs(!showBranchTabs)}
+                  style={{
+                    background: '#f8fafc',
+                    border: '1px solid #cbd5e1',
+                    color: '#475569',
+                    padding: '3px 8px',
+                    borderRadius: '6px',
+                    fontSize: '0.72rem',
+                    fontWeight: 700,
+                    cursor: 'pointer',
+                  }}
+                >
+                  {showBranchTabs ? '▲ Hide Tabs' : '▼ Show Tabs'}
+                </button>
+              </div>
             </div>
 
             {/* Scrollable sheet tabs row */}
-            <div style={{
-              display: 'flex',
-              alignItems: 'stretch',
-              overflowX: 'auto',
-              background: '#f1f5f9',
-              padding: '0.4rem 0.6rem 0 0.6rem',
-              gap: '0.35rem',
-            }}>
-              {/* Consolidated Ministry AIP Tab */}
-              <button
-                type="button"
-                onClick={() => handleBranchChange('all')}
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '0.45rem',
-                  padding: '0.55rem 0.95rem',
-                  fontSize: '0.82rem',
-                  fontWeight: (selectedBranchId === 'all' || isConsolidated) ? 700 : 500,
-                  color: (selectedBranchId === 'all' || isConsolidated) ? '#00534E' : '#475569',
-                  background: (selectedBranchId === 'all' || isConsolidated) ? '#ffffff' : 'transparent',
-                  borderTop: (selectedBranchId === 'all' || isConsolidated) ? '3px solid #00534E' : '3px solid transparent',
-                  borderLeft: (selectedBranchId === 'all' || isConsolidated) ? '1px solid #cbd5e1' : '1px solid transparent',
-                  borderRight: (selectedBranchId === 'all' || isConsolidated) ? '1px solid #cbd5e1' : '1px solid transparent',
-                  borderBottom: (selectedBranchId === 'all' || isConsolidated) ? '1px solid #ffffff' : '1px solid transparent',
-                  borderRadius: '6px 6px 0 0',
-                  cursor: 'pointer',
-                  whiteSpace: 'nowrap',
-                  transition: 'all 0.15s ease',
-                  boxShadow: (selectedBranchId === 'all' || isConsolidated) ? '0 -2px 5px rgba(0,0,0,0.05)' : 'none',
-                }}
-                title="Consolidated Ministry-Level AIP: All operational branches aggregated into one unified implementation plan"
-              >
-                <span style={{ fontSize: '0.95rem' }}>🌐</span>
-                <span>Consolidated Ministry AIP</span>
-                <span style={{
-                  fontSize: '0.68rem',
-                  fontWeight: 700,
-                  padding: '1px 6px',
-                  borderRadius: '10px',
-                  background: '#dcfce7',
-                  color: '#166534',
-                }}>
-                  All Branches
-                </span>
-              </button>
+            {showBranchTabs && (
+              <div style={{
+                display: 'flex',
+                alignItems: 'stretch',
+                overflowX: 'auto',
+                background: '#f1f5f9',
+                padding: '0.4rem 0.6rem 0 0.6rem',
+                gap: '0.35rem',
+              }}>
+                {/* Consolidated Ministry AIP Tab */}
+                <button
+                  type="button"
+                  onClick={() => handleBranchChange('all')}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '0.45rem',
+                    padding: '0.55rem 0.95rem',
+                    fontSize: '0.82rem',
+                    fontWeight: (selectedBranchId === 'all' || isConsolidated) ? 700 : 500,
+                    color: (selectedBranchId === 'all' || isConsolidated) ? '#00534E' : '#475569',
+                    background: (selectedBranchId === 'all' || isConsolidated) ? '#ffffff' : 'transparent',
+                    borderTop: (selectedBranchId === 'all' || isConsolidated) ? '3px solid #00534E' : '3px solid transparent',
+                    borderLeft: (selectedBranchId === 'all' || isConsolidated) ? '1px solid #cbd5e1' : '1px solid transparent',
+                    borderRight: (selectedBranchId === 'all' || isConsolidated) ? '1px solid #cbd5e1' : '1px solid transparent',
+                    borderBottom: (selectedBranchId === 'all' || isConsolidated) ? '1px solid #ffffff' : '1px solid transparent',
+                    borderRadius: '6px 6px 0 0',
+                    cursor: 'pointer',
+                    whiteSpace: 'nowrap',
+                    transition: 'all 0.15s ease',
+                    boxShadow: (selectedBranchId === 'all' || isConsolidated) ? '0 -2px 5px rgba(0,0,0,0.05)' : 'none',
+                  }}
+                  title="Consolidated Ministry-Level AIP: All operational branches aggregated into one unified implementation plan"
+                >
+                  <span style={{ fontSize: '0.95rem' }}>🌐</span>
+                  <span>Consolidated Ministry AIP</span>
+                  <span style={{
+                    fontSize: '0.68rem',
+                    fontWeight: 700,
+                    padding: '1px 6px',
+                    borderRadius: '10px',
+                    background: '#dcfce7',
+                    color: '#166534',
+                  }}>
+                    All Branches
+                  </span>
+                </button>
 
-              {moeBranches.map((br) => {
-                const isActive = (branchInfo?.id || selectedBranchId) === br.id;
-                const amendSubmission = currentAmendment?.branchSubmissions?.find((s) => s.branchId === br.id);
-                const isSubmitted = amendSubmission?.status === 'Submitted' || amendSubmission?.status === 'Approved';
+                {filteredMoeBranches.map((br) => {
+                  const isActive = (branchInfo?.id || selectedBranchId) === br.id;
+                  const amendSubmission = currentAmendment?.branchSubmissions?.find((s) => s.branchId === br.id);
+                  const isSubmitted = amendSubmission?.status === 'Submitted' || amendSubmission?.status === 'Approved';
 
-                return (
-                  <button
-                    key={br.id}
-                    type="button"
-                    onClick={() => handleBranchChange(br.id)}
-                    style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: '0.45rem',
-                      padding: '0.55rem 0.95rem',
-                      fontSize: '0.82rem',
-                      fontWeight: isActive ? 700 : 500,
-                      color: isActive ? '#7a1c2d' : '#475569',
-                      background: isActive ? '#ffffff' : 'transparent',
-                      borderTop: isActive ? '3px solid #7a1c2d' : '3px solid transparent',
-                      borderLeft: isActive ? '1px solid #cbd5e1' : '1px solid transparent',
-                      borderRight: isActive ? '1px solid #cbd5e1' : '1px solid transparent',
-                      borderBottom: isActive ? '1px solid #ffffff' : '1px solid transparent',
-                      borderRadius: '6px 6px 0 0',
-                      cursor: 'pointer',
-                      whiteSpace: 'nowrap',
-                      transition: 'all 0.15s ease',
-                      boxShadow: isActive ? '0 -2px 5px rgba(0,0,0,0.05)' : 'none',
-                    }}
-                    title={`Switch to sheet for ${br.name}`}
-                  >
-                    <BranchBadge name={br.name} showName={false} size="xs" />
-                    <span>{br.name.replace(/^MOE\s+/i, '')}</span>
-                    {selectedAmendmentNumber > 0 ? (
-                      <span style={{
-                        fontSize: '0.68rem',
-                        fontWeight: 700,
-                        padding: '1px 6px',
-                        borderRadius: '10px',
-                        background: isSubmitted ? '#dcfce7' : amendSubmission?.isDispatchedToBranch ? '#e0f2fe' : '#fef3c7',
-                        color: isSubmitted ? '#166534' : amendSubmission?.isDispatchedToBranch ? '#0369a1' : '#92400e',
-                      }}>
-                        {isSubmitted ? '✓ Done' : amendSubmission?.isDispatchedToBranch ? 'Sent to Branch' : 'Draft'}
-                      </span>
-                    ) : (
-                      (() => {
-                        const origSub = (originalPlanSubmissions || []).find((s: any) => s.branchId === br.id);
-                        const isAppr = origSub?.status === 'Approved';
-                        const isSubm = origSub?.status === 'Submitted';
-                        if (!isAppr && !isSubm) return null;
-                        return (
-                          <span style={{
-                            fontSize: '0.68rem',
-                            fontWeight: 700,
-                            padding: '1px 6px',
-                            borderRadius: '10px',
-                            background: isAppr ? '#dcfce7' : '#fef3c7',
-                            color: isAppr ? '#166534' : '#92400e',
-                          }}>
-                            {isAppr ? '✓ Approved' : 'Submitted'}
-                          </span>
-                        );
-                      })()
-                    )}
-                  </button>
-                );
-              })}
-            </div>
+                  return (
+                    <button
+                      key={br.id}
+                      type="button"
+                      onClick={() => handleBranchChange(br.id)}
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '0.45rem',
+                        padding: '0.55rem 0.95rem',
+                        fontSize: '0.82rem',
+                        fontWeight: isActive ? 700 : 500,
+                        color: isActive ? '#7a1c2d' : '#475569',
+                        background: isActive ? '#ffffff' : 'transparent',
+                        borderTop: isActive ? '3px solid #7a1c2d' : '3px solid transparent',
+                        borderLeft: isActive ? '1px solid #cbd5e1' : '1px solid transparent',
+                        borderRight: isActive ? '1px solid #cbd5e1' : '1px solid transparent',
+                        borderBottom: isActive ? '1px solid #ffffff' : '1px solid transparent',
+                        borderRadius: '6px 6px 0 0',
+                        cursor: 'pointer',
+                        whiteSpace: 'nowrap',
+                        transition: 'all 0.15s ease',
+                        boxShadow: isActive ? '0 -2px 5px rgba(0,0,0,0.05)' : 'none',
+                      }}
+                      title={`Switch to sheet for ${br.name}`}
+                    >
+                      <BranchBadge name={br.name} showName={false} size="xs" />
+                      <span>{br.name.replace(/^MOE\s+/i, '')}</span>
+                      {selectedAmendmentNumber > 0 ? (
+                        <span style={{
+                          fontSize: '0.68rem',
+                          fontWeight: 700,
+                          padding: '1px 6px',
+                          borderRadius: '10px',
+                          background: isSubmitted ? '#dcfce7' : amendSubmission?.isDispatchedToBranch ? '#e0f2fe' : '#fef3c7',
+                          color: isSubmitted ? '#166534' : amendSubmission?.isDispatchedToBranch ? '#0369a1' : '#92400e',
+                        }}>
+                          {isSubmitted ? '✓ Done' : amendSubmission?.isDispatchedToBranch ? 'Sent to Branch' : 'Draft'}
+                        </span>
+                      ) : (
+                        (() => {
+                          const origSub = (originalPlanSubmissions || []).find((s: any) => s.branchId === br.id);
+                          const isAppr = origSub?.status === 'Approved';
+                          const isSubm = origSub?.status === 'Submitted';
+                          if (!isAppr && !isSubm) return null;
+                          return (
+                            <span style={{
+                              fontSize: '0.68rem',
+                              fontWeight: 700,
+                              padding: '1px 6px',
+                              borderRadius: '10px',
+                              background: isAppr ? '#dcfce7' : '#fef3c7',
+                              color: isAppr ? '#166534' : '#92400e',
+                            }}>
+                              {isAppr ? '✓ Approved' : 'Submitted'}
+                            </span>
+                          );
+                        })()
+                      )}
+                    </button>
+                  );
+                })}
+              </div>
+            )}
           </div>
         )}
 
@@ -2640,8 +2756,16 @@ export default function AnnualPlanPage() {
                     />
                   </div>
                 </div>
-                <div style={{ fontSize: '1.45rem', fontWeight: 800, color: '#00534E', lineHeight: 1.2 }}>
-                  Rs. {formatMillion(totals.totalEstimatedCost)} Mn
+                <div
+                  title={`Exact Plan Budget: ${formatMillion(totals.totalEstimatedCost, { minDecimals: 6, maxDecimals: 6 })} Mn (${formatRupees(totals.totalEstimatedCost, true)})`}
+                  style={{ cursor: 'help' }}
+                >
+                  <div style={{ fontSize: '1.45rem', fontWeight: 800, color: '#00534E', lineHeight: 1.2 }}>
+                    Rs. {displayMn(totals.totalEstimatedCost)} Mn
+                  </div>
+                  <div style={{ fontSize: '0.68rem', color: '#64748b', fontWeight: 600, fontFamily: 'monospace', marginTop: '2px' }}>
+                    {formatMillion(totals.totalEstimatedCost, { minDecimals: 6, maxDecimals: 6 })} Mn
+                  </div>
                 </div>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: '0.72rem', color: '#64748B', marginTop: '0.25rem' }}>
                   <span title={`Exact vote allocation: ${formatRupees(totals.totalEstimatedCost, true)}`}>
@@ -2796,8 +2920,16 @@ export default function AnnualPlanPage() {
                     />
                   </div>
                 </div>
-                <div style={{ fontSize: '1.45rem', fontWeight: 800, color: '#0369A1', lineHeight: 1.2 }}>
-                  Rs. {formatMillion(totals.totalFinancialProgress)} Mn
+                <div
+                  title={`Exact Disbursed: ${formatMillion(totals.totalFinancialProgress, { minDecimals: 6, maxDecimals: 6 })} Mn (${formatRupees(totals.totalFinancialProgress, true)})`}
+                  style={{ cursor: 'help' }}
+                >
+                  <div style={{ fontSize: '1.45rem', fontWeight: 800, color: '#0369A1', lineHeight: 1.2 }}>
+                    Rs. {displayMn(totals.totalFinancialProgress)} Mn
+                  </div>
+                  <div style={{ fontSize: '0.68rem', color: '#64748b', fontWeight: 600, fontFamily: 'monospace', marginTop: '2px' }}>
+                    {formatMillion(totals.totalFinancialProgress, { minDecimals: 6, maxDecimals: 6 })} Mn
+                  </div>
                 </div>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: '0.72rem', color: '#64748B', marginTop: '0.25rem' }}>
                   <span title={`Exact disbursed: ${formatRupees(totals.totalFinancialProgress, true)} of ${formatRupees(totals.totalEstimatedCost, true)}`}>
@@ -2894,30 +3026,50 @@ export default function AnnualPlanPage() {
                     </p>
                   </div>
 
-                  <button
-                    type="button"
-                    onClick={() => handleOpenMonthlyReturnModal(selectedReportingMonth)}
-                    style={{
-                      background: '#00534E',
-                      color: '#ffffff',
-                      border: 'none',
-                      padding: '0.55rem 1.25rem',
-                      borderRadius: '6px',
-                      fontWeight: 700,
-                      fontSize: '0.85rem',
-                      cursor: 'pointer',
-                      display: 'inline-flex',
-                      alignItems: 'center',
-                      gap: '0.4rem',
-                      boxShadow: '0 2px 4px rgba(0, 83, 78, 0.25)',
-                    }}
-                  >
-                    <span>📤</span>
-                    <span>Report & Submit Month {selectedReportingMonth} Progress to M&E</span>
-                  </button>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap' }}>
+                    <button
+                      type="button"
+                      onClick={() => handleOpenMonthlyReturnModal(selectedReportingMonth)}
+                      style={{
+                        background: '#00534E',
+                        color: '#ffffff',
+                        border: 'none',
+                        padding: '0.55rem 1.25rem',
+                        borderRadius: '6px',
+                        fontWeight: 700,
+                        fontSize: '0.85rem',
+                        cursor: 'pointer',
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: '0.4rem',
+                        boxShadow: '0 2px 4px rgba(0, 83, 78, 0.25)',
+                      }}
+                    >
+                      <span>📤</span>
+                      <span>Report & Submit Month {selectedReportingMonth} Progress to M&E</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setShowMonthlyProgress(!showMonthlyProgress)}
+                      style={{
+                        background: '#ffffff',
+                        border: '1px solid #86efac',
+                        color: '#166534',
+                        padding: '0.55rem 0.85rem',
+                        borderRadius: '6px',
+                        fontSize: '0.78rem',
+                        fontWeight: 700,
+                        cursor: 'pointer',
+                      }}
+                    >
+                      {showMonthlyProgress ? '▲ Hide Month Tabs' : '▼ View 12 Months'}
+                    </button>
+                  </div>
                 </div>
 
                 {/* Month Selector Pills (Jan to Dec) */}
+                {showMonthlyProgress && (
+                <>
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(80px, 1fr))', gap: '0.45rem' }}>
                   {[
                     'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
@@ -3010,6 +3162,8 @@ export default function AnnualPlanPage() {
                     </div>
                   );
                 })()}
+                </>
+                )}
               </div>
             )}
 
@@ -3058,162 +3212,166 @@ export default function AnnualPlanPage() {
         {/* ── Official AIP Sheet ── */}
         <div className="aip-sheet-card">
 
-            {/* Document Title Banner - Editable */}
+            {/* Document Header & Responsibility Card (Collapsible) */}
             <div style={{
-              background: '#7a1c2d',
-              color: '#ffffff',
-              padding: '1.1rem 1.5rem',
-              textAlign: 'center',
-              borderBottom: '2px solid #5a101e',
-            }}>
-              <input
-                value={formPhaseTitle}
-                onChange={(e) => setFormPhaseTitle(e.target.value)}
-                style={{
-                  display: 'block',
-                  width: '100%',
-                  background: 'transparent',
-                  border: 'none',
-                  borderBottom: '1px dashed rgba(255,255,255,0.5)',
-                  color: '#ffffff',
-                  fontSize: '1.35rem',
-                  fontWeight: 800,
-                  letterSpacing: '0.025em',
-                  textAlign: 'center',
-                  outline: 'none',
-                  margin: '0 auto',
-                  padding: '2px 0',
-                  cursor: 'text',
-                }}
-                placeholder="3. Implementation Phase"
-                title="Click to edit phase title"
-              />
-            </div>
-
-            {/* Editable Header Meta Box (Main & Overall Responsibility) */}
-            <div style={{
-              background: '#f8fafc',
-              padding: '1rem 1.25rem',
-              borderBottom: '1px solid #cbd5e1',
+              background: '#ffffff',
+              borderBottom: '1px solid #e2e8f0',
+              padding: '0.65rem 1.25rem',
             }}>
               <div style={{
-                display: 'grid',
-                gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))',
-                gap: '1rem',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                flexWrap: 'wrap',
+                gap: '0.75rem',
               }}>
-                {/* Main Responsibility */}
-                <div style={{ background: '#ffffff', padding: '0.75rem 1rem', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
-                  <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 700, color: '#7a1c2d', textTransform: 'uppercase', marginBottom: '0.25rem' }}>
-                    Main Responsibility
-                  </label>
-                  <input
-                    type="text"
-                    disabled={selectedAmendmentNumber > 0 && !isPrivileged}
-                    value={mainResp}
-                    onChange={(e) => setMainResp(e.target.value)}
-                    placeholder="Enter main responsibility officer..."
-                    style={{
-                      width: '100%',
-                      padding: '0.4rem 0.5rem',
-                      fontSize: '0.85rem',
-                      border: '1px solid #cbd5e1',
-                      borderRadius: '4px',
-                      marginBottom: '0.4rem',
-                      color: '#1f2937',
-                    }}
-                  />
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                    <span style={{ fontSize: '0.75rem', color: '#6b7280', fontWeight: 600 }}>Contact No:</span>
-                    <input
-                      type="text"
-                      disabled={selectedAmendmentNumber > 0 && !isPrivileged}
-                      value={mainContact}
-                      onChange={(e) => setMainContact(e.target.value)}
-                      placeholder="e.g. 714929279"
-                      style={{
-                        flex: 1,
-                        padding: '0.3rem 0.5rem',
-                        fontSize: '0.85rem',
-                        border: '1px solid #cbd5e1',
-                        borderRadius: '4px',
-                        color: '#1f2937',
-                      }}
-                    />
-                  </div>
-                </div>
-
-                {/* Overall Responsibility */}
-                <div style={{ background: '#ffffff', padding: '0.75rem 1rem', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
-                  <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 700, color: '#7a1c2d', textTransform: 'uppercase', marginBottom: '0.25rem' }}>
-                    Overall Responsibility
-                  </label>
-                  <input
-                    type="text"
-                    disabled={selectedAmendmentNumber > 0 && !isPrivileged}
-                    value={overallResp}
-                    onChange={(e) => setOverallResp(e.target.value)}
-                    placeholder="Enter overall responsibility director..."
-                    style={{
-                      width: '100%',
-                      padding: '0.4rem 0.5rem',
-                      fontSize: '0.85rem',
-                      border: '1px solid #cbd5e1',
-                      borderRadius: '4px',
-                      marginBottom: '0.4rem',
-                      color: '#1f2937',
-                    }}
-                  />
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                    <span style={{ fontSize: '0.75rem', color: '#6b7280', fontWeight: 600 }}>Contact No:</span>
-                    <input
-                      type="text"
-                      disabled={selectedAmendmentNumber > 0 && !isPrivileged}
-                      value={overallContact}
-                      onChange={(e) => setOverallContact(e.target.value)}
-                      placeholder="e.g. 714325568"
-                      style={{
-                        flex: 1,
-                        padding: '0.3rem 0.5rem',
-                        fontSize: '0.85rem',
-                        border: '1px solid #cbd5e1',
-                        borderRadius: '4px',
-                        color: '#1f2937',
-                      }}
-                    />
-                  </div>
-                </div>
-              </div>
-
-              {/* Save header button */}
-              <div className="no-print" style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '0.75rem', alignItems: 'center', gap: '0.75rem' }}>
-                {headerSavedSuccess && (
-                  <span style={{ fontSize: '0.8rem', color: '#166534', fontWeight: 600 }}>
-                    ✅ Responsibilities saved successfully
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem', flexWrap: 'wrap' }}>
+                  <span style={{
+                    background: '#7a1c2d',
+                    color: '#ffffff',
+                    padding: '3px 10px',
+                    borderRadius: '6px',
+                    fontSize: '0.85rem',
+                    fontWeight: 800,
+                    letterSpacing: '0.02em',
+                  }}>
+                    {formPhaseTitle || '3. Implementation Phase'}
                   </span>
-                )}
-                {(selectedAmendmentNumber === 0 ? plan?.status !== 'Approved' : isPrivileged) && (
+                  <div style={{ fontSize: '0.8rem', color: '#475569', display: 'flex', alignItems: 'center', gap: '0.4rem', flexWrap: 'wrap' }}>
+                    <span>Main: <strong>{mainResp || 'Not set'}</strong>{mainContact ? ` (${mainContact})` : ''}</span>
+                    <span style={{ color: '#cbd5e1' }}>|</span>
+                    <span>Overall: <strong>{overallResp || 'Not set'}</strong>{overallContact ? ` (${overallContact})` : ''}</span>
+                  </div>
+                </div>
+
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                  {headerSavedSuccess && (
+                    <span style={{ fontSize: '0.75rem', color: '#166534', fontWeight: 600 }}>
+                      ✅ Saved
+                    </span>
+                  )}
                   <button
                     type="button"
-                    onClick={handleSaveHeaderFields}
-                    disabled={isSavingHeader}
+                    onClick={() => setShowResponsibilityCard(!showResponsibilityCard)}
                     style={{
-                      background: '#ffffff',
-                      border: '1px solid #7a1c2d',
-                      color: '#7a1c2d',
-                      padding: '0.35rem 0.85rem',
+                      background: '#f8fafc',
+                      border: '1px solid #cbd5e1',
+                      color: '#475569',
+                      padding: '3px 10px',
                       borderRadius: '6px',
-                      fontSize: '0.8rem',
+                      fontSize: '0.75rem',
                       fontWeight: 700,
                       cursor: 'pointer',
                     }}
                   >
-                    {isSavingHeader ? 'Saving...' : '💾 Save Responsibility Details'}
+                    {showResponsibilityCard ? '▲ Close Details' : '✏️ Edit Responsibility Info'}
                   </button>
-                )}
+                </div>
               </div>
+
+              {/* Collapsible Edit Form */}
+              {showResponsibilityCard && (
+                <div style={{ marginTop: '0.85rem', paddingTop: '0.85rem', borderTop: '1px dashed #cbd5e1' }}>
+                  <div style={{ marginBottom: '0.65rem' }}>
+                    <label style={{ fontSize: '0.72rem', fontWeight: 700, color: '#7a1c2d', textTransform: 'uppercase' }}>
+                      Phase / Section Title
+                    </label>
+                    <input
+                      value={formPhaseTitle}
+                      onChange={(e) => setFormPhaseTitle(e.target.value)}
+                      placeholder="3. Implementation Phase"
+                      style={{
+                        width: '100%',
+                        padding: '0.35rem 0.5rem',
+                        fontSize: '0.85rem',
+                        border: '1px solid #cbd5e1',
+                        borderRadius: '4px',
+                        color: '#1f2937',
+                        marginTop: '2px',
+                      }}
+                    />
+                  </div>
+                  <div style={{
+                    display: 'grid',
+                    gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
+                    gap: '0.75rem',
+                  }}>
+                    {/* Main Responsibility */}
+                    <div style={{ background: '#f8fafc', padding: '0.6rem 0.8rem', borderRadius: '6px', border: '1px solid #e2e8f0' }}>
+                      <label style={{ display: 'block', fontSize: '0.72rem', fontWeight: 700, color: '#7a1c2d', textTransform: 'uppercase', marginBottom: '0.2rem' }}>
+                        Main Responsibility Officer
+                      </label>
+                      <input
+                        type="text"
+                        disabled={selectedAmendmentNumber > 0 && !isPrivileged}
+                        value={mainResp}
+                        onChange={(e) => setMainResp(e.target.value)}
+                        placeholder="Enter main responsibility officer..."
+                        style={{ width: '100%', padding: '0.35rem 0.5rem', fontSize: '0.82rem', border: '1px solid #cbd5e1', borderRadius: '4px', marginBottom: '0.35rem' }}
+                      />
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                        <span style={{ fontSize: '0.72rem', color: '#6b7280', fontWeight: 600 }}>Contact No:</span>
+                        <input
+                          type="text"
+                          disabled={selectedAmendmentNumber > 0 && !isPrivileged}
+                          value={mainContact}
+                          onChange={(e) => setMainContact(e.target.value)}
+                          placeholder="e.g. 714929279"
+                          style={{ flex: 1, padding: '0.25rem 0.4rem', fontSize: '0.82rem', border: '1px solid #cbd5e1', borderRadius: '4px' }}
+                        />
+                      </div>
+                    </div>
+
+                    {/* Overall Responsibility */}
+                    <div style={{ background: '#f8fafc', padding: '0.6rem 0.8rem', borderRadius: '6px', border: '1px solid #e2e8f0' }}>
+                      <label style={{ display: 'block', fontSize: '0.72rem', fontWeight: 700, color: '#7a1c2d', textTransform: 'uppercase', marginBottom: '0.2rem' }}>
+                        Overall Responsibility Director
+                      </label>
+                      <input
+                        type="text"
+                        disabled={selectedAmendmentNumber > 0 && !isPrivileged}
+                        value={overallResp}
+                        onChange={(e) => setOverallResp(e.target.value)}
+                        placeholder="Enter overall responsibility director..."
+                        style={{ width: '100%', padding: '0.35rem 0.5rem', fontSize: '0.82rem', border: '1px solid #cbd5e1', borderRadius: '4px', marginBottom: '0.35rem' }}
+                      />
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                        <span style={{ fontSize: '0.72rem', color: '#6b7280', fontWeight: 600 }}>Contact No:</span>
+                        <input
+                          type="text"
+                          disabled={selectedAmendmentNumber > 0 && !isPrivileged}
+                          value={overallContact}
+                          onChange={(e) => setOverallContact(e.target.value)}
+                          placeholder="e.g. 714325568"
+                          style={{ flex: 1, padding: '0.25rem 0.4rem', fontSize: '0.82rem', border: '1px solid #cbd5e1', borderRadius: '4px' }}
+                        />
+                      </div>
+                    </div>
+                  </div>
+                  <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '0.6rem' }}>
+                    <button
+                      type="button"
+                      onClick={handleSaveHeaderFields}
+                      disabled={isSavingHeader}
+                      style={{
+                        background: '#7a1c2d',
+                        color: '#ffffff',
+                        border: 'none',
+                        padding: '0.35rem 0.85rem',
+                        borderRadius: '6px',
+                        fontSize: '0.78rem',
+                        fontWeight: 700,
+                        cursor: 'pointer',
+                      }}
+                    >
+                      {isSavingHeader ? 'Saving...' : '💾 Save Responsibility Details'}
+                    </button>
+                  </div>
+                </div>
+              )}
             </div>
 
-            {/* Origin & Activity Category Filter Chips */}
+            {/* Origin & Activity Category Filter Chips + View Mode Toolbar */}
             <div className="no-print" style={{
               display: 'flex',
               alignItems: 'center',
@@ -3224,15 +3382,15 @@ export default function AnnualPlanPage() {
               flexWrap: 'wrap',
               gap: '0.6rem',
             }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap' }}>
-                <span style={{ fontSize: '0.78rem', fontWeight: 700, color: '#475569' }}>Activity Origin:</span>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', flexWrap: 'wrap' }}>
+                <span style={{ fontSize: '0.75rem', fontWeight: 700, color: '#475569' }}>Activity Origin:</span>
                 <button
                   type="button"
                   onClick={() => setOriginFilter('all')}
                   style={{
-                    padding: '0.25rem 0.65rem',
-                    borderRadius: '20px',
-                    fontSize: '0.75rem',
+                    padding: '0.2rem 0.6rem',
+                    borderRadius: '16px',
+                    fontSize: '0.72rem',
                     fontWeight: originFilter === 'all' ? 800 : 600,
                     border: originFilter === 'all' ? '1.5px solid #00534E' : '1px solid #cbd5e1',
                     background: originFilter === 'all' ? '#00534E' : '#ffffff',
@@ -3240,15 +3398,15 @@ export default function AnnualPlanPage() {
                     cursor: 'pointer',
                   }}
                 >
-                  All Activities ({activities.length})
+                  All ({activities.length})
                 </button>
                 <button
                   type="button"
                   onClick={() => setOriginFilter('proposed')}
                   style={{
-                    padding: '0.25rem 0.65rem',
-                    borderRadius: '20px',
-                    fontSize: '0.75rem',
+                    padding: '0.2rem 0.6rem',
+                    borderRadius: '16px',
+                    fontSize: '0.72rem',
                     fontWeight: originFilter === 'proposed' ? 800 : 600,
                     border: originFilter === 'proposed' ? '1.5px solid #0284c7' : '1px solid #cbd5e1',
                     background: originFilter === 'proposed' ? '#0284c7' : '#ffffff',
@@ -3256,53 +3414,168 @@ export default function AnnualPlanPage() {
                     cursor: 'pointer',
                   }}
                 >
-                  📋 Branch Proposed ({branchProposedCount})
+                  Branch Proposed ({branchProposedCount})
                 </button>
-                <button
-                  type="button"
-                  onClick={() => setOriginFilter('planning_added')}
-                  style={{
-                    padding: '0.25rem 0.65rem',
-                    borderRadius: '20px',
-                    fontSize: '0.75rem',
-                    fontWeight: originFilter === 'planning_added' ? 800 : 600,
-                    border: originFilter === 'planning_added' ? '1.5px solid #7c3aed' : '1px solid #cbd5e1',
-                    background: originFilter === 'planning_added' ? '#7c3aed' : '#ffffff',
-                    color: originFilter === 'planning_added' ? '#ffffff' : '#6d28d9',
-                    cursor: 'pointer',
-                  }}
-                >
-                  🏛️ Added by Planning ({planningAddedCount})
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setOriginFilter('adjusted')}
-                  style={{
-                    padding: '0.25rem 0.65rem',
-                    borderRadius: '20px',
-                    fontSize: '0.75rem',
-                    fontWeight: originFilter === 'adjusted' ? 800 : 600,
-                    border: originFilter === 'adjusted' ? '1.5px solid #d97706' : '1px solid #cbd5e1',
-                    background: originFilter === 'adjusted' ? '#d97706' : '#ffffff',
-                    color: originFilter === 'adjusted' ? '#ffffff' : '#b45309',
-                    cursor: 'pointer',
-                  }}
-                >
-                  ⚙️ Adjusted by Planning ({planningAdjustedCount})
-                </button>
+                {planningAddedCount > 0 && (
+                  <button
+                    type="button"
+                    onClick={() => setOriginFilter('planning_added')}
+                    style={{
+                      padding: '0.2rem 0.6rem',
+                      borderRadius: '16px',
+                      fontSize: '0.72rem',
+                      fontWeight: originFilter === 'planning_added' ? 800 : 600,
+                      border: originFilter === 'planning_added' ? '1.5px solid #7c3aed' : '1px solid #cbd5e1',
+                      background: originFilter === 'planning_added' ? '#7c3aed' : '#ffffff',
+                      color: originFilter === 'planning_added' ? '#ffffff' : '#6d28d9',
+                      cursor: 'pointer',
+                    }}
+                  >
+                    Added by Planning ({planningAddedCount})
+                  </button>
+                )}
+                {planningAdjustedCount > 0 && (
+                  <button
+                    type="button"
+                    onClick={() => setOriginFilter('adjusted')}
+                    style={{
+                      padding: '0.2rem 0.6rem',
+                      borderRadius: '16px',
+                      fontSize: '0.72rem',
+                      fontWeight: originFilter === 'adjusted' ? 800 : 600,
+                      border: originFilter === 'adjusted' ? '1.5px solid #d97706' : '1px solid #cbd5e1',
+                      background: originFilter === 'adjusted' ? '#d97706' : '#ffffff',
+                      color: originFilter === 'adjusted' ? '#ffffff' : '#b45309',
+                      cursor: 'pointer',
+                    }}
+                  >
+                    Adjusted by Planning ({planningAdjustedCount})
+                  </button>
+                )}
               </div>
 
-              {/* Status pill on the right */}
-              <div style={{ fontSize: '0.76rem', color: '#64748b' }}>
-                {plan?.isDispatchedToBranch ? (
-                  <span style={{ color: '#166534', fontWeight: 700 }}>
-                    ✓ Plan Dispatched with Official Vote Numbers
-                  </span>
-                ) : (
-                  <span style={{ color: '#92400e', fontWeight: 600 }}>
-                    ⏳ Awaiting Official Voted Plan Dispatch
-                  </span>
-                )}
+              {/* Right: View Mode Switches & Status */}
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', flexWrap: 'wrap' }}>
+                {/* View Mode Toggle: Monthly vs Quarterly */}
+                <div style={{
+                  display: 'inline-flex',
+                  background: '#e2e8f0',
+                  padding: '2px',
+                  borderRadius: '6px',
+                }}>
+                  <button
+                    type="button"
+                    onClick={() => setViewMode('monthly')}
+                    style={{
+                      padding: '3px 8px',
+                      borderRadius: '4px',
+                      fontSize: '0.72rem',
+                      fontWeight: 700,
+                      border: 'none',
+                      background: viewMode === 'monthly' ? '#ffffff' : 'transparent',
+                      color: viewMode === 'monthly' ? '#7a1c2d' : '#64748b',
+                      cursor: 'pointer',
+                      boxShadow: viewMode === 'monthly' ? '0 1px 3px rgba(0,0,0,0.1)' : 'none',
+                    }}
+                    title="View all 12 monthly columns (Jan - Dec)"
+                  >
+                    📅 12 Months
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setViewMode('quarterly')}
+                    style={{
+                      padding: '3px 8px',
+                      borderRadius: '4px',
+                      fontSize: '0.72rem',
+                      fontWeight: 700,
+                      border: 'none',
+                      background: viewMode === 'quarterly' ? '#ffffff' : 'transparent',
+                      color: viewMode === 'quarterly' ? '#7a1c2d' : '#64748b',
+                      cursor: 'pointer',
+                      boxShadow: viewMode === 'quarterly' ? '0 1px 3px rgba(0,0,0,0.1)' : 'none',
+                    }}
+                    title="View clean Quarterly summary (Q1 - Q4)"
+                  >
+                    📊 Quarterly Summary
+                  </button>
+                </div>
+
+                {/* Number Format Precision: Dual (2 Dec + Subtext) vs Clean 2 Dec vs Full 6 Dec */}
+                <div style={{
+                  display: 'inline-flex',
+                  background: '#e2e8f0',
+                  padding: '2px',
+                  borderRadius: '6px',
+                }}>
+                  <button
+                    type="button"
+                    onClick={() => setDecimalMode('dual')}
+                    style={{
+                      padding: '3px 8px',
+                      borderRadius: '4px',
+                      fontSize: '0.72rem',
+                      fontWeight: 700,
+                      border: 'none',
+                      background: decimalMode === 'dual' ? '#ffffff' : 'transparent',
+                      color: decimalMode === 'dual' ? '#00534E' : '#64748b',
+                      cursor: 'pointer',
+                      boxShadow: decimalMode === 'dual' ? '0 1px 3px rgba(0,0,0,0.1)' : 'none',
+                    }}
+                    title="2 Decimal places with exact value shown in smaller font below and on mouse hover"
+                  >
+                    🔢 2 Dec + Subtext
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setDecimalMode('standard')}
+                    style={{
+                      padding: '3px 8px',
+                      borderRadius: '4px',
+                      fontSize: '0.72rem',
+                      fontWeight: 700,
+                      border: 'none',
+                      background: decimalMode === 'standard' ? '#ffffff' : 'transparent',
+                      color: decimalMode === 'standard' ? '#00534E' : '#64748b',
+                      cursor: 'pointer',
+                      boxShadow: decimalMode === 'standard' ? '0 1px 3px rgba(0,0,0,0.1)' : 'none',
+                    }}
+                    title="Clean 2 Decimal places (exact value shown on mouse hover)"
+                  >
+                    ✨ 2 Dec Only
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setDecimalMode('full')}
+                    style={{
+                      padding: '3px 8px',
+                      borderRadius: '4px',
+                      fontSize: '0.72rem',
+                      fontWeight: 700,
+                      border: 'none',
+                      background: decimalMode === 'full' ? '#ffffff' : 'transparent',
+                      color: decimalMode === 'full' ? '#92400e' : '#64748b',
+                      cursor: 'pointer',
+                      boxShadow: decimalMode === 'full' ? '0 1px 3px rgba(0,0,0,0.1)' : 'none',
+                    }}
+                    title="Exact 6 Decimal precision across entire table"
+                  >
+                    🔬 6 Dec Full
+                  </button>
+                </div>
+
+                {/* Status pill on the right */}
+                <div style={{ fontSize: '0.74rem' }}>
+                  {plan?.isDispatchedToBranch ? (
+                    <span style={{ color: '#166534', fontWeight: 700, background: '#dcfce7', padding: '2px 8px', borderRadius: '10px' }}>
+                      ✓ Plan Dispatched
+                    </span>
+                  ) : (
+                    <span style={{ color: '#92400e', fontWeight: 600, background: '#fef3c7', padding: '2px 8px', borderRadius: '10px' }}>
+                      ⏳ Awaiting Dispatch
+                    </span>
+                  )}
+                </div>
               </div>
             </div>
 
@@ -3325,7 +3598,7 @@ export default function AnnualPlanPage() {
                     <th rowSpan={3} style={{ width: '75px' }}>Remark</th>
                     <th rowSpan={3} style={{ width: '115px' }}>Indicator</th>
                     <th
-                      colSpan={16}
+                      colSpan={viewMode === 'monthly' ? 16 : 4}
                       style={{
                         background: '#7a1c2d',
                         color: '#ffffff',
@@ -3412,9 +3685,11 @@ export default function AnnualPlanPage() {
 
                   {/* Row 2: Monthly & Quarterly Group Headers */}
                   <tr>
-                    <th colSpan={12} className="header-sub-group">
-                      January to December - Monthly basis (Non-Cumulative)
-                    </th>
+                    {viewMode === 'monthly' && (
+                      <th colSpan={12} className="header-sub-group">
+                        January to December - Monthly basis (Non-Cumulative)
+                      </th>
+                    )}
                     <th colSpan={4} className="header-sub-group" style={{ background: '#fef3c7', color: '#92400e' }}>
                       Q1 to Q4 - Quarterly basis (Cumulative)
                     </th>
@@ -3422,7 +3697,7 @@ export default function AnnualPlanPage() {
 
                   {/* Row 3: Sub Header Months & Quarters & 4 Progress Columns */}
                   <tr>
-                    {MONTH_NAMES_SHORT.map((m, i) => (
+                    {viewMode === 'monthly' && MONTH_NAMES_SHORT.map((m, i) => (
                       <th key={`m-${i}`} style={{ width: '38px', fontSize: '0.75rem' }}>
                         {m}
                       </th>
@@ -3454,7 +3729,7 @@ export default function AnnualPlanPage() {
                 <tbody>
                   {activities.length === 0 ? (
                     <tr>
-                      <td colSpan={(selectedAmendmentNumber > 0 ? 29 : 25) + (isConsolidated ? 1 : 0)} style={{ padding: '3.5rem 1rem', textAlign: 'center' }}>
+                      <td colSpan={(viewMode === 'monthly' ? (selectedAmendmentNumber > 0 ? 29 : 25) : (selectedAmendmentNumber > 0 ? 17 : 13)) + (isConsolidated ? 1 : 0)} style={{ padding: '3.5rem 1rem', textAlign: 'center' }}>
                         <div style={{ fontSize: '2.2rem', marginBottom: '0.5rem' }}>📋</div>
                         <div style={{ fontWeight: 800, fontSize: '1.05rem', color: '#1e293b', marginBottom: '0.35rem' }}>
                           No activities in this AIP draft yet
@@ -3531,7 +3806,20 @@ export default function AnnualPlanPage() {
                               <div style={{ fontWeight: 600, color: '#1E293B' }}>{act.activity}</div>
                               {act.isAdjustedByPlanning && act.originalProposedCost !== undefined && act.originalProposedCost !== act.estimatedCost && (
                                 <div style={{ fontSize: '0.68rem', color: '#92400E', marginTop: '2px' }}>
-                                  Voted: <strong>Rs. {formatMillion(act.estimatedCost)} Mn</strong> (Branch Demand: <strong>Rs. {formatMillion(act.originalProposedCost)} Mn</strong>)
+                                  Voted:{' '}
+                                  <strong
+                                    title={`Exact Voted: ${formatMillion(act.estimatedCost, { minDecimals: 6, maxDecimals: 6 })} Mn (${formatRupees(act.estimatedCost, true)})`}
+                                    style={{ cursor: 'help' }}
+                                  >
+                                    Rs. {displayMn(act.estimatedCost)} Mn
+                                  </strong>{' '}
+                                  (Branch Demand:{' '}
+                                  <strong
+                                    title={`Exact Proposed: ${formatMillion(act.originalProposedCost, { minDecimals: 6, maxDecimals: 6 })} Mn (${formatRupees(act.originalProposedCost, true)})`}
+                                    style={{ cursor: 'help' }}
+                                  >
+                                    Rs. {displayMn(act.originalProposedCost)} Mn
+                                  </strong>)
                                 </div>
                               )}
                               {act.planningNotes && (
@@ -3580,9 +3868,9 @@ export default function AnnualPlanPage() {
                                 </button>
                               )}
                             </td>
-                            <td rowSpan={2} className="text-right" style={{ fontWeight: 700 }} title={`Exact allocation to the cent: ${formatRupees(act.estimatedCost, true)}`}>
+                            <td rowSpan={2} className="text-right" style={{ padding: '4px 6px' }}>
                               {act.estimatedCost !== undefined && act.estimatedCost !== 0
-                                ? formatMillion(act.estimatedCost)
+                                ? renderMnCell(act.estimatedCost, { align: 'right', bold: true })
                                 : '-'}
                             </td>
                             {/* Column 6: Remark (e.g. CF) */}
@@ -3596,17 +3884,17 @@ export default function AnnualPlanPage() {
                             </td>
 
                             {/* 12 Months Financial */}
-                            {finMonths.map((val, mIdx) => (
-                              <td key={`fin-${act.id}-${mIdx}`} style={{ fontSize: '0.75rem' }} title={`Exact: ${formatRupees(val, true)}`}>
-                                {Number(val) !== 0 ? formatMillion(val) : '0.00'}
+                            {viewMode === 'monthly' && finMonths.map((val, mIdx) => (
+                              <td key={`fin-${act.id}-${mIdx}`} style={{ padding: '3px 4px' }}>
+                                {renderMnCell(val, { align: 'center', bold: Number(val) !== 0 })}
                               </td>
                             ))}
 
                             {/* Cumulative Quarters Financial */}
-                            <td style={{ background: '#fef9c3', fontWeight: 600 }} title={`Exact: ${formatRupees(act.financialQ1, true)}`}>{formatMillion(act.financialQ1)}</td>
-                            <td style={{ background: '#fef9c3', fontWeight: 600 }} title={`Exact: ${formatRupees(act.financialQ2, true)}`}>{formatMillion(act.financialQ2)}</td>
-                            <td style={{ background: '#fef9c3', fontWeight: 600 }} title={`Exact: ${formatRupees(act.financialQ3, true)}`}>{formatMillion(act.financialQ3)}</td>
-                            <td style={{ background: '#fef9c3', fontWeight: 700, color: '#7a1c2d' }} title={`Exact: ${formatRupees(act.financialQ4, true)}`}>{formatMillion(act.financialQ4)}</td>
+                            <td style={{ background: '#fef9c3', padding: '3px 4px' }}>{renderMnCell(act.financialQ1, { align: 'center', bold: true })}</td>
+                            <td style={{ background: '#fef9c3', padding: '3px 4px' }}>{renderMnCell(act.financialQ2, { align: 'center', bold: true })}</td>
+                            <td style={{ background: '#fef9c3', padding: '3px 4px' }}>{renderMnCell(act.financialQ3, { align: 'center', bold: true })}</td>
+                            <td style={{ background: '#fef9c3', padding: '3px 4px' }}>{renderMnCell(act.financialQ4, { align: 'center', bold: true, color: '#7a1c2d' })}</td>
 
                             {/* Responsibility */}
                             <td rowSpan={2} className="text-left" style={{ fontSize: '0.78rem', lineHeight: '1.3' }}>
@@ -3778,7 +4066,7 @@ export default function AnnualPlanPage() {
                             </td>
 
                             {/* 12 Months Physical */}
-                            {physMonths.map((val, mIdx) => (
+                            {viewMode === 'monthly' && physMonths.map((val, mIdx) => (
                               <td key={`phys-${act.id}-${mIdx}`} style={{ fontSize: '0.75rem' }}>
                                 {val || '-'}
                               </td>
@@ -3856,23 +4144,23 @@ export default function AnnualPlanPage() {
                       <td colSpan={isConsolidated ? 5 : 4} rowSpan={2} style={{ textAlign: 'center', fontWeight: 800, fontSize: '1rem', background: '#f8fafc', verticalAlign: 'middle', borderRight: '1px solid #cbd5e1' }}>
                         Total
                       </td>
-                      <td rowSpan={2} className="text-right" style={{ fontWeight: 800, fontSize: '0.9rem', background: '#f8fafc', verticalAlign: 'middle', borderRight: '1px solid #cbd5e1' }} title={`Exact Total Plan Budget to the cent: ${formatRupees(totals.totalEstimatedCost, true)}`}>
-                        {formatMillion(totals.totalEstimatedCost)}
+                      <td rowSpan={2} className="text-right" style={{ background: '#f8fafc', verticalAlign: 'middle', borderRight: '1px solid #cbd5e1', padding: '4px 6px' }}>
+                        {renderMnCell(totals.totalEstimatedCost, { align: 'right', bold: true })}
                       </td>
                       <td rowSpan={2} style={{ background: '#f8fafc', borderRight: '1px solid #cbd5e1' }}></td>
                       <td style={{ fontWeight: 700, fontSize: '0.75rem', whiteSpace: 'nowrap' }}>Financial (Rs. Mn)</td>
 
                       {/* Monthly financial totals */}
-                      {totals.monthlyFinancial.map((mVal, idx) => (
-                        <td key={`tot-fin-${idx}`} style={{ fontWeight: 700 }} title={`Exact Month ${idx + 1} Total: ${formatRupees(mVal, true)}`}>
-                          {mVal !== 0 ? formatMillion(mVal) : '0.00'}
+                      {viewMode === 'monthly' && totals.monthlyFinancial.map((mVal, idx) => (
+                        <td key={`tot-fin-${idx}`} style={{ padding: '3px 4px' }}>
+                          {renderMnCell(mVal, { align: 'center', bold: true })}
                         </td>
                       ))}
 
                       {/* Cumulative quarterly financial totals */}
                       {totals.quarterlyFinancial.map((qVal, idx) => (
-                        <td key={`tot-qfin-${idx}`} style={{ fontWeight: 800, background: '#fee2e2' }} title={`Exact Q${idx + 1} Cumulative Total: ${formatRupees(qVal, true)}`}>
-                          {formatMillion(qVal)}
+                        <td key={`tot-qfin-${idx}`} style={{ background: '#fee2e2', padding: '3px 4px' }}>
+                          {renderMnCell(qVal, { align: 'center', bold: true, color: '#991b1b' })}
                         </td>
                       ))}
 
@@ -3883,8 +4171,8 @@ export default function AnnualPlanPage() {
                         <>
                           <td style={{ background: '#b6d7a8', border: '1px solid #8cb37d' }}></td>
                           <td style={{ background: '#fce5cd', border: '1px solid #e6b8af' }}></td>
-                          <td style={{ background: '#b6d7a8', textAlign: 'center', fontWeight: 800, fontSize: '0.8rem', color: '#14532d', border: '1px solid #8cb37d' }} title={`Exact Disbursed Progress: ${formatRupees(totals.totalFinancialProgress, true)}`}>
-                            {totals.totalFinancialProgress > 0 ? formatMillion(totals.totalFinancialProgress) : ''}
+                          <td style={{ background: '#b6d7a8', textAlign: 'center', border: '1px solid #8cb37d', padding: '3px 4px' }}>
+                            {totals.totalFinancialProgress > 0 ? renderMnCell(totals.totalFinancialProgress, { align: 'center', bold: true, color: '#14532d' }) : ''}
                           </td>
                           <td style={{ background: '#fce5cd', textAlign: 'center', fontWeight: 800, fontSize: '0.8rem', color: '#7c2d12', border: '1px solid #e6b8af' }}>
                             {totals.overallFinancialProgressPct || ''}
@@ -3900,7 +4188,7 @@ export default function AnnualPlanPage() {
                       <td style={{ fontWeight: 700, fontSize: '0.75rem', whiteSpace: 'nowrap' }}>Physical (%) Cumulative</td>
 
                       {/* Monthly physical average contribution */}
-                      {totals.monthlyPhysical.map((pVal, idx) => (
+                      {viewMode === 'monthly' && totals.monthlyPhysical.map((pVal, idx) => (
                         <td key={`tot-phys-${idx}`} style={{ fontWeight: 700 }}>
                           {pVal}%
                         </td>

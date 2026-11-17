@@ -767,10 +767,12 @@ img { max-width: 100%; display: block; }
 }
 
 /* ── Custom Scrollbar for Sidebar Navigation Rail ("Suitable Colour to Scrolling Edge") ── */
-.app-sidebar,
-.nav-rail-scroll-container {
-  scrollbar-width: thin;
-  scrollbar-color: #FFBE29 rgba(0, 0, 0, 0.28);
+@supports (scrollbar-width: thin) {
+  .app-sidebar,
+  .nav-rail-scroll-container {
+    scrollbar-width: thin;
+    scrollbar-color: #FFBE29 rgba(0, 0, 0, 0.28);
+  }
 }
 
 .app-sidebar::-webkit-scrollbar,
@@ -844,10 +846,11 @@ img { max-width: 100%; display: block; }
   border: none;
   display: flex;
   align-items: center;
-  justifyContent: center;
+  justify-content: center;
   cursor: pointer;
   z-index: 15;
   transition: all 0.2s ease;
+  -webkit-backdrop-filter: blur(4px);
   backdrop-filter: blur(4px);
   color: #FFBE29;
   flex-shrink: 0;
@@ -1562,7 +1565,7 @@ img { max-width: 100%; display: block; }
   padding: 0.75rem 1.25rem;
   color: #FFFFFF;
   display: flex;
-  justifyContent: space-between;
+  justify-content: space-between;
   align-items: center;
   position: relative;
   overflow: hidden;
@@ -1621,7 +1624,7 @@ img { max-width: 100%; display: block; }
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.03);
   display: flex;
   align-items: center;
-  justifyContent: space-between;
+  justify-content: space-between;
   gap: 0.85rem;
   transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
 }
@@ -1638,7 +1641,7 @@ img { max-width: 100%; display: block; }
   border-radius: 10px;
   display: flex;
   align-items: center;
-  justifyContent: center;
+  justify-content: center;
   flex-shrink: 0;
 }
 
@@ -1746,7 +1749,7 @@ img { max-width: 100%; display: block; }
   border-radius: 10px;
   padding: 0.4rem 1rem;
   display: flex;
-  justifyContent: space-between;
+  justify-content: space-between;
   align-items: center;
   font-size: 0.72rem;
   color: #64748B;
@@ -1772,8 +1775,8 @@ img { max-width: 100%; display: block; }
 
 /* Button & Interactive micro-interactions */
 button, .btn, a.btn {
-  user-select: none;
   -webkit-user-select: none;
+  user-select: none;
   touch-action: manipulation;
   transition: transform 0.15s cubic-bezier(0.16, 1, 0.3, 1),
               box-shadow 0.15s cubic-bezier(0.16, 1, 0.3, 1),
@@ -1971,9 +1974,11 @@ html {
 }
 
 /* Normalized thin, elegant scrollbars across all browsers */
-* {
-  scrollbar-width: thin;
-  scrollbar-color: #CBD5E1 transparent;
+@supports (scrollbar-width: thin) {
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: #CBD5E1 transparent;
+  }
 }
 
 ::-webkit-scrollbar {
