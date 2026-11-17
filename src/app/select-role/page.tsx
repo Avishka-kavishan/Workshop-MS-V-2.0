@@ -1,11 +1,11 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, Suspense } from 'react';
 import { useSession } from 'next-auth/react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 
-export default function SelectRolePage() {
+function SelectRoleContent() {
   const { data: session, status, update } = useSession();
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -465,5 +465,28 @@ export default function SelectRolePage() {
         </div>
       </main>
     </div>
+  );
+}
+
+export default function SelectRolePage() {
+  return (
+    <Suspense
+      fallback={
+        <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#F8FAFC' }}>
+          <div style={{ textAlign: 'center' }}>
+            <div style={{ width: '48px', height: '48px', border: '4px solid #CBD5E1', borderTopColor: '#0F766E', borderRadius: '50%', animation: 'spin 0.8s linear infinite', margin: '0 auto 1rem' }} />
+            <h3 style={{ fontSize: '1.1rem', fontWeight: 700, color: '#1E293B' }}>Retrieving Authorized Roles...</h3>
+            <p style={{ fontSize: '0.82rem', color: '#64748B' }}>Connecting to Centralized IPMIS Access Management</p>
+          </div>
+          <style jsx>{`
+            @keyframes spin {
+              to { transform: rotate(360deg); }
+            }
+          `}</style>
+        </div>
+      }
+    >
+      <SelectRoleContent />
+    </Suspense>
   );
 }
