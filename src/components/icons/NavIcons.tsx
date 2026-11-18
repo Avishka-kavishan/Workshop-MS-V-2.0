@@ -301,3 +301,24 @@ export function AuditVaultIcon({ size = 24, className = '', color = '#FFFFFF', a
     </svg>
   );
 }
+
+// 17. Vote Management: Ballot ledger document with badge and checkmark
+export function VoteManagementIcon({ size = 24, className = '', color = '#FFFFFF', accentColor = '#FFBE29', style }: IconProps) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" className={className} style={style}>
+      {/* Document / Card backing */}
+      <rect x="5" y="4" width="22" height="24" rx="3" stroke={color} strokeWidth="2.2" fill="none" />
+      {/* Vote number badge on top right */}
+      <rect x="15" y="7" width="9" height="4" rx="1.5" fill={accentColor} />
+      {/* Ledger list lines */}
+      <line x1="8" y1="9" x2="12" y2="9" stroke={color} strokeWidth="2" strokeLinecap="round" />
+      <line x1="8" y1="14" x2="24" y2="14" stroke={color} strokeWidth="1.8" strokeLinecap="round" />
+      <line x1="8" y1="18" x2="19" y2="18" stroke={color} strokeWidth="1.8" strokeLinecap="round" />
+      <line x1="8" y1="22" x2="16" y2="22" stroke={color} strokeWidth="1.8" strokeLinecap="round" />
+      {/* Ballot check circle at bottom right */}
+      <circle cx="22" cy="22" r="3.5" fill={accentColor} />
+      <path d="M20.5 22 L21.5 23 L23.5 21" stroke="#5c0f28" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}
+

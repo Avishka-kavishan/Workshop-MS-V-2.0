@@ -19,6 +19,7 @@ import {
   AdminConsoleIcon,
   WorkshopsDirectoryIcon,
   AuditVaultIcon,
+  VoteManagementIcon,
 } from '@/components/icons/NavIcons';
 import BranchBadge from '@/components/common/BranchBadge';
 import GlobalSearchableSelect from '@/components/common/GlobalSearchableSelect';
@@ -227,11 +228,25 @@ export default function AppShell({ children }: AppShellProps) {
     user?.username === 'monitoring.officer'
   );
 
+  // Planning branch check (Vote Management module is strictly reserved for Planning Branch)
+  const isPlanningBranchUser = Boolean(
+    isSuperAdmin ||
+    (user as any)?.functionalCategory === 'Planning' ||
+    user?.username === 'planning.officer' ||
+    user?.username === 'planning' ||
+    user?.username === 'doe.planning' ||
+    (user as any)?.organizationName?.toLowerCase().includes('plan') ||
+    (user as any)?.organizationId?.toLowerCase().includes('plan')
+  );
+
   // Primary System Pillars (Matching the Architecture Flow - Reports restricted to Admins/Governance)
   const primaryNavItems = [
     { href: '/dashboard', label: 'Dashboard', icon: DashboardIcon },
     { href: '/budget-forecasting', label: 'Budget Planning', icon: BudgetPlanningIcon },
     { href: '/annual-plan', label: 'Annual Plan (AIP)', icon: AnnualPlanIcon },
+    ...(isPlanningBranchUser ? [
+      { href: '/vote-management', label: 'Vote Management', icon: VoteManagementIcon },
+    ] : []),
     { href: '/monitoring', label: 'Monitoring & Verification', icon: MonitoringIcon },
     ...(isAdminUser || isGovernanceOfficer ? [
       { href: '/reports', label: 'Analytics & Audit', icon: AnalyticsIcon },
@@ -253,6 +268,7 @@ export default function AppShell({ children }: AppShellProps) {
     if (exact) return pathname === href;
     if (href === '/admin/audit-logs') return pathname.startsWith('/admin/audit-logs') || pathname.startsWith('/audit-logs');
     if (href === '/workshops') return pathname.startsWith('/workshops') && pathname !== '/workshops/new';
+    if (href === '/vote-management') return pathname.startsWith('/vote-management');
     if (href === '/annual-plan') return pathname.startsWith('/annual-plan');
     if (href === '/budget-forecasting') return pathname.startsWith('/budget-forecasting');
     if (href === '/monitoring') return pathname.startsWith('/monitoring');
@@ -266,6 +282,7 @@ export default function AppShell({ children }: AppShellProps) {
   // Get active breadcrumb icon
   const getActivePageDetails = () => {
     if (pathname === '/dashboard') return { title: 'Dashboard', href: '/dashboard', parent: null };
+    if (pathname === '/vote-management') return { title: 'Vote Management', href: '/vote-management', parent: { title: 'Planning Division', href: '/annual-plan' } };
     if (pathname === '/budget-forecasting') return { title: 'Budget Forecasting & Formulation', href: '/budget-forecasting', parent: null };
     if (pathname === '/annual-plan') return { title: 'Annual Implementation Plan (AIP)', href: '/annual-plan', parent: null };
     if (pathname.startsWith('/annual-plan/')) return { title: 'AIP Details', href: pathname, parent: { title: 'Annual Implementation Plan (AIP)', href: '/annual-plan' } };
@@ -292,6 +309,7 @@ export default function AppShell({ children }: AppShellProps) {
   const getActiveBreadcrumbIcon = () => {
     if (pathname.startsWith('/admin/audit-logs') || pathname === '/audit-logs') return <AuditVaultIcon size={16} color="var(--primary)" />;
     if (pathname === '/dashboard') return <DashboardIcon size={16} color="var(--primary)" />;
+    if (pathname === '/vote-management') return <VoteManagementIcon size={16} color="var(--primary)" />;
     if (pathname === '/budget-forecasting') return <BudgetPlanningIcon size={16} color="var(--primary)" />;
     if (pathname.startsWith('/annual-plan')) return <AnnualPlanIcon size={16} color="var(--primary)" />;
     if (pathname === '/monitoring') return <MonitoringIcon size={16} color="var(--primary)" />;

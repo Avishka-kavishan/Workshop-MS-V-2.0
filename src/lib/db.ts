@@ -34,6 +34,7 @@ import {
   DEFAULT_DEADLINES,
   DEFAULT_ANNOUNCEMENTS,
   DEFAULT_BUDGET_PROPOSALS,
+  DEFAULT_GOVERNMENT_VOTES,
   LEVEL_ADMIN_ROLES,
   LEVEL_ADMIN_USERS,
 } from './frsSeedData';
@@ -88,6 +89,7 @@ export interface DbSchema {
   announcements: Announcement[];
   calendarSubscribers?: CalendarSubscriber[];
   auditLogs?: SystemAuditLog[];
+  votes?: GovernmentVote[];
 }
 
 export interface SystemAuditLog {
@@ -539,6 +541,20 @@ export interface FinancialYear {
   description?: string;
   createdAt: string;
   createdBy: string;
+}
+
+export interface GovernmentVote {
+  id: string;
+  voteNumber: string;
+  voteName: string;
+  description: string;
+  category: 'Recurrent' | 'Capital';
+  availableFor?: string;
+  status?: 'Active' | 'Inactive';
+  financialYear: string;
+  createdAt: string;
+  updatedAt?: string;
+  createdBy?: string;
 }
 
 export interface SystemDeadline {
@@ -1043,6 +1059,7 @@ function readJsonFile(): DbSchema {
       deadlines: [...DEFAULT_DEADLINES],
       announcements: [...DEFAULT_ANNOUNCEMENTS],
       budgetProposalActivities: [...DEFAULT_BUDGET_PROPOSALS],
+      votes: [...DEFAULT_GOVERNMENT_VOTES],
     };
     writeJsonFile(emptyDb);
     memoryDb = emptyDb;
@@ -1106,6 +1123,9 @@ function readJsonFile(): DbSchema {
     }
     if (!parsed.budgetProposalActivities || parsed.budgetProposalActivities.length === 0) {
       parsed.budgetProposalActivities = [...DEFAULT_BUDGET_PROPOSALS];
+    }
+    if (!parsed.votes || parsed.votes.length === 0) {
+      parsed.votes = [...DEFAULT_GOVERNMENT_VOTES];
     }
 
     // Ensure Monitoring Division, Role, and User exist in memory/db
