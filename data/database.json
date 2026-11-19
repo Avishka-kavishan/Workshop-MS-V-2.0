@@ -9089,7 +9089,7 @@
       "organizationId": "org-moe-data",
       "roleId": "role-admin",
       "isActive": true,
-      "lastLogin": "2026-11-18T05:29:43.245Z",
+      "lastLogin": "2026-11-18T08:46:48.847Z",
       "createdAt": "2026-09-28T06:03:41.165Z",
       "aliases": [
         "admin",
@@ -9128,7 +9128,7 @@
           "assignedAt": "2026-01-01T00:00:00.000Z"
         }
       ],
-      "lastSelectedRoleId": "ura-admin-data",
+      "lastSelectedRoleId": "ura-admin-sys",
       "rememberLastRole": false
     },
     {
@@ -9175,7 +9175,7 @@
       "organizationId": "org-moe-planning",
       "roleId": "role-planning-officer",
       "isActive": true,
-      "lastLogin": "2026-11-18T07:18:15.596Z",
+      "lastLogin": "2026-11-19T04:00:10.389Z",
       "createdAt": "2026-09-28T06:03:41.165Z",
       "aliases": [
         "planning.officer",
@@ -52065,6 +52065,138 @@
     }
   ],
   "auditLogs": [
+    {
+      "id": "audit-1795060825735-5a6274d9",
+      "timestamp": "2026-11-19T04:00:25.735Z",
+      "userId": "user-planning-officer",
+      "username": "planning.officer",
+      "userFullName": "MOE Planning Division Officer (Special)",
+      "organizationId": "org-moe-planning",
+      "organizationName": "MOE Planning Division",
+      "category": "Security",
+      "action": "AUTH_ROLE_SWITCH",
+      "entityType": "AUTH",
+      "entityId": "ura-planning-officer",
+      "summary": "Officer \"MOE Planning Division Officer (Special)\" (planning.officer) switched active working role from \"Planning Division Officer\" to \"Planning Division Officer\" (MOE Planning Division).",
+      "details": {
+        "previousRole": "Planning Division Officer",
+        "newRole": "Planning Division Officer",
+        "organization": "MOE Planning Division",
+        "functionalCategory": "Planning",
+        "rememberedForNextLogin": false,
+        "switchTimestamp": "2026-11-19T04:00:25.735Z"
+      },
+      "severity": "Info"
+    },
+    {
+      "id": "audit-1795060810410-f54940dd",
+      "timestamp": "2026-11-19T04:00:10.410Z",
+      "userId": "user-planning-officer",
+      "username": "planning.officer",
+      "userFullName": "MOE Planning Division Officer (Special)",
+      "organizationId": "org-moe-planning",
+      "organizationName": "MOE Planning Division",
+      "category": "Security",
+      "action": "AUTH_LOGIN_SUCCESS",
+      "entityType": "AUTH",
+      "entityId": "user-planning-officer",
+      "summary": "User \"MOE Planning Division Officer (Special)\" (planning.officer) authenticated into IPMIS with unified account. Active role: \"Planning Division Officer\".",
+      "details": {
+        "role": "Planning Division Officer",
+        "organization": "MOE Planning Division",
+        "loginTime": "2026-11-19T04:00:10.410Z",
+        "assignedRoleCount": 2,
+        "rememberLastRole": false
+      },
+      "severity": "Info"
+    },
+    {
+      "id": "audit-1795060802321-1192e7e4",
+      "timestamp": "2026-11-19T04:00:02.321Z",
+      "userId": "user-planning-officer",
+      "username": "planning.officer",
+      "userFullName": "MOE Planning Division Officer (Special)",
+      "organizationId": "org-moe",
+      "organizationName": "Ministry of Education",
+      "category": "Security",
+      "action": "AUTH_LOGIN_FAILED",
+      "entityType": "AUTH",
+      "entityId": "user-planning-officer",
+      "summary": "Failed login attempt for user \"MOE Planning Division Officer (Special)\" (planning.officer): Invalid credentials.",
+      "details": {
+        "reason": "Invalid password"
+      },
+      "severity": "Warning"
+    },
+    {
+      "id": "audit-1794995570574-ddc4d968",
+      "timestamp": "2026-11-18T09:52:50.574Z",
+      "userId": "user-admin",
+      "username": "admin",
+      "userFullName": "MOE Data Management Branch",
+      "organizationId": "org-moe",
+      "organizationName": "Ministry of Education National Headquarters",
+      "category": "Security",
+      "action": "AUTH_ROLE_SWITCH",
+      "entityType": "AUTH",
+      "entityId": "ura-admin-sys",
+      "summary": "Officer \"MOE Data Management Branch\" (admin) switched active working role from \"MOE Data Management Branch (Operational)\" to \"System Administrator (Level 1 MoE Admin)\" (Ministry of Education National Headquarters).",
+      "details": {
+        "previousRole": "MOE Data Management Branch (Operational)",
+        "newRole": "System Administrator (Level 1 MoE Admin)",
+        "organization": "Ministry of Education National Headquarters",
+        "functionalCategory": "All",
+        "adminLevel": 1,
+        "rememberedForNextLogin": false,
+        "switchTimestamp": "2026-11-18T09:52:50.573Z"
+      },
+      "severity": "Info"
+    },
+    {
+      "id": "audit-1794991632916-4b7f517c",
+      "timestamp": "2026-11-18T08:47:12.916Z",
+      "userId": "user-admin",
+      "username": "admin",
+      "userFullName": "MOE Data Management Branch",
+      "organizationId": "org-moe-data",
+      "organizationName": "MOE Data Management Branch",
+      "category": "Security",
+      "action": "AUTH_ROLE_SWITCH",
+      "entityType": "AUTH",
+      "entityId": "ura-admin-data",
+      "summary": "Officer \"MOE Data Management Branch\" (admin) switched active working role from \"MOE Data Management Branch (Operational)\" to \"MOE Data Management Branch (Operational)\" (MOE Data Management Branch).",
+      "details": {
+        "previousRole": "MOE Data Management Branch (Operational)",
+        "newRole": "MOE Data Management Branch (Operational)",
+        "organization": "MOE Data Management Branch",
+        "functionalCategory": "Normal",
+        "rememberedForNextLogin": false,
+        "switchTimestamp": "2026-11-18T08:47:12.915Z"
+      },
+      "severity": "Info"
+    },
+    {
+      "id": "audit-1794991608870-5dd4c820",
+      "timestamp": "2026-11-18T08:46:48.870Z",
+      "userId": "user-admin",
+      "username": "admin",
+      "userFullName": "MOE Data Management Branch",
+      "organizationId": "org-moe-data",
+      "organizationName": "MOE Data Management Branch",
+      "category": "Security",
+      "action": "AUTH_LOGIN_SUCCESS",
+      "entityType": "AUTH",
+      "entityId": "user-admin",
+      "summary": "User \"MOE Data Management Branch\" (admin) authenticated into IPMIS with unified account. Active role: \"MOE Data Management Branch (Operational)\".",
+      "details": {
+        "role": "MOE Data Management Branch (Operational)",
+        "organization": "MOE Data Management Branch",
+        "loginTime": "2026-11-18T08:46:48.870Z",
+        "assignedRoleCount": 2,
+        "rememberLastRole": false
+      },
+      "severity": "Info"
+    },
     {
       "id": "audit-1794986302369-6dd4d88e",
       "timestamp": "2026-11-18T07:18:22.369Z",
