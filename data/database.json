@@ -55311,7 +55311,7 @@
       "isDefault": true,
       "status": "Active",
       "createdAt": "2026-01-01T08:00:00.000Z",
-      "updatedAt": "2026-11-19T08:51:29.343Z",
+      "updatedAt": "2026-11-19T09:15:04.697Z",
       "createdBy": "user-superadmin",
       "columns": [
         {
@@ -55427,6 +55427,20 @@
           "visible": true,
           "order": 8,
           "isSystemCore": true
+        },
+        {
+          "id": "col-9178dfc3",
+          "key": "col_test_4b57",
+          "label": "Test",
+          "description": "",
+          "dataType": "text",
+          "width": "130px",
+          "textAlign": "left",
+          "required": false,
+          "visible": true,
+          "order": 9,
+          "isSystemCore": false,
+          "defaultValue": ""
         }
       ]
     },
@@ -55713,156 +55727,6 @@
           "isSystemCore": true
         }
       ]
-    },
-    {
-      "id": "tmpl-61364169-eeb5-4dbb-9a17-f2554dcf8005",
-      "name": "National Standard MoE AIP Template (Copy)",
-      "code": "MOE-NAT-STD_COPY",
-      "description": "Cloned from National Standard MoE AIP Template",
-      "financialYear": "all",
-      "isDefault": false,
-      "status": "Draft",
-      "columns": [
-        {
-          "id": "col-bdfaa466",
-          "key": "outputNo",
-          "label": "Outcome / Output No",
-          "description": "Strategic Outcome or Output numbering reference (e.g. 1.1, 2.3)",
-          "dataType": "text",
-          "width": "70px",
-          "textAlign": "center",
-          "required": false,
-          "visible": true,
-          "order": 1,
-          "isSystemCore": true
-        },
-        {
-          "id": "col-b5b66257",
-          "key": "activityCode",
-          "label": "Activity No",
-          "description": "Sequential activity code identifier (e.g. 1.1.1, ACT-01)",
-          "dataType": "text",
-          "width": "65px",
-          "textAlign": "center",
-          "required": true,
-          "visible": true,
-          "order": 2,
-          "isSystemCore": true
-        },
-        {
-          "id": "col-14e0eca6",
-          "key": "activity",
-          "label": "Main Activities",
-          "description": "Full narrative title and operational description of the implementation activity",
-          "dataType": "textarea",
-          "width": "280px",
-          "textAlign": "left",
-          "required": true,
-          "visible": true,
-          "order": 3,
-          "isSystemCore": true
-        },
-        {
-          "id": "col-9ae2fd6b",
-          "key": "voteNumber",
-          "label": "Vote Number",
-          "description": "Treasury budgetary vote head from Government Estimates (e.g. 126, 127)",
-          "dataType": "dropdown",
-          "options": [
-            "126",
-            "127",
-            "128",
-            "129",
-            "130",
-            "131",
-            "126-02-03-2502",
-            "126-01-01-1101"
-          ],
-          "width": "120px",
-          "textAlign": "center",
-          "required": true,
-          "visible": true,
-          "order": 4,
-          "isSystemCore": true
-        },
-        {
-          "id": "col-2dfdd06f",
-          "key": "estimatedCost",
-          "label": "Allocation / Estimated Cost (Mn)",
-          "description": "Total approved budget allocation in Sri Lankan Rupees (Millions LKR)",
-          "dataType": "currency",
-          "width": "100px",
-          "textAlign": "right",
-          "required": true,
-          "visible": true,
-          "order": 5,
-          "isSystemCore": true
-        },
-        {
-          "id": "col-0c12b3f5",
-          "key": "remark",
-          "label": "Remark",
-          "description": "Operational notes, procurement conditions, or executing remarks",
-          "dataType": "text",
-          "width": "85px",
-          "textAlign": "left",
-          "required": false,
-          "visible": true,
-          "order": 6,
-          "isSystemCore": true
-        },
-        {
-          "id": "col-1c661004",
-          "key": "indicator",
-          "label": "Indicator",
-          "description": "Performance measurement metric or deliverable indicator",
-          "dataType": "text",
-          "width": "120px",
-          "textAlign": "left",
-          "required": false,
-          "visible": true,
-          "order": 7,
-          "isSystemCore": true
-        },
-        {
-          "id": "col-190bb2ff",
-          "key": "responsibility",
-          "label": "Responsibility",
-          "description": "Designated implementing officer or desk officer designation",
-          "dataType": "text",
-          "width": "160px",
-          "textAlign": "left",
-          "required": true,
-          "visible": true,
-          "order": 8,
-          "isSystemCore": true
-        },
-        {
-          "id": "col-d98ebd46",
-          "key": "sdgTarget",
-          "label": "SDG 4 Target",
-          "description": "Sustainable Development Goal 4 education target mapping",
-          "dataType": "dropdown",
-          "options": [
-            "SDG 4.1 - Primary/Secondary Quality",
-            "SDG 4.2 - Early Childhood Education",
-            "SDG 4.3 - Technical & Vocational Skills",
-            "SDG 4.4 - Skills for Decent Work",
-            "SDG 4.5 - Gender Equality & Inclusion",
-            "SDG 4.a - Safe School Facilities",
-            "SDG 4.c - Teacher Training & Quality"
-          ],
-          "width": "140px",
-          "textAlign": "left",
-          "required": false,
-          "visible": false,
-          "order": 9,
-          "isSystemCore": false
-        }
-      ],
-      "createdAt": "2026-11-19T08:49:24.867Z",
-      "updatedAt": "2026-11-19T08:49:24.867Z",
-      "createdBy": "Ministry Chief Super Administrator"
     }
   ]
 }
