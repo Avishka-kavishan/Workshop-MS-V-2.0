@@ -521,8 +521,8 @@ export async function DELETE(request: NextRequest) {
           return;
         }
 
-        if (col.isSystemCore) {
-          errorMsg = 'System core columns cannot be deleted. You can hide them by setting visibility to false.';
+        if (tmpl.columns.length <= 1) {
+          errorMsg = 'Cannot delete all columns. An AIP template must retain at least one column.';
           return;
         }
 

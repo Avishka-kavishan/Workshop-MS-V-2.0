@@ -9537,7 +9537,7 @@
       "roleId": "role-superadmin",
       "isActive": true,
       "createdAt": "2026-10-01T08:00:00.000Z",
-      "lastLogin": "2026-11-19T07:59:07.067Z",
+      "lastLogin": "2026-11-19T08:46:38.674Z",
       "aliases": [
         "superadmin"
       ],
@@ -9601,7 +9601,7 @@
           "assignedAt": "2026-01-01T00:00:00.000Z"
         }
       ],
-      "lastSelectedRoleId": "ura-sa-mon",
+      "lastSelectedRoleId": "ura-sa-apex",
       "rememberLastRole": false
     },
     {
@@ -52066,6 +52066,52 @@
   ],
   "auditLogs": [
     {
+      "id": "audit-1795078012109-21a700a0",
+      "timestamp": "2026-11-19T08:46:52.109Z",
+      "userId": "user-superadmin",
+      "username": "superadmin",
+      "userFullName": "Ministry Chief Super Administrator",
+      "organizationId": "org-moe",
+      "organizationName": "Ministry of Education National Headquarters",
+      "category": "Security",
+      "action": "AUTH_ROLE_SWITCH",
+      "entityType": "AUTH",
+      "entityId": "ura-sa-apex",
+      "summary": "Officer \"Ministry Chief Super Administrator\" (superadmin) switched active working role from \"National Quality Assurance & M&E Oversight\" to \"Ministry Chief Super Administrator\" (Ministry of Education National Headquarters).",
+      "details": {
+        "previousRole": "National Quality Assurance & M&E Oversight",
+        "newRole": "Ministry Chief Super Administrator",
+        "organization": "Ministry of Education National Headquarters",
+        "functionalCategory": "All",
+        "adminLevel": 0,
+        "rememberedForNextLogin": false,
+        "switchTimestamp": "2026-11-19T08:46:52.108Z"
+      },
+      "severity": "Info"
+    },
+    {
+      "id": "audit-1795077998690-7f6ce7c9",
+      "timestamp": "2026-11-19T08:46:38.690Z",
+      "userId": "user-superadmin",
+      "username": "superadmin",
+      "userFullName": "Ministry Chief Super Administrator",
+      "organizationId": "org-moe-monitoring",
+      "organizationName": "MOE Quality Assurance & Monitoring Branch",
+      "category": "Security",
+      "action": "AUTH_LOGIN_SUCCESS",
+      "entityType": "AUTH",
+      "entityId": "user-superadmin",
+      "summary": "User \"Ministry Chief Super Administrator\" (superadmin) authenticated into IPMIS with unified account. Active role: \"National Quality Assurance & M&E Oversight\".",
+      "details": {
+        "role": "National Quality Assurance & M&E Oversight",
+        "organization": "MOE Quality Assurance & Monitoring Branch",
+        "loginTime": "2026-11-19T08:46:38.690Z",
+        "assignedRoleCount": 4,
+        "rememberLastRole": false
+      },
+      "severity": "Info"
+    },
+    {
       "id": "audit-1795075159932-ab958958",
       "timestamp": "2026-11-19T07:59:19.932Z",
       "userId": "user-superadmin",
@@ -55265,7 +55311,7 @@
       "isDefault": true,
       "status": "Active",
       "createdAt": "2026-01-01T08:00:00.000Z",
-      "updatedAt": "2026-11-19T08:00:00.000Z",
+      "updatedAt": "2026-11-19T08:51:29.343Z",
       "createdBy": "user-superadmin",
       "columns": [
         {
@@ -55381,28 +55427,6 @@
           "visible": true,
           "order": 8,
           "isSystemCore": true
-        },
-        {
-          "id": "col-sdg-target",
-          "key": "sdgTarget",
-          "label": "SDG 4 Target",
-          "description": "Sustainable Development Goal 4 education target mapping",
-          "dataType": "dropdown",
-          "options": [
-            "SDG 4.1 - Primary/Secondary Quality",
-            "SDG 4.2 - Early Childhood Education",
-            "SDG 4.3 - Technical & Vocational Skills",
-            "SDG 4.4 - Skills for Decent Work",
-            "SDG 4.5 - Gender Equality & Inclusion",
-            "SDG 4.a - Safe School Facilities",
-            "SDG 4.c - Teacher Training & Quality"
-          ],
-          "width": "140px",
-          "textAlign": "left",
-          "required": false,
-          "visible": false,
-          "order": 9,
-          "isSystemCore": false
         }
       ]
     },
@@ -55689,6 +55713,156 @@
           "isSystemCore": true
         }
       ]
+    },
+    {
+      "id": "tmpl-61364169-eeb5-4dbb-9a17-f2554dcf8005",
+      "name": "National Standard MoE AIP Template (Copy)",
+      "code": "MOE-NAT-STD_COPY",
+      "description": "Cloned from National Standard MoE AIP Template",
+      "financialYear": "all",
+      "isDefault": false,
+      "status": "Draft",
+      "columns": [
+        {
+          "id": "col-bdfaa466",
+          "key": "outputNo",
+          "label": "Outcome / Output No",
+          "description": "Strategic Outcome or Output numbering reference (e.g. 1.1, 2.3)",
+          "dataType": "text",
+          "width": "70px",
+          "textAlign": "center",
+          "required": false,
+          "visible": true,
+          "order": 1,
+          "isSystemCore": true
+        },
+        {
+          "id": "col-b5b66257",
+          "key": "activityCode",
+          "label": "Activity No",
+          "description": "Sequential activity code identifier (e.g. 1.1.1, ACT-01)",
+          "dataType": "text",
+          "width": "65px",
+          "textAlign": "center",
+          "required": true,
+          "visible": true,
+          "order": 2,
+          "isSystemCore": true
+        },
+        {
+          "id": "col-14e0eca6",
+          "key": "activity",
+          "label": "Main Activities",
+          "description": "Full narrative title and operational description of the implementation activity",
+          "dataType": "textarea",
+          "width": "280px",
+          "textAlign": "left",
+          "required": true,
+          "visible": true,
+          "order": 3,
+          "isSystemCore": true
+        },
+        {
+          "id": "col-9ae2fd6b",
+          "key": "voteNumber",
+          "label": "Vote Number",
+          "description": "Treasury budgetary vote head from Government Estimates (e.g. 126, 127)",
+          "dataType": "dropdown",
+          "options": [
+            "126",
+            "127",
+            "128",
+            "129",
+            "130",
+            "131",
+            "126-02-03-2502",
+            "126-01-01-1101"
+          ],
+          "width": "120px",
+          "textAlign": "center",
+          "required": true,
+          "visible": true,
+          "order": 4,
+          "isSystemCore": true
+        },
+        {
+          "id": "col-2dfdd06f",
+          "key": "estimatedCost",
+          "label": "Allocation / Estimated Cost (Mn)",
+          "description": "Total approved budget allocation in Sri Lankan Rupees (Millions LKR)",
+          "dataType": "currency",
+          "width": "100px",
+          "textAlign": "right",
+          "required": true,
+          "visible": true,
+          "order": 5,
+          "isSystemCore": true
+        },
+        {
+          "id": "col-0c12b3f5",
+          "key": "remark",
+          "label": "Remark",
+          "description": "Operational notes, procurement conditions, or executing remarks",
+          "dataType": "text",
+          "width": "85px",
+          "textAlign": "left",
+          "required": false,
+          "visible": true,
+          "order": 6,
+          "isSystemCore": true
+        },
+        {
+          "id": "col-1c661004",
+          "key": "indicator",
+          "label": "Indicator",
+          "description": "Performance measurement metric or deliverable indicator",
+          "dataType": "text",
+          "width": "120px",
+          "textAlign": "left",
+          "required": false,
+          "visible": true,
+          "order": 7,
+          "isSystemCore": true
+        },
+        {
+          "id": "col-190bb2ff",
+          "key": "responsibility",
+          "label": "Responsibility",
+          "description": "Designated implementing officer or desk officer designation",
+          "dataType": "text",
+          "width": "160px",
+          "textAlign": "left",
+          "required": true,
+          "visible": true,
+          "order": 8,
+          "isSystemCore": true
+        },
+        {
+          "id": "col-d98ebd46",
+          "key": "sdgTarget",
+          "label": "SDG 4 Target",
+          "description": "Sustainable Development Goal 4 education target mapping",
+          "dataType": "dropdown",
+          "options": [
+            "SDG 4.1 - Primary/Secondary Quality",
+            "SDG 4.2 - Early Childhood Education",
+            "SDG 4.3 - Technical & Vocational Skills",
+            "SDG 4.4 - Skills for Decent Work",
+            "SDG 4.5 - Gender Equality & Inclusion",
+            "SDG 4.a - Safe School Facilities",
+            "SDG 4.c - Teacher Training & Quality"
+          ],
+          "width": "140px",
+          "textAlign": "left",
+          "required": false,
+          "visible": false,
+          "order": 9,
+          "isSystemCore": false
+        }
+      ],
+      "createdAt": "2026-11-19T08:49:24.867Z",
+      "updatedAt": "2026-11-19T08:49:24.867Z",
+      "createdBy": "Ministry Chief Super Administrator"
     }
   ]
 }

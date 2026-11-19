@@ -1039,7 +1039,7 @@ export default function AipTemplateManager() {
 
                       {/* Action Buttons */}
                       <td style={{ padding: '0.65rem 0.8rem', textAlign: 'center' }}>
-                        <div style={{ display: 'inline-flex', gap: '0.35rem' }}>
+                        <div style={{ display: 'inline-flex', alignItems: 'center', gap: '0.35rem' }}>
                           <button
                             type="button"
                             onClick={() => openEditColumnModal(col)}
@@ -1058,32 +1058,26 @@ export default function AipTemplateManager() {
                             Edit
                           </button>
 
-                          {!col.isSystemCore ? (
-                            <button
-                              type="button"
-                              onClick={() => {
-                                setSelectedColumnForDelete(col);
-                                setShowDeleteColModal(true);
-                              }}
-                              style={{
-                                border: '1px solid #FECDD3',
-                                background: '#FFF1F2',
-                                color: '#E11D48',
-                                padding: '0.25rem 0.55rem',
-                                borderRadius: '5px',
-                                fontSize: '0.74rem',
-                                fontWeight: 600,
-                                cursor: 'pointer',
-                              }}
-                              title="Delete Custom Column"
-                            >
-                              Delete
-                            </button>
-                          ) : (
-                            <span style={{ color: '#CBD5E1', fontSize: '0.7rem', padding: '0.25rem' }} title="Core columns cannot be deleted">
-                              🔒
-                            </span>
-                          )}
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setSelectedColumnForDelete(col);
+                              setShowDeleteColModal(true);
+                            }}
+                            style={{
+                              border: '1px solid #FECDD3',
+                              background: '#FFF1F2',
+                              color: '#E11D48',
+                              padding: '0.25rem 0.55rem',
+                              borderRadius: '5px',
+                              fontSize: '0.74rem',
+                              fontWeight: 600,
+                              cursor: 'pointer',
+                            }}
+                            title="Delete Column"
+                          >
+                            Delete
+                          </button>
                         </div>
                       </td>
                     </tr>
@@ -1715,7 +1709,7 @@ export default function AipTemplateManager() {
               Delete Column &quot;{selectedColumnForDelete.label}&quot;?
             </h3>
             <p style={{ color: '#64748B', fontSize: '0.84rem', lineHeight: 1.5, marginBottom: '1.4rem' }}>
-              Are you sure you want to delete this custom column? Any data entered in this column for activities using this template will no longer be visible.
+              Are you sure you want to delete this column? It will be removed from this AIP template and will no longer appear in the table.
             </p>
             <div style={{ display: 'flex', justifyContent: 'center', gap: '0.75rem' }}>
               <button
