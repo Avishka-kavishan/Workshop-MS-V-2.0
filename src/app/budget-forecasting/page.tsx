@@ -6,7 +6,7 @@ import AppShell from '@/components/layout/AppShell';
 import BranchBadge, { getBranchAbbreviation } from '@/components/common/BranchBadge';
 import SearchableSelect from '@/components/common/SearchableSelect';
 import TileActionMenu, { TileExportData } from '@/components/dashboard/TileActionMenu';
-import { formatMillion, formatRupees, formatDualDeclaration, roundToCentInMn } from '@/lib/financialFormat';
+import { formatMillion, formatRupees, formatDualDeclaration, roundToCentInMn, format2DecMn, formatExactMn } from '@/lib/financialFormat';
 import { MOE_STANDARD_VOTE_NUMBERS, getVoteDetails } from '@/lib/sriLankanVotes';
 
 interface BudgetProposalActivity {
@@ -940,11 +940,11 @@ export default function BudgetPlanningWorkspacePage() {
       ]),
       summaryStats: [
         { label: 'Requirements', value: filteredFormulationProposals.length },
-        { label: 'Total Demand', value: `Rs. ${formatMillion(proposalSummary?.totalDemandMn || 0)} Mn` },
-        { label: 'Branch Proposed', value: `Rs. ${formatMillion(proposalSummary?.branchProposedMn || 0)} Mn` },
-        { label: 'Vision Proposed', value: `Rs. ${formatMillion(proposalSummary?.visionProposedMn || 0)} Mn` },
-        { label: 'Accepted / Rationalized', value: `Rs. ${formatMillion(proposalSummary?.acceptedCostMn || 0)} Mn` },
-        { label: 'Budget Speech Earmarked', value: `Rs. ${formatMillion(proposalSummary?.budgetSpeechCostMn || 0)} Mn` },
+        { label: 'Total Demand', value: `Rs. ${format2DecMn(proposalSummary?.totalDemandMn || 0)} Mn (Exact: Rs. ${formatExactMn(proposalSummary?.totalDemandMn || 0)} Mn)` },
+        { label: 'Branch Proposed', value: `Rs. ${format2DecMn(proposalSummary?.branchProposedMn || 0)} Mn (Exact: Rs. ${formatExactMn(proposalSummary?.branchProposedMn || 0)} Mn)` },
+        { label: 'Vision Proposed', value: `Rs. ${format2DecMn(proposalSummary?.visionProposedMn || 0)} Mn (Exact: Rs. ${formatExactMn(proposalSummary?.visionProposedMn || 0)} Mn)` },
+        { label: 'Accepted / Rationalized', value: `Rs. ${format2DecMn(proposalSummary?.acceptedCostMn || 0)} Mn (Exact: Rs. ${formatExactMn(proposalSummary?.acceptedCostMn || 0)} Mn)` },
+        { label: 'Budget Speech Earmarked', value: `Rs. ${format2DecMn(proposalSummary?.budgetSpeechCostMn || 0)} Mn (Exact: Rs. ${formatExactMn(proposalSummary?.budgetSpeechCostMn || 0)} Mn)` },
       ],
       orientation: 'landscape',
     };
@@ -1045,62 +1045,167 @@ export default function BudgetPlanningWorkspacePage() {
                 marginBottom: '1.25rem',
               }}
             >
-              <div className="card" style={{ padding: '1rem 1.25rem', borderLeft: '4px solid #00534E' }}>
-                <div style={{ fontSize: '0.75rem', color: '#666', fontWeight: 700, textTransform: 'uppercase' }}>
+              {/* Card 1: Branch Proposals */}
+              <div className="card" style={{ padding: '0.9rem 1.15rem', borderLeft: '4px solid #00534E' }}>
+                <div style={{ fontSize: '0.73rem', color: '#666', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.03em' }}>
                   Branch Proposals
                 </div>
-                <div style={{ fontSize: '1.5rem', fontWeight: 800, color: '#00534E', marginTop: '0.2rem' }}>
-                  Rs. {proposalSummary.branchProposedMn} Mn
+                <div
+                  style={{
+                    fontSize: '1.38rem',
+                    fontWeight: 800,
+                    color: '#00534E',
+                    marginTop: '0.2rem',
+                    whiteSpace: 'nowrap',
+                    cursor: 'help',
+                    display: 'flex',
+                    alignItems: 'baseline',
+                    gap: '0.25rem',
+                  }}
+                  title={`Exact Demand: Rs. ${formatExactMn(proposalSummary.branchProposedMn)} Mn (${formatRupees(proposalSummary.branchProposedMn, true)})`}
+                >
+                  <span>Rs. {format2DecMn(proposalSummary.branchProposedMn)}</span>
+                  <span style={{ fontSize: '0.92rem', fontWeight: 700, opacity: 0.9 }}>Mn</span>
                 </div>
-                <div style={{ fontSize: '0.75rem', color: '#888', marginTop: '0.15rem' }}>
+                <div
+                  style={{ fontSize: '0.71rem', color: '#64748B', marginTop: '0.15rem', fontWeight: 600, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}
+                  title={`Exact Demand: Rs. ${formatExactMn(proposalSummary.branchProposedMn)} Mn (${formatRupees(proposalSummary.branchProposedMn, true)})`}
+                >
+                  Exact: Rs. {formatExactMn(proposalSummary.branchProposedMn)} Mn
+                </div>
+                <div style={{ fontSize: '0.72rem', color: '#888', marginTop: '0.2rem' }}>
                   {proposalSummary.branchProposalsCount} activities submitted (No votes required)
                 </div>
               </div>
 
-              <div className="card" style={{ padding: '1rem 1.25rem', borderLeft: '4px solid #8D153A' }}>
-                <div style={{ fontSize: '0.75rem', color: '#666', fontWeight: 700, textTransform: 'uppercase' }}>
+              {/* Card 2: Government Vision */}
+              <div className="card" style={{ padding: '0.9rem 1.15rem', borderLeft: '4px solid #8D153A' }}>
+                <div style={{ fontSize: '0.73rem', color: '#666', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.03em' }}>
                   Stage 2: Government Vision
                 </div>
-                <div style={{ fontSize: '1.5rem', fontWeight: 800, color: '#8D153A', marginTop: '0.2rem' }}>
-                  Rs. {proposalSummary.visionProposedMn} Mn
+                <div
+                  style={{
+                    fontSize: '1.38rem',
+                    fontWeight: 800,
+                    color: '#8D153A',
+                    marginTop: '0.2rem',
+                    whiteSpace: 'nowrap',
+                    cursor: 'help',
+                    display: 'flex',
+                    alignItems: 'baseline',
+                    gap: '0.25rem',
+                  }}
+                  title={`Exact Government Vision: Rs. ${formatExactMn(proposalSummary.visionProposedMn)} Mn (${formatRupees(proposalSummary.visionProposedMn, true)})`}
+                >
+                  <span>Rs. {format2DecMn(proposalSummary.visionProposedMn)}</span>
+                  <span style={{ fontSize: '0.92rem', fontWeight: 700, opacity: 0.9 }}>Mn</span>
                 </div>
-                <div style={{ fontSize: '0.75rem', color: '#888', marginTop: '0.15rem' }}>
+                <div
+                  style={{ fontSize: '0.71rem', color: '#64748B', marginTop: '0.15rem', fontWeight: 600, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}
+                  title={`Exact Government Vision: Rs. ${formatExactMn(proposalSummary.visionProposedMn)} Mn (${formatRupees(proposalSummary.visionProposedMn, true)})`}
+                >
+                  Exact: Rs. {formatExactMn(proposalSummary.visionProposedMn)} Mn
+                </div>
+                <div style={{ fontSize: '0.72rem', color: '#888', marginTop: '0.2rem' }}>
                   {proposalSummary.visionProposalsCount} strategic policy initiatives injected
                 </div>
               </div>
 
-              <div className="card" style={{ padding: '1rem 1.25rem', borderLeft: '4px solid #EB7400' }}>
-                <div style={{ fontSize: '0.75rem', color: '#666', fontWeight: 700, textTransform: 'uppercase' }}>
+              {/* Card 3: Total Ministry Demand */}
+              <div className="card" style={{ padding: '0.9rem 1.15rem', borderLeft: '4px solid #EB7400' }}>
+                <div style={{ fontSize: '0.73rem', color: '#666', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.03em' }}>
                   Total Ministry Demand
                 </div>
-                <div style={{ fontSize: '1.5rem', fontWeight: 800, color: '#EB7400', marginTop: '0.2rem' }}>
-                  Rs. {proposalSummary.totalDemandMn} Mn
+                <div
+                  style={{
+                    fontSize: '1.38rem',
+                    fontWeight: 800,
+                    color: '#EB7400',
+                    marginTop: '0.2rem',
+                    whiteSpace: 'nowrap',
+                    cursor: 'help',
+                    display: 'flex',
+                    alignItems: 'baseline',
+                    gap: '0.25rem',
+                  }}
+                  title={`Exact Total Demand: Rs. ${formatExactMn(proposalSummary.totalDemandMn)} Mn (${formatRupees(proposalSummary.totalDemandMn, true)})`}
+                >
+                  <span>Rs. {format2DecMn(proposalSummary.totalDemandMn)}</span>
+                  <span style={{ fontSize: '0.92rem', fontWeight: 700, opacity: 0.9 }}>Mn</span>
                 </div>
-                <div style={{ fontSize: '0.75rem', color: '#888', marginTop: '0.15rem' }}>
+                <div
+                  style={{ fontSize: '0.71rem', color: '#64748B', marginTop: '0.15rem', fontWeight: 600, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}
+                  title={`Exact Total Demand: Rs. ${formatExactMn(proposalSummary.totalDemandMn)} Mn (${formatRupees(proposalSummary.totalDemandMn, true)})`}
+                >
+                  Exact: Rs. {formatExactMn(proposalSummary.totalDemandMn)} Mn
+                </div>
+                <div style={{ fontSize: '0.72rem', color: '#888', marginTop: '0.2rem' }}>
                   Across {proposalSummary.totalProposals} total combined requirements
                 </div>
               </div>
 
-              <div className="card" style={{ padding: '1rem 1.25rem', borderLeft: '4px solid #2B6CB0' }}>
-                <div style={{ fontSize: '0.75rem', color: '#666', fontWeight: 700, textTransform: 'uppercase' }}>
+              {/* Card 4: Rationalized / Accepted */}
+              <div className="card" style={{ padding: '0.9rem 1.15rem', borderLeft: '4px solid #2B6CB0' }}>
+                <div style={{ fontSize: '0.73rem', color: '#666', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.03em' }}>
                   Rationalized / Accepted
                 </div>
-                <div style={{ fontSize: '1.5rem', fontWeight: 800, color: '#2B6CB0', marginTop: '0.2rem' }}>
-                  Rs. {proposalSummary.acceptedCostMn} Mn
+                <div
+                  style={{
+                    fontSize: '1.38rem',
+                    fontWeight: 800,
+                    color: '#2B6CB0',
+                    marginTop: '0.2rem',
+                    whiteSpace: 'nowrap',
+                    cursor: 'help',
+                    display: 'flex',
+                    alignItems: 'baseline',
+                    gap: '0.25rem',
+                  }}
+                  title={`Exact Accepted: Rs. ${formatExactMn(proposalSummary.acceptedCostMn)} Mn (${formatRupees(proposalSummary.acceptedCostMn, true)})`}
+                >
+                  <span>Rs. {format2DecMn(proposalSummary.acceptedCostMn)}</span>
+                  <span style={{ fontSize: '0.92rem', fontWeight: 700, opacity: 0.9 }}>Mn</span>
                 </div>
-                <div style={{ fontSize: '0.75rem', color: '#888', marginTop: '0.15rem' }}>
+                <div
+                  style={{ fontSize: '0.71rem', color: '#64748B', marginTop: '0.15rem', fontWeight: 600, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}
+                  title={`Exact Accepted: Rs. ${formatExactMn(proposalSummary.acceptedCostMn)} Mn (${formatRupees(proposalSummary.acceptedCostMn, true)})`}
+                >
+                  Exact: Rs. {formatExactMn(proposalSummary.acceptedCostMn)} Mn
+                </div>
+                <div style={{ fontSize: '0.72rem', color: '#888', marginTop: '0.2rem' }}>
                   {proposalSummary.acceptedCount} proposals classified with official votes
                 </div>
               </div>
 
-              <div className="card" style={{ padding: '1rem 1.25rem', borderLeft: '4px solid #B7791F' }}>
-                <div style={{ fontSize: '0.75rem', color: '#666', fontWeight: 700, textTransform: 'uppercase' }}>
+              {/* Card 5: Annual Budget Speech */}
+              <div className="card" style={{ padding: '0.9rem 1.15rem', borderLeft: '4px solid #B7791F' }}>
+                <div style={{ fontSize: '0.73rem', color: '#666', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.03em' }}>
                   Annual Budget Speech
                 </div>
-                <div style={{ fontSize: '1.5rem', fontWeight: 800, color: '#B7791F', marginTop: '0.2rem' }}>
-                  Rs. {proposalSummary.budgetSpeechCostMn} Mn
+                <div
+                  style={{
+                    fontSize: '1.38rem',
+                    fontWeight: 800,
+                    color: '#B7791F',
+                    marginTop: '0.2rem',
+                    whiteSpace: 'nowrap',
+                    cursor: 'help',
+                    display: 'flex',
+                    alignItems: 'baseline',
+                    gap: '0.25rem',
+                  }}
+                  title={`Exact Budget Speech: Rs. ${formatExactMn(proposalSummary.budgetSpeechCostMn)} Mn (${formatRupees(proposalSummary.budgetSpeechCostMn, true)})`}
+                >
+                  <span>Rs. {format2DecMn(proposalSummary.budgetSpeechCostMn)}</span>
+                  <span style={{ fontSize: '0.92rem', fontWeight: 700, opacity: 0.9 }}>Mn</span>
                 </div>
-                <div style={{ fontSize: '0.75rem', color: '#888', marginTop: '0.15rem' }}>
+                <div
+                  style={{ fontSize: '0.71rem', color: '#64748B', marginTop: '0.15rem', fontWeight: 600, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}
+                  title={`Exact Budget Speech: Rs. ${formatExactMn(proposalSummary.budgetSpeechCostMn)} Mn (${formatRupees(proposalSummary.budgetSpeechCostMn, true)})`}
+                >
+                  Exact: Rs. {formatExactMn(proposalSummary.budgetSpeechCostMn)} Mn
+                </div>
+                <div style={{ fontSize: '0.72rem', color: '#888', marginTop: '0.2rem' }}>
                   {proposalSummary.budgetSpeechCount} flagship proposals earmarked
                 </div>
               </div>
@@ -1142,12 +1247,15 @@ export default function BudgetPlanningWorkspacePage() {
                 </span>
                 <span style={{ fontSize: '1.05rem' }}>💰</span>
               </div>
-              <div style={{ fontSize: '1.45rem', fontWeight: 800, color: '#00534E', lineHeight: 1.2 }}>
-                Rs. {formatMillion(branchStats.totalDemandMn)} Mn
+              <div
+                style={{ fontSize: '1.45rem', fontWeight: 800, color: '#00534E', lineHeight: 1.2, whiteSpace: 'nowrap', cursor: 'help' }}
+                title={`Exact Demand: Rs. ${formatExactMn(branchStats.totalDemandMn)} Mn (${formatRupees(branchStats.totalDemandMn, true)})`}
+              >
+                Rs. {format2DecMn(branchStats.totalDemandMn)} <span style={{ fontSize: '0.95rem', fontWeight: 700 }}>Mn</span>
               </div>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: '0.72rem', color: '#64748B', marginTop: '0.25rem' }}>
-                <span title={`Exact Demand: ${formatRupees(branchStats.totalDemandMn, true)}`}>
-                  Exact: {formatRupees(branchStats.totalDemandMn, true)}
+                <span title={`Exact Demand: Rs. ${formatExactMn(branchStats.totalDemandMn)} Mn (${formatRupees(branchStats.totalDemandMn, true)})`}>
+                  Exact: Rs. {formatExactMn(branchStats.totalDemandMn)} Mn
                 </span>
                 {activeTileFilter === 'all' && (
                   <span style={{ fontSize: '0.64rem', fontWeight: 700, color: '#00534E', background: 'rgba(0, 83, 78, 0.1)', padding: '0.1rem 0.35rem', borderRadius: '4px' }}>
@@ -1187,7 +1295,7 @@ export default function BudgetPlanningWorkspacePage() {
                 {branchStats.draftsCount} Drafts
               </div>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: '0.72rem', color: '#64748B', marginTop: '0.25rem' }}>
-                <span title={`Exact: ${formatRupees(branchStats.draftsCostMn, true)}`}>Rs. {formatMillion(branchStats.draftsCostMn)} Mn in prep</span>
+                <span title={`Exact Drafts: Rs. ${formatExactMn(branchStats.draftsCostMn)} Mn (${formatRupees(branchStats.draftsCostMn, true)})`}>Rs. {format2DecMn(branchStats.draftsCostMn)} Mn in prep</span>
                 {activeTileFilter === 'drafts' ? (
                   <span style={{ fontSize: '0.64rem', fontWeight: 700, color: '#334155', background: 'rgba(71, 85, 105, 0.15)', padding: '0.1rem 0.35rem', borderRadius: '4px' }}>
                     Filtered ✓
@@ -1228,7 +1336,7 @@ export default function BudgetPlanningWorkspacePage() {
                 {branchStats.submittedCount} Activities
               </div>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: '0.72rem', color: '#64748B', marginTop: '0.25rem' }}>
-                <span title={`Exact: ${formatRupees(branchStats.submittedCostMn, true)}`}>Rs. {formatMillion(branchStats.submittedCostMn)} Mn under appraisal</span>
+                <span title={`Exact Submitted: Rs. ${formatExactMn(branchStats.submittedCostMn)} Mn (${formatRupees(branchStats.submittedCostMn, true)})`}>Rs. {format2DecMn(branchStats.submittedCostMn)} Mn under appraisal</span>
                 {activeTileFilter === 'submitted' ? (
                   <span style={{ fontSize: '0.64rem', fontWeight: 700, color: '#0369A1', background: 'rgba(2, 132, 199, 0.15)', padding: '0.1rem 0.35rem', borderRadius: '4px' }}>
                     Filtered ✓
@@ -1269,7 +1377,7 @@ export default function BudgetPlanningWorkspacePage() {
                 {branchStats.acceptedCount} Activities
               </div>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: '0.72rem', color: '#64748B', marginTop: '0.25rem' }}>
-                <span title={`Exact: ${formatRupees(branchStats.acceptedCostMn, true)}`}>Rs. {formatMillion(branchStats.acceptedCostMn)} Mn approved</span>
+                <span title={`Exact Accepted: Rs. ${formatExactMn(branchStats.acceptedCostMn)} Mn (${formatRupees(branchStats.acceptedCostMn, true)})`}>Rs. {format2DecMn(branchStats.acceptedCostMn)} Mn approved</span>
                 {activeTileFilter === 'accepted' ? (
                   <span style={{ fontSize: '0.64rem', fontWeight: 700, color: '#15803D', background: 'rgba(22, 163, 74, 0.15)', padding: '0.1rem 0.35rem', borderRadius: '4px' }}>
                     Filtered ✓
@@ -1837,12 +1945,15 @@ export default function BudgetPlanningWorkspacePage() {
                               </div>
                             ) : (
                               <>
-                                <div style={{ fontWeight: 800, color: 'var(--primary)', fontSize: '0.92rem' }} title={`Exact: ${formatRupees(p.estimatedCostMn, true)}`}>
-                                  Rs. {formatMillion(p.estimatedCostMn)} Mn
+                                <div style={{ fontWeight: 800, color: 'var(--primary)', fontSize: '0.92rem' }} title={`Exact: Rs. ${formatExactMn(p.estimatedCostMn)} Mn (${formatRupees(p.estimatedCostMn, true)})`}>
+                                  Rs. {format2DecMn(p.estimatedCostMn)} Mn
+                                </div>
+                                <div style={{ fontSize: '0.68rem', color: '#64748B' }} title={`Exact: Rs. ${formatExactMn(p.estimatedCostMn)} Mn`}>
+                                  Exact: Rs. {formatExactMn(p.estimatedCostMn)} Mn
                                 </div>
                                 {p.adjustedCostMn && p.adjustedCostMn !== p.estimatedCostMn && (
-                                  <div style={{ fontSize: '0.72rem', color: '#2B6CB0', fontWeight: 600 }} title={`Exact: ${formatRupees(p.adjustedCostMn, true)}`}>
-                                    Rationalized: Rs. {formatMillion(p.adjustedCostMn)} Mn
+                                  <div style={{ fontSize: '0.72rem', color: '#2B6CB0', fontWeight: 600 }} title={`Exact: Rs. ${formatExactMn(p.adjustedCostMn)} Mn (${formatRupees(p.adjustedCostMn, true)})`}>
+                                    Rationalized: Rs. {format2DecMn(p.adjustedCostMn)} Mn
                                   </div>
                                 )}
                               </>
@@ -2364,20 +2475,28 @@ export default function BudgetPlanningWorkspacePage() {
                           )}
                         </td>
 
-                        <td style={{ padding: '0.75rem', fontWeight: 700, color: '#666' }} title={`Exact: ${formatRupees(p.estimatedCostMn, true)}`}>
+                        <td style={{ padding: '0.75rem', fontWeight: 700, color: '#666' }} title={`Exact: Rs. ${formatExactMn(p.estimatedCostMn)} Mn (${formatRupees(p.estimatedCostMn, true)})`}>
                           {p.noBudgetRequired || Number(p.estimatedCostMn) === 0 ? (
                             <span style={{ fontSize: '0.75rem', color: '#718096' }}>Rs. 0.00 Mn (Zero-Cost)</span>
                           ) : (
-                            `Rs. ${formatMillion(p.estimatedCostMn)} Mn`
+                            <div>
+                              <div>Rs. {format2DecMn(p.estimatedCostMn)} Mn</div>
+                              <div style={{ fontSize: '0.68rem', color: '#64748B' }}>Exact: Rs. {formatExactMn(p.estimatedCostMn)} Mn</div>
+                            </div>
                           )}
                         </td>
 
-                        <td style={{ padding: '0.75rem' }} title={p.status !== 'Rejected' ? `Exact: ${formatRupees(p.adjustedCostMn ?? p.estimatedCostMn, true)}` : ''}>
+                        <td style={{ padding: '0.75rem' }} title={p.status !== 'Rejected' ? `Exact: Rs. ${formatExactMn(p.adjustedCostMn ?? p.estimatedCostMn)} Mn (${formatRupees(p.adjustedCostMn ?? p.estimatedCostMn, true)})` : ''}>
                           {p.status === 'Rejected' ? (
                             <span style={{ color: '#C53030', fontWeight: 700 }}>Rs. 0.00 Mn (Rejected)</span>
                           ) : (
-                            <div style={{ fontWeight: 800, color: '#00534E', fontSize: '0.92rem' }}>
-                              Rs. {formatMillion(p.adjustedCostMn ?? p.estimatedCostMn)} Mn
+                            <div>
+                              <div style={{ fontWeight: 800, color: '#00534E', fontSize: '0.92rem' }}>
+                                Rs. {format2DecMn(p.adjustedCostMn ?? p.estimatedCostMn)} Mn
+                              </div>
+                              <div style={{ fontSize: '0.68rem', color: '#64748B' }}>
+                                Exact: Rs. {formatExactMn(p.adjustedCostMn ?? p.estimatedCostMn)} Mn
+                              </div>
                             </div>
                           )}
                         </td>
@@ -2566,12 +2685,17 @@ export default function BudgetPlanningWorkspacePage() {
                         <tr key={theme} style={{ borderBottom: '1px solid #EBEBEB' }}>
                           <td style={{ padding: '0.75rem', fontWeight: 700, color: '#00534E' }}>{theme}</td>
                           <td style={{ padding: '0.75rem' }}>{branchItems.length} activities</td>
-                          <td style={{ padding: '0.75rem' }} title={`Exact: ${formatRupees(branchCost, true)}`}>Rs. {formatMillion(branchCost)} Mn</td>
-                          <td style={{ padding: '0.75rem', fontWeight: 600, color: '#8D153A' }} title={`Exact: ${formatRupees(visionCost, true)}`}>
-                            Rs. {formatMillion(visionCost)} Mn
+                          <td style={{ padding: '0.75rem' }} title={`Exact: Rs. ${formatExactMn(branchCost)} Mn (${formatRupees(branchCost, true)})`}>
+                            <div>Rs. {format2DecMn(branchCost)} Mn</div>
+                            <div style={{ fontSize: '0.68rem', color: '#64748B' }}>Exact: Rs. {formatExactMn(branchCost)} Mn</div>
                           </td>
-                          <td style={{ padding: '0.75rem', fontWeight: 800, color: 'var(--primary)' }} title={`Exact: ${formatRupees(totalThemeCost, true)}`}>
-                            Rs. {formatMillion(totalThemeCost)} Mn
+                          <td style={{ padding: '0.75rem', fontWeight: 600, color: '#8D153A' }} title={`Exact: Rs. ${formatExactMn(visionCost)} Mn (${formatRupees(visionCost, true)})`}>
+                            <div>Rs. {format2DecMn(visionCost)} Mn</div>
+                            <div style={{ fontSize: '0.68rem', color: '#64748B' }}>Exact: Rs. {formatExactMn(visionCost)} Mn</div>
+                          </td>
+                          <td style={{ padding: '0.75rem', fontWeight: 800, color: 'var(--primary)' }} title={`Exact: Rs. ${formatExactMn(totalThemeCost)} Mn (${formatRupees(totalThemeCost, true)})`}>
+                            <div>Rs. {format2DecMn(totalThemeCost)} Mn</div>
+                            <div style={{ fontSize: '0.68rem', color: '#64748B' }}>Exact: Rs. {formatExactMn(totalThemeCost)} Mn</div>
                           </td>
                           <td style={{ padding: '0.75rem' }}>
                             <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>

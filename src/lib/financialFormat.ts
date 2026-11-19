@@ -114,6 +114,41 @@ export function formatMillion(
 }
 
 /**
+ * Formats a fund amount in Millions (Mn) strictly to 2 decimal places with thousands separators.
+ * Example: 29110.54005 => "29,110.54", 87.5 => "87.50"
+ */
+export function format2DecMn(val: number | string | null | undefined): string {
+  if (val === null || val === undefined || val === '') return '0.00';
+  const num = parseAmountToMn(val);
+  if (isNaN(num)) return '0.00';
+  return num.toLocaleString('en-US', {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  });
+}
+
+/**
+ * Formats a fund amount in Millions (Mn) with exact precision:
+ * Shows at least 2 decimal places, and preserves all significant decimals up to 6 without loss.
+ * Example: 29110.54005 => "29,110.54005", 87.5 => "87.50"
+ */
+export function formatExactMn(val: number | string | null | undefined): string {
+  if (val === null || val === undefined || val === '') return '0.00';
+  const num = parseAmountToMn(val);
+  if (isNaN(num)) return '0.00';
+  const rounded = roundTo6Decimals(num);
+  const parts = rounded.toString().split('.');
+  const intFormatted = Number(parts[0]).toLocaleString('en-US');
+  if (!parts[1]) {
+    return `${intFormatted}.00`;
+  }
+  if (parts[1].length === 1) {
+    return `${intFormatted}.${parts[1]}0`;
+  }
+  return `${intFormatted}.${parts[1]}`;
+}
+
+/**
  * Formats an amount in Sri Lankan Rupees (Rs.) strictly down to the last cent (.00 cents).
  * 
  * Examples:
