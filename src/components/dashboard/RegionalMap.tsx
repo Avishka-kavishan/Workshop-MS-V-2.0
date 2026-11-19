@@ -440,66 +440,57 @@ function RegionalMap({ workshops = [], provincesData, onSelectProvince }: Region
                 );
               })}
 
-              {/* ── Interactive Status Pins & Codes for 9 Provinces ── */}
+              {/* ── Full Province Name Labels for 9 Provinces ── */}
               {provinces.map((prov) => {
                 const [px, py] = SRI_LANKA_GEO_PINS[prov.id] || prov.pin;
                 const isMatch = bandFilter === 'All' || getTrafficLight(prov.progressPct).band === bandFilter;
                 const isHover = hoveredProvince?.id === prov.id;
-                const tl = getTrafficLight(prov.progressPct);
+
+                // Split province name (e.g. "Western Province" -> "Western" + "Province") for clean two-line fit
+                const baseName = prov.name.replace(/\s+Province$/i, '');
 
                 return (
                   <g
-                    key={`pin-${prov.id}`}
+                    key={`label-${prov.id}`}
                     style={{
                       cursor: 'pointer',
                       transition: 'transform 0.18s ease, opacity 0.2s ease',
                       opacity: isMatch ? 1 : 0.25,
                     }}
-                    transform={isHover ? `translate(${px}, ${py - 4}) scale(1.18) translate(-${px}, -${py})` : ''}
+                    transform={isHover ? `translate(${px}, ${py}) scale(1.16) translate(-${px}, -${py})` : ''}
                     onMouseEnter={() => setHoveredProvince(prov)}
                     onMouseLeave={() => setHoveredProvince(null)}
                     onClick={() => openDrillDown(prov)}
                   >
-                    {/* Pulsing Outer Ring */}
-                    {isMatch && (
-                      <circle cx={px} cy={py} r={isHover ? 13 : 9} fill={tl.bg} opacity={isHover ? 0.45 : 0.26}>
-                        <animate
-                          attributeName="r"
-                          values={`${isHover ? 11 : 8};${isHover ? 16 : 12};${isHover ? 11 : 8}`}
-                          dur="2.5s"
-                          repeatCount="indefinite"
-                        />
-                      </circle>
-                    )}
-
-                    {/* Teardrop SVG Drop Pin in Traffic Light Color */}
-                    <path
-                      d={`M ${px} ${py + 2} 
-                         C ${px - 6} ${py - 4}, ${px - 7} ${py - 12}, ${px} ${py - 14} 
-                         C ${px + 7} ${py - 12}, ${px + 6} ${py - 4}, ${px} ${py + 2} Z`}
-                      fill={isMatch ? tl.bg : '#94A3B8'}
-                      stroke="#FFFFFF"
-                      strokeWidth="1.6"
-                      filter="drop-shadow(0 2px 4px rgba(0,0,0,0.3))"
-                    />
-
-                    {/* Inner White Core Circle */}
-                    <circle cx={px} cy={py - 8} r="2.8" fill="#FFFFFF" />
-
-                    {/* Province Code Label */}
+                    {/* Full Province Name in smaller font */}
                     <text
                       x={px}
-                      y={py + 13}
+                      y={py - 1.5}
                       textAnchor="middle"
-                      fill="#0F172A"
-                      fontSize="7.5"
+                      fill={isHover ? '#0F172A' : '#1E293B'}
+                      fontSize="4.8"
                       fontWeight="800"
                       fontFamily="system-ui, -apple-system, sans-serif"
                       stroke="#FFFFFF"
-                      strokeWidth="0.6"
+                      strokeWidth="1.2"
                       paintOrder="stroke"
+                      strokeLinejoin="round"
+                      style={{ letterSpacing: '0.01em', userSelect: 'none' }}
                     >
-                      {prov.code}
+                      <tspan x={px} dy="0">{baseName}</tspan>
+                      <tspan
+                        x={px}
+                        dy="5.2"
+                        fontSize="3.9"
+                        fontWeight="700"
+                        fill={isHover ? '#334155' : '#475569'}
+                        stroke="#FFFFFF"
+                        strokeWidth="1.0"
+                        paintOrder="stroke"
+                        strokeLinejoin="round"
+                      >
+                        Province
+                      </tspan>
                     </text>
                   </g>
                 );
