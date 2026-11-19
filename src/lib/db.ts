@@ -35,6 +35,9 @@ import {
   DEFAULT_ANNOUNCEMENTS,
   DEFAULT_BUDGET_PROPOSALS,
   DEFAULT_GOVERNMENT_VOTES,
+  DEFAULT_AIP_TEMPLATES,
+  AipColumn,
+  AipTemplate,
   LEVEL_ADMIN_ROLES,
   LEVEL_ADMIN_USERS,
 } from './frsSeedData';
@@ -90,7 +93,11 @@ export interface DbSchema {
   calendarSubscribers?: CalendarSubscriber[];
   auditLogs?: SystemAuditLog[];
   votes?: GovernmentVote[];
+  aipTemplates?: AipTemplate[];
 }
+
+export type { AipColumn, AipTemplate };
+export { DEFAULT_AIP_TEMPLATES };
 
 export interface SystemAuditLog {
   id: string;
@@ -981,6 +988,7 @@ export interface AipActivity {
   physicalProgressPct?: string;
   financialProgress?: number;
   financialProgressPct?: string;
+  customFields?: Record<string, any>;
   createdBy?: string;
   creatorName?: string;
   createdAt: string;
@@ -1060,6 +1068,7 @@ function readJsonFile(): DbSchema {
       announcements: [...DEFAULT_ANNOUNCEMENTS],
       budgetProposalActivities: [...DEFAULT_BUDGET_PROPOSALS],
       votes: [...DEFAULT_GOVERNMENT_VOTES],
+      aipTemplates: [...DEFAULT_AIP_TEMPLATES],
     };
     writeJsonFile(emptyDb);
     memoryDb = emptyDb;
@@ -1126,6 +1135,9 @@ function readJsonFile(): DbSchema {
     }
     if (!parsed.votes || parsed.votes.length === 0) {
       parsed.votes = [...DEFAULT_GOVERNMENT_VOTES];
+    }
+    if (!parsed.aipTemplates || parsed.aipTemplates.length === 0) {
+      parsed.aipTemplates = [...DEFAULT_AIP_TEMPLATES];
     }
 
     // Ensure Monitoring Division, Role, and User exist in memory/db

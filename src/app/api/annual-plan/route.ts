@@ -353,6 +353,16 @@ export async function GET(request: NextRequest) {
         (r.year === String(year) || !r.year)
     );
 
+    // Active AIP Template for dynamic columns
+    const allTemplates = data.aipTemplates || [];
+    let activeTemplate = allTemplates.find((t) => t.isDefault && t.status === 'Active');
+    if (!activeTemplate && year) {
+      activeTemplate = allTemplates.find((t) => t.financialYear === year && t.status === 'Active');
+    }
+    if (!activeTemplate && allTemplates.length > 0) {
+      activeTemplate = allTemplates[0];
+    }
+
     return NextResponse.json({
       success: true,
       hasPlan: true,
@@ -363,6 +373,7 @@ export async function GET(request: NextRequest) {
       relevantPlanningBranch,
       relevantMonitoringBranch,
       monthlyReturns,
+      aipTemplate: activeTemplate || null,
       deadline: aipDeadline || null,
       year,
       amendmentNumber,

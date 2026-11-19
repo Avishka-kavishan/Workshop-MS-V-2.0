@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useMemo } from 'react';
 import { useSession } from 'next-auth/react';
+import Link from 'next/link';
 import AppShell from '@/components/layout/AppShell';
 import BranchBadge from '@/components/common/BranchBadge';
 import SearchableSelect from '@/components/common/SearchableSelect';
@@ -101,6 +102,7 @@ interface AipActivity {
   physicalProgressPct?: string;
   financialProgress?: number;
   financialProgressPct?: string;
+  customFields?: Record<string, any>;
   createdAt: string;
   updatedAt: string;
 }
@@ -227,6 +229,14 @@ export default function AnnualPlanPage() {
   const [editingActivity, setEditingActivity] = useState<AipActivity | null>(null);
   const [formSubmitting, setFormSubmitting] = useState(false);
   const [formError, setFormError] = useState('');
+
+  // AIP Template & Custom Fields State
+  const [aipTemplate, setAipTemplate] = useState<any | null>(null);
+  const [formCustomFields, setFormCustomFields] = useState<Record<string, any>>({});
+  const customColumns = useMemo(
+    () => (aipTemplate?.columns || []).filter((c: any) => !c.isSystemCore && c.visible !== false),
+    [aipTemplate]
+  );
 
   // Activity Form Fields
   const [formOutputNo, setFormOutputNo] = useState('1');
@@ -518,6 +528,9 @@ export default function AnnualPlanPage() {
         }
         if (json.monthlyReturns) {
           setMonthlyReturns(json.monthlyReturns);
+        }
+        if (json.aipTemplate) {
+          setAipTemplate(json.aipTemplate);
         }
         if (json.branch?.id) {
           setSelectedBranchId(json.branch.id);
@@ -1036,6 +1049,13 @@ export default function AnnualPlanPage() {
     setFormPhysicalProgressPct('');
     setFormFinancialProgress('');
     setFormFinancialProgressPct('');
+    const initialCustom: Record<string, any> = {};
+    (aipTemplate?.columns || []).forEach((c: any) => {
+      if (!c.isSystemCore && c.defaultValue !== undefined) {
+        initialCustom[c.key] = c.defaultValue;
+      }
+    });
+    setFormCustomFields(initialCustom);
     setFormError('');
     setIsModalOpen(true);
   };
@@ -1078,6 +1098,7 @@ export default function AnnualPlanPage() {
     setFormPhysicalProgressPct(act.physicalProgressPct || '');
     setFormFinancialProgress(act.financialProgress !== undefined && act.financialProgress !== null ? String(act.financialProgress) : '');
     setFormFinancialProgressPct(act.financialProgressPct || '');
+    setFormCustomFields(act.customFields || {});
 
     setFormError('');
     setIsModalOpen(true);
@@ -1174,6 +1195,7 @@ export default function AnnualPlanPage() {
         physicalProgressPct: formPhysicalProgressPct,
         financialProgress: formFinancialProgress !== '' ? parseFloat(formFinancialProgress) : undefined,
         financialProgressPct: formFinancialProgressPct,
+        customFields: formCustomFields,
       };
 
       const res = await fetch('/api/annual-plan/activities', {
@@ -1965,6 +1987,30 @@ export default function AnnualPlanPage() {
                   <span>📤</span> {selectedAmendmentNumber === 0 ? `Submit Plan to ${relevantPlanningBranch?.planningAuthorityLabel || 'Planning Branch'}` : `Submit Amendment 0${selectedAmendmentNumber}`}
                 </button>
               )
+            )}
+
+            {/* Super Admin: AIP Template Configuration Link */}
+            {Boolean(user?.adminLevel === 0 || user?.isSuperAdmin || user?.username === 'superadmin' || user?.roleName === 'Super Administrator') && (
+              <Link
+                href="/admin?tab=aip-templates"
+                style={{
+                  background: '#FEF3C7',
+                  color: '#92400E',
+                  border: '1px solid #FDE68A',
+                  padding: '0.45rem 0.85rem',
+                  borderRadius: '8px',
+                  fontWeight: 700,
+                  fontSize: '0.82rem',
+                  textDecoration: 'none',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.35rem',
+                  boxShadow: '0 1px 3px rgba(146, 64, 14, 0.1)',
+                }}
+                title="Super Admin Console: Configure AIP Templates and Column Specifications"
+              >
+                <span>⚙️</span> AIP Template: {aipTemplate?.name ? aipTemplate.name : 'Standard MoE'}
+              </Link>
             )}
 
             {/* Primary Action Button: Add Activity */}
@@ -3629,6 +3675,24 @@ export default function AnnualPlanPage() {
                       />
                     </th>
                     <th rowSpan={3} style={{ minWidth: '160px' }}>Responsibility</th>
+                    {customColumns.map((col: any) => (
+                      <th
+                        key={col.id}
+                        rowSpan={3}
+                        style={{
+                          width: col.width || '130px',
+                          minWidth: col.width || '110px',
+                          textAlign: col.textAlign || 'left',
+                          background: '#F0FDFA',
+                          color: '#00534E',
+                          fontWeight: 700,
+                          fontSize: '0.8rem',
+                          border: '1px solid #CCFBF1',
+                        }}
+                      >
+                        {col.label}
+                      </th>
+                    ))}
                     {selectedAmendmentNumber > 0 && (
                       <th
                         colSpan={4}
@@ -3900,6 +3964,27 @@ export default function AnnualPlanPage() {
                             <td rowSpan={2} className="text-left" style={{ fontSize: '0.78rem', lineHeight: '1.3' }}>
                               {act.responsibleOfficer || '-'}
                             </td>
+
+                            {/* Dynamic Custom Template Columns */}
+                            {customColumns.map((col: any) => {
+                              const val = act.customFields?.[col.key] || (act as any)[col.key];
+                              return (
+                                <td
+                                  key={`custom-${col.id}-${act.id}`}
+                                  rowSpan={2}
+                                  style={{
+                                    fontSize: '0.78rem',
+                                    textAlign: col.textAlign || 'left',
+                                    padding: '4px 8px',
+                                    verticalAlign: 'middle',
+                                    background: '#FAFAFA',
+                                    borderRight: '1px solid #E2E8F0',
+                                  }}
+                                >
+                                  {val !== undefined && val !== null && val !== '' ? String(val) : '-'}
+                                </td>
+                              );
+                            })}
 
                             {/* 4 Progress Columns (Sub-row 1: Financial) - Directly Editable in Amendments */}
                             {selectedAmendmentNumber > 0 && (
@@ -5451,6 +5536,64 @@ export default function AnnualPlanPage() {
                         placeholder="e.g. Allocation adjusted in line with National Treasury ceilings; laptop procurement consolidated under GEMP."
                         style={{ width: '100%', padding: '0.45rem', border: '1px solid #D8B4FE', borderRadius: '6px', fontSize: '0.82rem', background: '#ffffff' }}
                       />
+                    </div>
+                  </div>
+                )}
+
+                {/* Custom Template Columns Section */}
+                {customColumns.length > 0 && (
+                  <div style={{ background: '#F8FAFC', border: '1px solid #E2E8F0', borderLeft: '4px solid #00534E', borderRadius: '8px', padding: '0.85rem 1rem', marginBottom: '1.25rem' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.45rem', marginBottom: '0.65rem' }}>
+                      <span style={{ fontSize: '1rem' }}>📑</span>
+                      <h4 style={{ margin: 0, fontSize: '0.84rem', fontWeight: 800, color: '#00534E', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+                        Template Custom Fields ({aipTemplate?.name || 'AIP Template'})
+                      </h4>
+                    </div>
+
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '0.85rem' }}>
+                      {customColumns.map((col: any) => (
+                        <div key={col.id}>
+                          <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 700, color: '#1E293B', marginBottom: '0.25rem' }}>
+                            {col.label} {col.required && <span style={{ color: '#E11D48' }}>*</span>}
+                          </label>
+
+                          {col.dataType === 'dropdown' ? (
+                            <select
+                              disabled={isBaselineLocked}
+                              value={formCustomFields[col.key] || ''}
+                              onChange={(e) => setFormCustomFields({ ...formCustomFields, [col.key]: e.target.value })}
+                              style={{ width: '100%', padding: '0.45rem 0.6rem', border: '1px solid #CBD5E1', borderRadius: '6px', fontSize: '0.82rem', background: '#FFFFFF' }}
+                              required={col.required}
+                            >
+                              <option value="">Select an option...</option>
+                              {(col.options || []).map((opt: string) => (
+                                <option key={opt} value={opt}>{opt}</option>
+                              ))}
+                            </select>
+                          ) : col.dataType === 'textarea' ? (
+                            <textarea
+                              rows={2}
+                              disabled={isBaselineLocked}
+                              value={formCustomFields[col.key] || ''}
+                              onChange={(e) => setFormCustomFields({ ...formCustomFields, [col.key]: e.target.value })}
+                              placeholder={col.description || col.label}
+                              style={{ width: '100%', padding: '0.45rem 0.6rem', border: '1px solid #CBD5E1', borderRadius: '6px', fontSize: '0.82rem' }}
+                              required={col.required}
+                            />
+                          ) : (
+                            <input
+                              type={col.dataType === 'number' || col.dataType === 'currency' ? 'number' : col.dataType === 'date' ? 'date' : 'text'}
+                              step={col.dataType === 'currency' ? 'any' : undefined}
+                              disabled={isBaselineLocked}
+                              value={formCustomFields[col.key] || ''}
+                              onChange={(e) => setFormCustomFields({ ...formCustomFields, [col.key]: e.target.value })}
+                              placeholder={col.description || col.label}
+                              style={{ width: '100%', padding: '0.45rem 0.6rem', border: '1px solid #CBD5E1', borderRadius: '6px', fontSize: '0.82rem' }}
+                              required={col.required}
+                            />
+                          )}
+                        </div>
+                      ))}
                     </div>
                   </div>
                 )}

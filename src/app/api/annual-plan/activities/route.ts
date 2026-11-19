@@ -101,6 +101,7 @@ export async function POST(request: NextRequest) {
       physicalProgressPct: body.physicalProgressPct ? String(body.physicalProgressPct).trim() : '',
       financialProgress: body.financialProgress !== undefined && body.financialProgress !== '' ? Number(body.financialProgress) : undefined,
       financialProgressPct: body.financialProgressPct ? String(body.financialProgressPct).trim() : '',
+      customFields: body.customFields || {},
       createdBy: user?.id || 'user',
       creatorName: user?.name || branchName,
       createdAt: new Date().toISOString(),
@@ -232,6 +233,7 @@ export async function PUT(request: NextRequest) {
           physicalProgressPct: body.physicalProgressPct !== undefined ? String(body.physicalProgressPct).trim() : current.physicalProgressPct,
           financialProgress: body.financialProgress !== undefined ? (body.financialProgress === '' ? undefined : roundToCentInMn(parseAmountToMn(body.financialProgress))) : current.financialProgress,
           financialProgressPct: body.financialProgressPct !== undefined ? String(body.financialProgressPct).trim() : current.financialProgressPct,
+          customFields: body.customFields !== undefined ? body.customFields : current.customFields,
           updatedAt: new Date().toISOString(),
         };
         updatedActivity = data.aipActivities[idx];

@@ -6,6 +6,7 @@ import Link from 'next/link';
 import AppShell from '@/components/layout/AppShell';
 import BranchBadge from '@/components/common/BranchBadge';
 import TileActionMenu, { TileExportData } from '@/components/dashboard/TileActionMenu';
+import AipTemplateManager from '@/components/admin/AipTemplateManager';
 
 export default function SuperAdminConsolePage() {
   const { data: session, status } = useSession();
@@ -46,7 +47,7 @@ export default function SuperAdminConsolePage() {
   const badgeInfo = getAdminBadge();
 
   // Active Tab
-  const [activeTab, setActiveTab] = useState<'access-control' | 'branches' | 'years' | 'deadlines' | 'announcements' | 'settings'>('access-control');
+  const [activeTab, setActiveTab] = useState<'access-control' | 'branches' | 'years' | 'deadlines' | 'announcements' | 'settings' | 'aip-templates'>('access-control');
   const [showProgressMeter, setShowProgressMeter] = useState(true);
   const [settingsLoading, setSettingsLoading] = useState(false);
 
@@ -563,6 +564,14 @@ export default function SuperAdminConsolePage() {
 
   useEffect(() => {
     loadData();
+    if (typeof window !== 'undefined') {
+      const tabParam = new URLSearchParams(window.location.search).get('tab');
+      if (tabParam === 'aip-templates') {
+        setActiveTab('aip-templates');
+      } else if (tabParam === 'settings') {
+        setActiveTab('settings');
+      }
+    }
   }, []);
 
   const triggerFeedback = (msg: string, isError = false) => {
@@ -1113,7 +1122,10 @@ export default function SuperAdminConsolePage() {
             { id: 'years', label: '📅 Financial Years', count: financialYears.length },
             { id: 'deadlines', label: '⏰ Deadlines & Cutoffs', count: deadlines.length },
             { id: 'announcements', label: '📢 Circulars & Announcements', count: announcements.length },
-            ...(adminLevel === 0 ? [{ id: 'settings', label: '👑 Dashboard & System Settings', count: undefined }] : []),
+            ...(adminLevel === 0 ? [
+              { id: 'aip-templates', label: '📑 AIP Plan Templates & Columns', count: undefined },
+              { id: 'settings', label: '👑 Dashboard & System Settings', count: undefined },
+            ] : []),
           ].map((tab) => {
             const active = activeTab === tab.id;
             return (
@@ -3547,6 +3559,13 @@ export default function SuperAdminConsolePage() {
               </div>
             </div>
           </div>
+        )}
+
+        {/* ══════════════════════════════════════════════════════════════ */}
+        {/* TAB 7: AIP PLAN TEMPLATES & COLUMNS (Super Admin)            */}
+        {/* ══════════════════════════════════════════════════════════════ */}
+        {activeTab === 'aip-templates' && adminLevel === 0 && (
+          <AipTemplateManager />
         )}
 
       </div>
