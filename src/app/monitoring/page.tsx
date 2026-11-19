@@ -8,6 +8,7 @@ import TileActionMenu, { TileExportData } from '@/components/dashboard/TileActio
 import { broadcastDataChange } from '@/lib/broadcastSync';
 import { formatMillion, formatRupees, formatDualDeclaration, roundToCentInMn, parseAmountToMn } from '@/lib/financialFormat';
 import { MOE_STANDARD_VOTE_NUMBERS } from '@/lib/sriLankanVotes';
+import VoteManagementTab from '@/components/monitoring/VoteManagementTab';
 
 interface MonitoringMetric {
   totalActivities: number;
@@ -51,6 +52,7 @@ export default function MonitoringWorkspacePage() {
     | 'observations'
     | 'evaluation'
     | 'vote_expenditure'
+    | 'vote_management'
   >(isQaMonitoringOfficer ? 'monthly_returns' : 'results_framework');
   const [loading, setLoading] = useState(true);
   const [selectedYear, setSelectedYear] = useState('2027');
@@ -186,6 +188,14 @@ export default function MonitoringWorkspacePage() {
 
   useEffect(() => {
     fetchData();
+    if (typeof window !== 'undefined') {
+      const tabParam = new URLSearchParams(window.location.search).get('tab');
+      if (tabParam === 'vote_management') {
+        setActiveTab('vote_management');
+      } else if (tabParam === 'vote_expenditure') {
+        setActiveTab('vote_expenditure');
+      }
+    }
   }, [selectedYear]);
 
   // Operational branches list for selectors
@@ -957,6 +967,25 @@ export default function MonitoringWorkspacePage() {
           )}
 
           <button
+            onClick={() => setActiveTab('vote_management')}
+            className={`tab-btn ${activeTab === 'vote_management' ? 'active' : ''}`}
+            style={{
+              padding: '0.75rem 1.15rem',
+              fontWeight: 700,
+              fontSize: '0.88rem',
+              border: 'none',
+              background: activeTab === 'vote_management' ? '#F0FDFA' : 'none',
+              cursor: 'pointer',
+              borderBottom: activeTab === 'vote_management' ? '3px solid #00534E' : '3px solid transparent',
+              color: activeTab === 'vote_management' ? '#00534E' : '#666',
+              whiteSpace: 'nowrap',
+              borderRadius: '4px 4px 0 0',
+            }}
+          >
+            🏛️ Vote Management
+          </button>
+
+          <button
             onClick={() => setActiveTab('vote_expenditure')}
             className={`tab-btn ${activeTab === 'vote_expenditure' ? 'active' : ''}`}
             style={{
@@ -975,6 +1004,11 @@ export default function MonitoringWorkspacePage() {
             💰 Vote Financial Expenditure
           </button>
         </div>
+
+        {/* ── MODULE: VOTE MANAGEMENT ── */}
+        {activeTab === 'vote_management' && (
+          <VoteManagementTab />
+        )}
 
         {/* ── MODULE 1: RESULTS FRAMEWORK ── */}
         {activeTab === 'results_framework' && (

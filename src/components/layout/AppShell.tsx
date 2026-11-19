@@ -244,9 +244,6 @@ export default function AppShell({ children }: AppShellProps) {
     { href: '/dashboard', label: 'Dashboard', icon: DashboardIcon },
     { href: '/budget-forecasting', label: 'Budget Planning', icon: BudgetPlanningIcon },
     { href: '/annual-plan', label: 'Annual Plan (AIP)', icon: AnnualPlanIcon },
-    ...(isPlanningBranchUser ? [
-      { href: '/vote-management', label: 'Vote Management', icon: VoteManagementIcon },
-    ] : []),
     { href: '/monitoring', label: 'Monitoring & Verification', icon: MonitoringIcon },
     ...(isAdminUser || isGovernanceOfficer ? [
       { href: '/reports', label: 'Analytics & Audit', icon: AnalyticsIcon },

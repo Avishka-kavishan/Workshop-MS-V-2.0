@@ -9175,7 +9175,7 @@
       "organizationId": "org-moe-planning",
       "roleId": "role-planning-officer",
       "isActive": true,
-      "lastLogin": "2026-11-19T04:00:10.389Z",
+      "lastLogin": "2026-11-19T05:59:58.775Z",
       "createdAt": "2026-09-28T06:03:41.165Z",
       "aliases": [
         "planning.officer",
@@ -52065,6 +52065,51 @@
     }
   ],
   "auditLogs": [
+    {
+      "id": "audit-1795068014093-77d258b7",
+      "timestamp": "2026-11-19T06:00:14.093Z",
+      "userId": "user-planning-officer",
+      "username": "planning.officer",
+      "userFullName": "MOE Planning Division Officer (Special)",
+      "organizationId": "org-moe-planning",
+      "organizationName": "MOE Planning Division",
+      "category": "Security",
+      "action": "AUTH_ROLE_SWITCH",
+      "entityType": "AUTH",
+      "entityId": "ura-planning-officer",
+      "summary": "Officer \"MOE Planning Division Officer (Special)\" (planning.officer) switched active working role from \"Planning Division Officer\" to \"Planning Division Officer\" (MOE Planning Division).",
+      "details": {
+        "previousRole": "Planning Division Officer",
+        "newRole": "Planning Division Officer",
+        "organization": "MOE Planning Division",
+        "functionalCategory": "Planning",
+        "rememberedForNextLogin": false,
+        "switchTimestamp": "2026-11-19T06:00:14.093Z"
+      },
+      "severity": "Info"
+    },
+    {
+      "id": "audit-1795067998802-a601344b",
+      "timestamp": "2026-11-19T05:59:58.802Z",
+      "userId": "user-planning-officer",
+      "username": "planning.officer",
+      "userFullName": "MOE Planning Division Officer (Special)",
+      "organizationId": "org-moe-planning",
+      "organizationName": "MOE Planning Division",
+      "category": "Security",
+      "action": "AUTH_LOGIN_SUCCESS",
+      "entityType": "AUTH",
+      "entityId": "user-planning-officer",
+      "summary": "User \"MOE Planning Division Officer (Special)\" (planning.officer) authenticated into IPMIS with unified account. Active role: \"Planning Division Officer\".",
+      "details": {
+        "role": "Planning Division Officer",
+        "organization": "MOE Planning Division",
+        "loginTime": "2026-11-19T05:59:58.802Z",
+        "assignedRoleCount": 2,
+        "rememberLastRole": false
+      },
+      "severity": "Info"
+    },
     {
       "id": "audit-1795060825735-5a6274d9",
       "timestamp": "2026-11-19T04:00:25.735Z",
