@@ -47,6 +47,7 @@ export default function AipTrackerTab({ selectedYear, onSelectYear }: AipTracker
   } | null>(null);
 
   const [selectedStageNum, setSelectedStageNum] = useState<number>(5);
+  const [diagramView, setDiagramView] = useState<'circle' | 'pipeline'>('circle');
   const [updatingStage, setUpdatingStage] = useState(false);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -291,7 +292,7 @@ export default function AipTrackerTab({ selectedYear, onSelectYear }: AipTracker
       </div>
 
       {/* ══════════════════════════════════════════════════════════════════════════ */}
-      {/* 7-STAGE VISUAL LIFECYCLE FLOW (HAND-DRAWN ARCHITECTURE ACCURACY)          */}
+      {/* 7-STAGE VISUAL LIFECYCLE FLOW (CIRCULAR CYCLE & PIPELINE VIEWS)            */}
       {/* ══════════════════════════════════════════════════════════════════════════ */}
       <div
         className="card"
@@ -304,101 +305,155 @@ export default function AipTrackerTab({ selectedYear, onSelectYear }: AipTracker
           boxShadow: '0 4px 16px rgba(0,0,0,0.04)',
         }}
       >
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.25rem', borderBottom: '1px solid #F1F5F9', paddingBottom: '0.75rem' }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.25rem', borderBottom: '1px solid #F1F5F9', paddingBottom: '0.75rem', flexWrap: 'wrap', gap: '0.75rem' }}>
           <div>
-            <h3 style={{ margin: 0, fontSize: '1.05rem', fontWeight: 800, color: '#0F172A' }}>
-              National Education AIP Progression Pipeline
+            <h3 style={{ margin: 0, fontSize: '1.05rem', fontWeight: 800, color: '#0F172A', display: 'flex', alignItems: 'center', gap: '0.45rem' }}>
+              <span>⭕</span> National Education AIP Lifecycle Process Flow
             </h3>
             <div style={{ fontSize: '0.75rem', color: '#64748B', marginTop: '2px' }}>
-              The pulsating glowing circle marks the exact active position of FY {selectedYear} AIP right now. Click any stage box to inspect deliverables.
+              The pulsating glowing circle marks the exact active position of FY {selectedYear} AIP right now. Click any circle to inspect deliverables.
             </div>
           </div>
 
-          <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', fontSize: '0.74rem', fontWeight: 700 }}>
-            <span style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', color: '#059669' }}>
-              <span style={{ width: '10px', height: '10px', borderRadius: '50%', background: '#10B981' }} />
-              Completed
-            </span>
-            <span style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', color: '#00534E' }}>
-              <span style={{ width: '10px', height: '10px', borderRadius: '50%', background: '#00534E', animation: 'aipCirclePulse 2s infinite' }} />
-              Current Stage (You Are Here)
-            </span>
-            <span style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', color: '#94A3B8' }}>
-              <span style={{ width: '10px', height: '10px', borderRadius: '50%', background: '#CBD5E1' }} />
-              Upcoming
-            </span>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', flexWrap: 'wrap' }}>
+            {/* View Switcher: Circular Cycle (Default) vs Pipeline Grid */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.3rem', background: '#F1F5F9', padding: '0.25rem', borderRadius: '8px' }}>
+              <button
+                type="button"
+                onClick={() => setDiagramView('circle')}
+                style={{
+                  padding: '0.35rem 0.8rem',
+                  borderRadius: '6px',
+                  border: 'none',
+                  background: diagramView === 'circle' ? '#00534E' : 'transparent',
+                  color: diagramView === 'circle' ? '#FFFFFF' : '#475569',
+                  fontWeight: 700,
+                  fontSize: '0.76rem',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.35rem',
+                  transition: 'all 0.15s ease',
+                  boxShadow: diagramView === 'circle' ? '0 2px 4px rgba(0, 83, 78, 0.2)' : 'none',
+                }}
+              >
+                <span>⭕</span> Circular Flow
+              </button>
+              <button
+                type="button"
+                onClick={() => setDiagramView('pipeline')}
+                style={{
+                  padding: '0.35rem 0.8rem',
+                  borderRadius: '6px',
+                  border: 'none',
+                  background: diagramView === 'pipeline' ? '#00534E' : 'transparent',
+                  color: diagramView === 'pipeline' ? '#FFFFFF' : '#475569',
+                  fontWeight: 700,
+                  fontSize: '0.76rem',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.35rem',
+                  transition: 'all 0.15s ease',
+                  boxShadow: diagramView === 'pipeline' ? '0 2px 4px rgba(0, 83, 78, 0.2)' : 'none',
+                }}
+              >
+                <span>🔲</span> Pipeline Grid
+              </button>
+            </div>
+
+            {/* Legend */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.85rem', fontSize: '0.74rem', fontWeight: 700 }}>
+              <span style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', color: '#059669' }}>
+                <span style={{ width: '10px', height: '10px', borderRadius: '50%', background: '#10B981' }} />
+                Completed
+              </span>
+              <span style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', color: '#00534E' }}>
+                <span style={{ width: '10px', height: '10px', borderRadius: '50%', background: '#00534E', animation: 'aipCirclePulse 2s infinite' }} />
+                Current Place of AIP
+              </span>
+              <span style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', color: '#94A3B8' }}>
+                <span style={{ width: '10px', height: '10px', borderRadius: '50%', background: '#CBD5E1' }} />
+                Upcoming
+              </span>
+            </div>
           </div>
         </div>
 
-        {/* Diagram Flow Container */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem', position: 'relative' }}>
-          
-          {/* ── ROW 1: Stages ① -> ② -> ③ ── */}
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr auto 1fr auto 1fr', alignItems: 'center', gap: '0.75rem' }}>
-            {/* Box 1 */}
-            {renderStageCard(stages[0], 1)}
+        {/* ── CONDITIONAL RENDER: CIRCULAR VIEW VS PIPELINE VIEW ── */}
+        {diagramView === 'circle' ? (
+          renderCircularCycle()
+        ) : (
+          /* Diagram Flow Container (Pipeline Grid) */
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem', position: 'relative' }}>
+            
+            {/* ── ROW 1: Stages ① -> ② -> ③ ── */}
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr auto 1fr auto 1fr', alignItems: 'center', gap: '0.75rem' }}>
+              {/* Box 1 */}
+              {renderStageCard(stages[0], 1)}
 
-            {/* Arrow 1 -> 2 */}
-            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', color: currentStageNumber > 1 ? '#00534E' : '#CBD5E1', fontSize: '1.4rem', fontWeight: 900 }}>
-              ➔
+              {/* Arrow 1 -> 2 */}
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', color: currentStageNumber > 1 ? '#00534E' : '#CBD5E1', fontSize: '1.4rem', fontWeight: 900 }}>
+                ➔
+              </div>
+
+              {/* Box 2 */}
+              {renderStageCard(stages[1], 2, '📥 Budget Speech Injected')}
+
+              {/* Arrow 2 -> 3 */}
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', color: currentStageNumber > 2 ? '#00534E' : '#CBD5E1', fontSize: '1.4rem', fontWeight: 900 }}>
+                ➔
+              </div>
+
+              {/* Box 3 */}
+              {renderStageCard(stages[2], 3, '🏛️ Parliamentary Vote Approval')}
             </div>
 
-            {/* Box 2 */}
-            {renderStageCard(stages[1], 2, '📥 Budget Speech Injected')}
-
-            {/* Arrow 2 -> 3 */}
-            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', color: currentStageNumber > 2 ? '#00534E' : '#CBD5E1', fontSize: '1.4rem', fontWeight: 900 }}>
-              ➔
+            {/* ── Vertical Connector: Row 1 (Box 3) down to Row 2 (Box 4) ── */}
+            <div style={{ display: 'flex', justifyContent: 'flex-end', paddingRight: '12%', margin: '-0.5rem 0' }}>
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', color: currentStageNumber >= 4 ? '#00534E' : '#CBD5E1' }}>
+                <div style={{ width: '3px', height: '24px', background: currentStageNumber >= 4 ? '#00534E' : '#CBD5E1' }} />
+                <div style={{ fontSize: '1.2rem', marginTop: '-4px', fontWeight: 900 }}>↓</div>
+              </div>
             </div>
 
-            {/* Box 3 */}
-            {renderStageCard(stages[2], 3, '🏛️ Parliamentary Vote Approval')}
+            {/* ── ROW 2: Stages ⑥ <- ⑤ <- ④ (Reverse Snake Flow as Drawn) ── */}
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr auto 1fr auto 1fr', alignItems: 'center', gap: '0.75rem' }}>
+              {/* Box 6 */}
+              {renderStageCard(stages[5], 6, '📑 Gazetted Ministry AIP')}
+
+              {/* Arrow 5 -> 6 (Pointing Left) */}
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', color: currentStageNumber > 5 ? '#00534E' : '#CBD5E1', fontSize: '1.4rem', fontWeight: 900 }}>
+                ⬅
+              </div>
+
+              {/* Box 5 */}
+              {renderStageCard(stages[4], 5)}
+
+              {/* Arrow 4 -> 5 (Pointing Left) */}
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', color: currentStageNumber > 4 ? '#00534E' : '#CBD5E1', fontSize: '1.4rem', fontWeight: 900 }}>
+                ⬅
+              </div>
+
+              {/* Box 4 */}
+              {renderStageCard(stages[3], 4)}
+            </div>
+
+            {/* ── Vertical Connector: Row 2 (Box 6) down to Row 3 (Box 7) ── */}
+            <div style={{ display: 'flex', justifyContent: 'flex-start', paddingLeft: '12%', margin: '-0.5rem 0' }}>
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', color: currentStageNumber >= 7 ? '#00534E' : '#CBD5E1' }}>
+                <div style={{ width: '3px', height: '24px', background: currentStageNumber >= 7 ? '#00534E' : '#CBD5E1' }} />
+                <div style={{ fontSize: '1.2rem', marginTop: '-4px', fontWeight: 900 }}>↓</div>
+              </div>
+            </div>
+
+            {/* ── ROW 3: Stage ⑦ Integrated Implementation & Monitoring ── */}
+            <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr)', gap: '0.75rem' }}>
+              {renderStage7Card(stages[6])}
+            </div>
+
           </div>
-
-          {/* ── Vertical Connector: Row 1 (Box 3) down to Row 2 (Box 4) ── */}
-          <div style={{ display: 'flex', justifyContent: 'flex-end', paddingRight: '12%', margin: '-0.5rem 0' }}>
-            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', color: currentStageNumber >= 4 ? '#00534E' : '#CBD5E1' }}>
-              <div style={{ width: '3px', height: '24px', background: currentStageNumber >= 4 ? '#00534E' : '#CBD5E1' }} />
-              <div style={{ fontSize: '1.2rem', marginTop: '-4px', fontWeight: 900 }}>↓</div>
-            </div>
-          </div>
-
-          {/* ── ROW 2: Stages ⑥ <- ⑤ <- ④ (Reverse Snake Flow as Drawn) ── */}
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr auto 1fr auto 1fr', alignItems: 'center', gap: '0.75rem' }}>
-            {/* Box 6 */}
-            {renderStageCard(stages[5], 6, '📑 Gazetted Ministry AIP')}
-
-            {/* Arrow 5 -> 6 (Pointing Left) */}
-            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', color: currentStageNumber > 5 ? '#00534E' : '#CBD5E1', fontSize: '1.4rem', fontWeight: 900 }}>
-              ⬅
-            </div>
-
-            {/* Box 5 */}
-            {renderStageCard(stages[4], 5)}
-
-            {/* Arrow 4 -> 5 (Pointing Left) */}
-            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', color: currentStageNumber > 4 ? '#00534E' : '#CBD5E1', fontSize: '1.4rem', fontWeight: 900 }}>
-              ⬅
-            </div>
-
-            {/* Box 4 */}
-            {renderStageCard(stages[3], 4)}
-          </div>
-
-          {/* ── Vertical Connector: Row 2 (Box 6) down to Row 3 (Box 7) ── */}
-          <div style={{ display: 'flex', justifyContent: 'flex-start', paddingLeft: '12%', margin: '-0.5rem 0' }}>
-            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', color: currentStageNumber >= 7 ? '#00534E' : '#CBD5E1' }}>
-              <div style={{ width: '3px', height: '24px', background: currentStageNumber >= 7 ? '#00534E' : '#CBD5E1' }} />
-              <div style={{ fontSize: '1.2rem', marginTop: '-4px', fontWeight: 900 }}>↓</div>
-            </div>
-          </div>
-
-          {/* ── ROW 3: Stage ⑦ Integrated Implementation & Monitoring ── */}
-          <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr)', gap: '0.75rem' }}>
-            {renderStage7Card(stages[6])}
-          </div>
-
-        </div>
+        )}
       </div>
 
       {/* ══════════════════════════════════════════════════════════════════════════ */}
@@ -540,6 +595,413 @@ export default function AipTrackerTab({ selectedYear, onSelectYear }: AipTracker
       )}
     </div>
   );
+
+  // ── Helper: Render 7-Stage Circular Cycle Diagram ──────────────────────────
+  function renderCircularCycle() {
+    const cx = 460;
+    const cy = 345;
+    const R = 215;
+
+    const CIRCLE_NODES = [
+      {
+        stageNumber: 1,
+        angleDeg: -90,
+        labelStyle: { left: '460px', top: '22px', transform: 'translateX(-50%)', width: '250px', textAlign: 'center' as const },
+        topBadgeNote: null,
+      },
+      {
+        stageNumber: 2,
+        angleDeg: -90 + 51.4286 * 1, // -38.57 deg
+        labelStyle: { left: '685px', top: '150px', width: '220px', textAlign: 'left' as const },
+        topBadgeNote: '📥 Budget Speech',
+      },
+      {
+        stageNumber: 3,
+        angleDeg: -90 + 51.4286 * 2, // 12.86 deg
+        labelStyle: { left: '725px', top: '355px', width: '185px', textAlign: 'left' as const },
+        topBadgeNote: '🏛️ Parliamentary Vote Approval',
+      },
+      {
+        stageNumber: 4,
+        angleDeg: -90 + 51.4286 * 3, // 64.29 deg
+        labelStyle: { left: '555px', top: '595px', width: '220px', textAlign: 'left' as const },
+        topBadgeNote: null,
+      },
+      {
+        stageNumber: 5,
+        angleDeg: -90 + 51.4286 * 4, // 115.71 deg
+        labelStyle: { left: '145px', top: '595px', width: '220px', textAlign: 'right' as const },
+        topBadgeNote: null,
+      },
+      {
+        stageNumber: 6,
+        angleDeg: -90 + 51.4286 * 5, // 167.14 deg
+        labelStyle: { left: '12px', top: '355px', width: '185px', textAlign: 'right' as const },
+        topBadgeNote: '📑 Gazetted PPB Approval',
+      },
+      {
+        stageNumber: 7,
+        angleDeg: -90 + 51.4286 * 6, // 218.57 deg
+        labelStyle: { left: '15px', top: '150px', width: '230px', textAlign: 'right' as const },
+        topBadgeNote: '⚙️ Implementation & Monitoring',
+      },
+    ];
+
+    const activeStageObj = stages.find((s) => s.stageNumber === currentStageNumber);
+
+    return (
+      <div style={{ width: '100%', overflowX: 'auto', padding: '0.75rem 0' }}>
+        <div style={{ position: 'relative', width: '920px', height: '690px', margin: '0 auto', userSelect: 'none' }}>
+          
+          {/* SVG Canvas for Circular Ring Track & Directional Connecting Arcs */}
+          <svg
+            width="920"
+            height="690"
+            style={{ position: 'absolute', top: 0, left: 0, pointerEvents: 'none' }}
+          >
+            <defs>
+              <marker
+                id="circle-arrow-completed"
+                viewBox="0 0 10 10"
+                refX="6"
+                refY="5"
+                markerWidth="6"
+                markerHeight="6"
+                orient="auto-start-reverse"
+              >
+                <path d="M 0 1 L 10 5 L 0 9 z" fill="#10B981" />
+              </marker>
+              <marker
+                id="circle-arrow-active"
+                viewBox="0 0 10 10"
+                refX="6"
+                refY="5"
+                markerWidth="7"
+                markerHeight="7"
+                orient="auto-start-reverse"
+              >
+                <path d="M 0 1 L 10 5 L 0 9 z" fill="#00534E" />
+              </marker>
+              <marker
+                id="circle-arrow-upcoming"
+                viewBox="0 0 10 10"
+                refX="6"
+                refY="5"
+                markerWidth="5"
+                markerHeight="5"
+                orient="auto-start-reverse"
+              >
+                <path d="M 0 1 L 10 5 L 0 9 z" fill="#CBD5E1" />
+              </marker>
+            </defs>
+
+            {/* Subtle outer guideline ring */}
+            <circle
+              cx={cx}
+              cy={cy}
+              r={R}
+              fill="none"
+              stroke="#F1F5F9"
+              strokeWidth="10"
+            />
+            <circle
+              cx={cx}
+              cy={cy}
+              r={R}
+              fill="none"
+              stroke="#E2E8F0"
+              strokeWidth="1.5"
+              strokeDasharray="4 4"
+            />
+
+            {/* Directional Arcs Connecting Stages in Clockwise Circle */}
+            {CIRCLE_NODES.map((node, i) => {
+              const startAngle = node.angleDeg + 12;
+              const nextAngle = i === 6 ? -90 + 360 : CIRCLE_NODES[i + 1].angleDeg;
+              const endAngle = nextAngle - 12;
+
+              const rad1 = (startAngle * Math.PI) / 180;
+              const rad2 = (endAngle * Math.PI) / 180;
+
+              const x1 = cx + R * Math.cos(rad1);
+              const y1 = cy + R * Math.sin(rad1);
+              const x2 = cx + R * Math.cos(rad2);
+              const y2 = cy + R * Math.sin(rad2);
+
+              const arcPath = `M ${x1} ${y1} A ${R} ${R} 0 0 1 ${x2} ${y2}`;
+
+              const targetStageNum = i === 6 ? 1 : node.stageNumber + 1;
+              const isArcCompleted = node.stageNumber < currentStageNumber;
+              const isArcActive = node.stageNumber === currentStageNumber;
+
+              const strokeColor = isArcCompleted
+                ? '#10B981'
+                : isArcActive
+                ? '#00534E'
+                : '#CBD5E1';
+
+              const markerId = isArcCompleted
+                ? 'url(#circle-arrow-completed)'
+                : isArcActive
+                ? 'url(#circle-arrow-active)'
+                : 'url(#circle-arrow-upcoming)';
+
+              return (
+                <path
+                  key={`arc-${node.stageNumber}`}
+                  d={arcPath}
+                  fill="none"
+                  stroke={strokeColor}
+                  strokeWidth={isArcActive ? 4 : isArcCompleted ? 3 : 2}
+                  strokeDasharray={isArcActive ? '6 4' : i === 6 ? '5 4' : undefined}
+                  markerEnd={markerId}
+                />
+              );
+            })}
+          </svg>
+
+          {/* ── CENTER HUB: FINANCIAL YEAR & ACTIVE STAGE OVERSIGHT ── */}
+          <div
+            style={{
+              position: 'absolute',
+              left: `${cx}px`,
+              top: `${cy}px`,
+              transform: 'translate(-50%, -50%)',
+              width: '210px',
+              height: '210px',
+              borderRadius: '50%',
+              background: 'radial-gradient(circle, #FFFFFF 65%, #F0FDFA 100%)',
+              border: '3px solid #00534E',
+              boxShadow: '0 12px 32px rgba(0, 83, 78, 0.14), inset 0 0 0 4px #CCFBF1',
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              justifyContent: 'center',
+              textAlign: 'center',
+              padding: '1rem',
+              zIndex: 5,
+            }}
+          >
+            <div style={{ fontSize: '0.66rem', fontWeight: 800, color: '#00534E', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
+              🏛️ MoE Governance
+            </div>
+            <div style={{ fontSize: '1.25rem', fontWeight: 900, color: '#0F172A', marginTop: '1px' }}>
+              FY {selectedYear}
+            </div>
+            <div style={{ fontSize: '0.74rem', fontWeight: 800, color: '#475569' }}>
+              AIP Lifecycle
+            </div>
+
+            <div
+              style={{
+                marginTop: '0.45rem',
+                padding: '0.2rem 0.55rem',
+                borderRadius: '9999px',
+                background: '#00534E',
+                color: '#FFFFFF',
+                fontSize: '0.68rem',
+                fontWeight: 800,
+                display: 'flex',
+                alignItems: 'center',
+                gap: '0.35rem',
+                boxShadow: '0 2px 6px rgba(0, 83, 78, 0.25)',
+              }}
+            >
+              <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#34D399', animation: 'aipCirclePulse 1.8s infinite' }} />
+              Stage {currentStageNumber} Active
+            </div>
+
+            <div style={{ fontSize: '0.7rem', fontWeight: 700, color: '#0F172A', marginTop: '0.35rem', lineHeight: 1.2, maxWidth: '170px' }}>
+              {activeStageObj?.shortName || 'Annual Implementation'}
+            </div>
+
+            <div style={{ fontSize: '0.62rem', color: '#64748B', marginTop: '0.35rem', fontStyle: 'italic' }}>
+              Click any circle to inspect
+            </div>
+          </div>
+
+          {/* ── 7 STAGE CIRCLES & LABELS POSITIONED ON THE CIRCULAR PERIMETER ── */}
+          {CIRCLE_NODES.map((node) => {
+            const stage = stages.find((s) => s.stageNumber === node.stageNumber);
+            if (!stage) return null;
+
+            const rad = (node.angleDeg * Math.PI) / 180;
+            const nodeX = cx + R * Math.cos(rad);
+            const nodeY = cy + R * Math.sin(rad);
+
+            const isActive = stage.stageNumber === currentStageNumber;
+            const isCompleted = stage.stageNumber < currentStageNumber;
+            const isSelected = stage.stageNumber === selectedStageNum;
+
+            return (
+              <React.Fragment key={`stage-node-${stage.stageNumber}`}>
+                {/* 1. THE INTERACTIVE CIRCLE (Focus of User Request) */}
+                <div
+                  role="button"
+                  tabIndex={0}
+                  onClick={() => setSelectedStageNum(stage.stageNumber)}
+                  onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') setSelectedStageNum(stage.stageNumber); }}
+                  title={`Stage ${stage.stageNumber}: ${stage.name} (${stage.actor}) - Click to inspect`}
+                  style={{
+                    position: 'absolute',
+                    left: `${nodeX}px`,
+                    top: `${nodeY}px`,
+                    transform: 'translate(-50%, -50%)',
+                    width: isActive ? '68px' : '58px',
+                    height: isActive ? '68px' : '58px',
+                    borderRadius: '50%',
+                    background: isActive
+                      ? '#00534E'
+                      : isCompleted
+                      ? '#10B981'
+                      : '#FFFFFF',
+                    border: isActive
+                      ? '3.5px solid #CCFBF1'
+                      : isSelected
+                      ? '3.5px solid #0284C7'
+                      : isCompleted
+                      ? '3px solid #059669'
+                      : '2px dashed #94A3B8',
+                    color: isActive || isCompleted ? '#FFFFFF' : '#475569',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    cursor: 'pointer',
+                    zIndex: isActive ? 10 : 6,
+                    boxShadow: isActive
+                      ? '0 0 0 8px rgba(0, 83, 78, 0.22), 0 10px 25px rgba(0, 83, 78, 0.4)'
+                      : isSelected
+                      ? '0 0 0 6px rgba(2, 132, 199, 0.25), 0 6px 16px rgba(0,0,0,0.1)'
+                      : isCompleted
+                      ? '0 4px 12px rgba(16, 185, 129, 0.3)'
+                      : '0 2px 8px rgba(0,0,0,0.05)',
+                    animation: isActive ? 'aipCirclePulse 2.4s infinite' : 'none',
+                    transition: 'all 0.2s ease',
+                  }}
+                >
+                  {isCompleted ? (
+                    <>
+                      <span style={{ fontSize: '1.25rem', fontWeight: 900, lineHeight: 1 }}>✓</span>
+                      <span style={{ fontSize: '0.62rem', fontWeight: 800, opacity: 0.9 }}>{stage.stageNumber}</span>
+                    </>
+                  ) : (
+                    <>
+                      <span style={{ fontSize: isActive ? '1.45rem' : '1.2rem', fontWeight: 900, lineHeight: 1 }}>
+                        {stage.stageNumber}
+                      </span>
+                      {isActive && (
+                        <span style={{ fontSize: '0.58rem', fontWeight: 900, letterSpacing: '0.04em', textTransform: 'uppercase', opacity: 0.95 }}>
+                          HERE
+                        </span>
+                      )}
+                    </>
+                  )}
+
+                  {/* Pulsing "CURRENTLY HERE" Beacon Pill */}
+                  {isActive && (
+                    <div
+                      style={{
+                        position: 'absolute',
+                        top: node.angleDeg > 0 ? '76px' : '-32px',
+                        left: '50%',
+                        transform: 'translateX(-50%)',
+                        background: '#00534E',
+                        color: '#FFFFFF',
+                        fontSize: '0.66rem',
+                        fontWeight: 900,
+                        padding: '0.2rem 0.6rem',
+                        borderRadius: '9999px',
+                        boxShadow: '0 4px 12px rgba(0, 83, 78, 0.35)',
+                        border: '1.5px solid #CCFBF1',
+                        whiteSpace: 'nowrap',
+                        letterSpacing: '0.04em',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '0.35rem',
+                      }}
+                    >
+                      <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#34D399', animation: 'aipCirclePulse 1.8s infinite' }} />
+                      CURRENTLY HERE
+                    </div>
+                  )}
+                </div>
+
+                {/* 2. THE STAGE LABEL & ACTOR BADGE ANCHORED BESIDE THE CIRCLE */}
+                <div
+                  role="button"
+                  tabIndex={0}
+                  onClick={() => setSelectedStageNum(stage.stageNumber)}
+                  onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') setSelectedStageNum(stage.stageNumber); }}
+                  style={{
+                    position: 'absolute',
+                    ...node.labelStyle,
+                    cursor: 'pointer',
+                    zIndex: 6,
+                    padding: '0.35rem 0.55rem',
+                    borderRadius: '8px',
+                    background: isSelected ? '#EFF6FF' : 'transparent',
+                    border: isSelected ? '1px solid #BFDBFE' : '1px solid transparent',
+                    transition: 'all 0.15s ease',
+                  }}
+                >
+                  {/* Top Hand-Drawn Note Banner if applicable */}
+                  {node.topBadgeNote && (
+                    <div
+                      style={{
+                        display: 'inline-block',
+                        background: '#0F172A',
+                        color: '#F8FAFC',
+                        fontSize: '0.64rem',
+                        fontWeight: 800,
+                        padding: '0.12rem 0.45rem',
+                        borderRadius: '4px',
+                        marginBottom: '0.25rem',
+                        boxShadow: '0 1px 3px rgba(0,0,0,0.15)',
+                      }}
+                    >
+                      {node.topBadgeNote}
+                    </div>
+                  )}
+
+                  {/* Stage Title & Actor Pill */}
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', justifyContent: node.labelStyle.textAlign === 'right' ? 'flex-end' : node.labelStyle.textAlign === 'center' ? 'center' : 'flex-start', flexWrap: 'wrap' }}>
+                    <span style={{ fontSize: '0.86rem', fontWeight: 800, color: isActive ? '#00534E' : isSelected ? '#0284C7' : '#0F172A', lineHeight: 1.25 }}>
+                      {stage.name}
+                    </span>
+
+                    <span
+                      style={{
+                        fontSize: '0.68rem',
+                        fontWeight: 800,
+                        padding: '0.1rem 0.4rem',
+                        borderRadius: '4px',
+                        background: stage.actorShort === '(All)' ? '#E0F2FE' : '#FEF3C7',
+                        color: stage.actorShort === '(All)' ? '#0369A1' : '#92400E',
+                        border: `1px solid ${stage.actorShort === '(All)' ? '#BAE6FD' : '#FDE68A'}`,
+                      }}
+                      title={stage.actor}
+                    >
+                      {stage.actorShort}
+                    </span>
+                  </div>
+
+                  {/* Subtitle / Status */}
+                  <div style={{ fontSize: '0.7rem', color: '#64748B', marginTop: '0.2rem', lineHeight: 1.3 }}>
+                    {stage.shortName}
+                    <span style={{ fontWeight: 700, marginLeft: '0.35rem', color: isActive ? '#00534E' : isCompleted ? '#059669' : '#94A3B8' }}>
+                      • {isActive ? 'In Progress' : isCompleted ? 'Completed' : 'Upcoming'}
+                    </span>
+                  </div>
+                </div>
+              </React.Fragment>
+            );
+          })}
+
+        </div>
+      </div>
+    );
+  }
 
   // ── Helper: Render Box 1 to 6 Card ──────────────────────────────────────────
   function renderStageCard(stage: AipLifecycleStage | undefined, stageNumber: number, topBadgeNote?: string) {
