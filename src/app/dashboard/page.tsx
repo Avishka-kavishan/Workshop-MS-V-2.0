@@ -401,428 +401,212 @@ export default function DashboardPage() {
   }, []);
 
   return (
-    <AppShell hideHeader hideFooter>
-      <div style={{ maxWidth: '1480px', margin: '0 auto', padding: '0.85rem 1.25rem 2rem' }}>
+    <AppShell>
+      <div className="page-container dashboard-container" style={{ maxWidth: '1440px', margin: '0 auto', paddingBottom: '1.25rem' }}>
         
         {/* ══════════════════════════════════════════════════════
             1. EXECUTIVE TOP GOVERNMENT BANNER
-            Clean Executive Header matching user mockup
+            Matching the Reference Image Header Exactly
            ══════════════════════════════════════════════════════ */}
         <div
+          className="gov-dashboard-header"
           style={{
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',
-            marginBottom: '0.85rem',
-            flexWrap: 'wrap',
-            gap: '0.75rem',
+            gap: '1rem',
+            padding: '0.35rem 0.85rem',
+            background: 'linear-gradient(135deg, #0A192F 0%, #0F2A4A 60%, #173B63 100%)',
+            borderRadius: '10px',
+            marginBottom: '0.35rem',
+            boxShadow: '0 4px 14px rgba(10, 25, 47, 0.25)',
           }}
         >
-          {/* Left: IPMIS & Subtitle */}
-          <div>
-            <h1
+          {/* Left: Logo Emblem & Title & Branch Capsule */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.85rem', minWidth: 0 }}>
+            {/* Logo at the corner */}
+            <div
               style={{
-                margin: 0,
-                fontSize: '1.65rem',
-                fontWeight: 900,
-                color: '#1E293B',
-                letterSpacing: '-0.03em',
-                lineHeight: 1.1,
+                width: '28px',
+                height: '28px',
+                borderRadius: '50%',
+                background: '#FFFFFF',
+                border: '2px solid #FFBE29',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                padding: '2px',
+                boxShadow: '0 2px 8px rgba(0,0,0,0.3)',
+                flexShrink: 0,
               }}
             >
-              IPMIS
-            </h1>
-            <div style={{ fontSize: '0.78rem', fontWeight: 600, color: '#64748B', marginTop: '2px' }}>
-              Integrated Planning & Monitoring Information System
+              <img
+                src="/logo-emblem.png"
+                alt="IPMIS Emblem"
+                style={{ width: '100%', height: '100%', objectFit: 'contain' }}
+              />
+            </div>
+
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '2px', minWidth: 0 }}>
+              <h1 style={{ margin: 0, fontSize: '0.92rem', fontWeight: 800, letterSpacing: '-0.01em', color: '#FFFFFF', lineHeight: 1.2 }}>
+                IPMIS – Integrated Planning & Monitoring Information System
+              </h1>
+
+              <div style={{ fontSize: '0.68rem', color: '#93C5FD', display: 'flex', alignItems: 'center', gap: '0.45rem' }}>
+                <span>SLST Updated: {lastUpdatedTime}</span>
+              </div>
             </div>
           </div>
 
-          {/* Right: Role Pill, Live Sync, Bell with badge 3, Avatar */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem', flexWrap: 'wrap' }}>
-            {/* Current Role Capsule */}
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', fontSize: '0.75rem', color: '#64748B' }}>
-              <span>Current Role:</span>
-              <button
-                type="button"
-                onClick={() => window.dispatchEvent(new CustomEvent('OPEN_ROLE_SWITCHER'))}
-                style={{
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: '0.35rem',
-                  background: '#FFFFFF',
-                  border: '1px solid #E2E8F0',
-                  borderRadius: '9999px',
-                  padding: '0.35rem 0.85rem',
-                  fontSize: '0.75rem',
-                  fontWeight: 700,
-                  color: '#1E293B',
-                  cursor: 'pointer',
-                  boxShadow: '0 1px 3px rgba(0,0,0,0.04)',
-                }}
-                title="Click to switch active role"
-              >
-                <span>👤</span>
-                <span>{user?.roleName || user?.organizationName || 'MOE Data Management Branch'}</span>
-                <span style={{ fontSize: '0.65rem', opacity: 0.7 }}>▾</span>
-              </button>
-            </div>
-
-            {/* Live Sync Pill */}
+          {/* Right: Live Executive Telemetry & Status Badges (Eliminating the empty void!) */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem', flexShrink: 0 }}>
+            {/* Live Sync Interactive Indicator & Instant Telemetry Refresh Button */}
             <button
               type="button"
               onClick={() => loadDashboard(true)}
               style={{
                 display: 'inline-flex',
                 alignItems: 'center',
-                gap: '0.45rem',
-                background: '#E8F5E9',
-                border: '1px solid #C8E6C9',
-                borderRadius: '9999px',
-                padding: '0.35rem 0.85rem',
-                fontSize: '0.75rem',
+                gap: '0.4rem',
+                background: isSyncing ? 'rgba(16, 185, 129, 0.28)' : 'rgba(16, 185, 129, 0.15)',
+                border: '1px solid rgba(16, 185, 129, 0.35)',
+                borderRadius: '20px',
+                padding: '0.2rem 0.65rem',
+                fontSize: '0.68rem',
                 fontWeight: 700,
-                color: '#2E7D32',
+                color: '#34D399',
                 cursor: 'pointer',
-                boxShadow: '0 1px 2px rgba(0,0,0,0.03)',
+                transition: 'all 0.15s ease',
               }}
-              title="Real-Time Database Sync Active. Click to refresh."
+              title="Real-Time Database Sync Active (Auto-syncs every 12s, focus & cross-tab). Click to refresh now."
             >
               <span
                 style={{
-                  width: '7px',
-                  height: '7px',
+                  width: '6px',
+                  height: '6px',
                   borderRadius: '50%',
-                  background: '#10B981',
+                  background: '#34D399',
+                  boxShadow: '0 0 6px #34D399',
                   display: 'inline-block',
-                  animation: isSyncing ? 'spin 1s linear infinite' : 'pulse 2s infinite',
+                  animation: isSyncing ? 'spin 1s linear infinite' : 'pulseGlow 2s infinite ease-in-out',
                 }}
               />
               <span>{isSyncing ? 'Syncing...' : 'Live Sync'}</span>
+              <svg
+                width="11"
+                height="11"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                style={{
+                  animation: isSyncing ? 'spin 0.8s linear infinite' : 'none',
+                  opacity: 0.85,
+                  transformOrigin: 'center',
+                }}
+              >
+                <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67" />
+              </svg>
             </button>
 
-            {/* Notification Bell with Badge 3 */}
+            {/* Quick Executive Progress Pill */}
             <div
               style={{
-                width: '36px',
-                height: '36px',
-                borderRadius: '50%',
-                background: '#FFFFFF',
-                border: '1px solid #E2E8F0',
-                display: 'flex',
+                display: 'inline-flex',
                 alignItems: 'center',
-                justifyContent: 'center',
-                position: 'relative',
-                boxShadow: '0 1px 3px rgba(0,0,0,0.04)',
-                cursor: 'pointer',
-              }}
-              title="Notifications (3 unread)"
-            >
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#64748B" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
-                <path d="M13.73 21a2 2 0 0 1-3.46 0" />
-              </svg>
-              <span
-                style={{
-                  position: 'absolute',
-                  top: '-2px',
-                  right: '-2px',
-                  background: '#EF4444',
-                  color: '#FFFFFF',
-                  fontSize: '0.62rem',
-                  fontWeight: 800,
-                  width: '16px',
-                  height: '16px',
-                  borderRadius: '50%',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  border: '2px solid #FAF5F2',
-                }}
-              >
-                3
-              </span>
-            </div>
-
-            {/* User Profile Avatar with Coral/Red Border */}
-            <div
-              style={{
-                width: '38px',
-                height: '38px',
-                borderRadius: '50%',
-                border: '2px solid #E11D48',
-                overflow: 'hidden',
-                background: '#FFE4E6',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                boxShadow: '0 2px 6px rgba(225, 29, 72, 0.2)',
+                gap: '0.5rem',
+                background: 'rgba(0, 0, 0, 0.25)',
+                border: '1px solid rgba(255, 255, 255, 0.15)',
+                borderRadius: '8px',
+                padding: '0.25rem 0.65rem',
+                fontSize: '0.68rem',
+                color: '#E2E8F0',
+                fontWeight: 600,
               }}
             >
-              <img
-                src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&h=100&fit=crop&crop=face"
-                alt="User Avatar"
-                style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                onError={(e) => {
-                  (e.currentTarget as HTMLElement).style.display = 'none';
-                }}
-              />
+              <span>{telemetryData?.metrics?.totalActivities || 186} Activities</span>
+              <span style={{ color: '#64748B' }}>•</span>
+              <span style={{ color: '#34D399', fontWeight: 800 }}>{telemetryData?.metrics?.physicalAchievementRate || 73}% Phys</span>
+              <span style={{ color: '#64748B' }}>•</span>
+              <span style={{ color: '#FBBF24', fontWeight: 800 }}>{telemetryData?.metrics?.budgetUtilizationRate || 31}% Fin</span>
             </div>
           </div>
         </div>
 
-        {/* ══════════════════════════════════════════════════════
-            2. HIGHLIGHT METRICS ROW (4 Cards)
-            Last Updated (Maroon) | Activities | Plan Progress | FY 2026
-           ══════════════════════════════════════════════════════ */}
+        {/* ──── GLOBAL ADMINISTRATIVE CONTROLS & SEGMENTED VIEW TABS ──── */}
         <div
           style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(230px, 1fr))',
-            gap: '0.75rem',
-            marginBottom: '0.85rem',
-          }}
-        >
-          {/* Card 1: Last Updated (Deep Maroon Card) */}
-          <div
-            style={{
-              background: 'linear-gradient(135deg, #7B112A 0%, #600B20 100%)',
-              borderRadius: '14px',
-              padding: '0.75rem 1rem',
-              color: '#FFFFFF',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '0.75rem',
-              boxShadow: '0 4px 14px rgba(123, 17, 42, 0.25)',
-            }}
-          >
-            <div
-              style={{
-                width: '36px',
-                height: '36px',
-                borderRadius: '10px',
-                background: 'rgba(255, 255, 255, 0.15)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                flexShrink: 0,
-              }}
-            >
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-                <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
-                <line x1="16" y1="2" x2="16" y2="6" />
-                <line x1="8" y1="2" x2="8" y2="6" />
-                <line x1="3" y1="10" x2="21" y2="10" />
-              </svg>
-            </div>
-            <div>
-              <div style={{ fontSize: '0.68rem', color: '#FBCFE8', fontWeight: 600 }}>Last Updated</div>
-              <div style={{ fontSize: '0.92rem', fontWeight: 800, color: '#FFFFFF', marginTop: '2px', letterSpacing: '-0.01em' }}>
-                20 Nov 2026, 09:13 AM SLST
-              </div>
-            </div>
-          </div>
-
-          {/* Card 2: 241 Activities + Red Sparkline */}
-          <div
-            style={{
-              background: '#FFFFFF',
-              borderRadius: '14px',
-              border: '1px solid #F0E5DF',
-              padding: '0.75rem 1rem',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-              boxShadow: '0 2px 8px rgba(0,0,0,0.03)',
-            }}
-          >
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-              <div
-                style={{
-                  width: '36px',
-                  height: '36px',
-                  borderRadius: '10px',
-                  background: '#FEE2E2',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  flexShrink: 0,
-                }}
-              >
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#DC2626" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
-                  <polyline points="14 2 14 8 20 8" />
-                  <line x1="16" y1="13" x2="8" y2="13" />
-                  <line x1="16" y1="17" x2="8" y2="17" />
-                  <polyline points="10 9 9 9 8 9" />
-                </svg>
-              </div>
-              <div>
-                <div style={{ fontSize: '1.12rem', fontWeight: 800, color: '#0F172A', letterSpacing: '-0.02em', lineHeight: 1.15 }}>
-                  {telemetryData?.metrics?.totalActivities || 241} Activities
-                </div>
-                <div style={{ fontSize: '0.7rem', fontWeight: 600, color: '#16A34A', marginTop: '2px' }}>
-                  ↑ 74% vs last period
-                </div>
-              </div>
-            </div>
-            {/* Red Sparkline */}
-            <svg width="68" height="28" viewBox="0 0 68 28" fill="none">
-              <path d="M2 24 C14 22, 22 10, 34 16 C44 22, 54 4, 66 6" stroke="#DC2626" strokeWidth="2.2" strokeLinecap="round" />
-            </svg>
-          </div>
-
-          {/* Card 3: 28% Plan Progress + Green Sparkline */}
-          <div
-            style={{
-              background: '#FFFFFF',
-              borderRadius: '14px',
-              border: '1px solid #F0E5DF',
-              padding: '0.75rem 1rem',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-              boxShadow: '0 2px 8px rgba(0,0,0,0.03)',
-            }}
-          >
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-              <div
-                style={{
-                  width: '36px',
-                  height: '36px',
-                  borderRadius: '10px',
-                  background: '#DCFCE7',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  flexShrink: 0,
-                }}
-              >
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#16A34A" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-                  <circle cx="12" cy="12" r="10" />
-                  <circle cx="12" cy="12" r="6" />
-                  <circle cx="12" cy="2" />
-                </svg>
-              </div>
-              <div>
-                <div style={{ fontSize: '1.12rem', fontWeight: 800, color: '#0F172A', letterSpacing: '-0.02em', lineHeight: 1.15 }}>
-                  {telemetryData?.metrics?.budgetUtilizationRate || 28}% Plan Progress
-                </div>
-                <div style={{ fontSize: '0.7rem', fontWeight: 600, color: '#16A34A', marginTop: '2px' }}>
-                  ↑ 8% vs last month
-                </div>
-              </div>
-            </div>
-            {/* Green Sparkline */}
-            <svg width="68" height="28" viewBox="0 0 68 28" fill="none">
-              <path d="M2 22 C14 20, 24 16, 36 10 C46 6, 56 12, 66 4" stroke="#16A34A" strokeWidth="2.2" strokeLinecap="round" />
-            </svg>
-          </div>
-
-          {/* Card 4: FY 2026 (Active) ▾ */}
-          <div
-            style={{
-              background: '#FFFFFF',
-              borderRadius: '14px',
-              border: '1px solid #F0E5DF',
-              padding: '0.75rem 1.15rem',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '0.75rem',
-              boxShadow: '0 2px 8px rgba(0,0,0,0.03)',
-            }}
-          >
-            <div
-              style={{
-                width: '36px',
-                height: '36px',
-                borderRadius: '10px',
-                background: '#FEE2E2',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                flexShrink: 0,
-              }}
-            >
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#DC2626" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-                <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
-                <line x1="16" y1="2" x2="16" y2="6" />
-                <line x1="8" y1="2" x2="8" y2="6" />
-                <line x1="3" y1="10" x2="21" y2="10" />
-              </svg>
-            </div>
-            <div style={{ flex: 1 }}>
-              <select
-                value={selectedYear}
-                onChange={(e) => setSelectedYear(e.target.value)}
-                style={{
-                  width: '100%',
-                  fontSize: '0.92rem',
-                  fontWeight: 800,
-                  color: '#0F172A',
-                  border: 'none',
-                  background: 'transparent',
-                  cursor: 'pointer',
-                  outline: 'none',
-                }}
-              >
-                <option value="2026">FY 2026 (Active)</option>
-                <option value="2025">FY 2025 (Previous)</option>
-                <option value="2027">FY 2027 (MTEF Horizon)</option>
-              </select>
-            </div>
-          </div>
-        </div>
-
-        {/* ══════════════════════════════════════════════════════
-            3. GLOBAL ADMINISTRATIVE CONTROLS & SEGMENTED VIEW TABS
-           ══════════════════════════════════════════════════════ */}
-        <div
-          style={{
+            background: '#FFFFFF',
+            border: '1px solid #E2E8F0',
+            borderRadius: '10px',
+            padding: '0.25rem 0.65rem',
+            marginBottom: '0.35rem',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',
-            marginBottom: '0.85rem',
             flexWrap: 'wrap',
-            gap: '0.65rem',
+            gap: '0.5rem',
+            boxShadow: '0 2px 6px rgba(0, 0, 0, 0.02)',
           }}
         >
           {/* Left: Global Multi-Tier Filters */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.45rem', flexWrap: 'wrap' }}>
             <span
               style={{
-                fontSize: '0.75rem',
-                fontWeight: 700,
-                color: '#FFFFFF',
-                background: '#7B112A',
-                padding: '0.35rem 0.95rem',
-                borderRadius: '9999px',
+                fontSize: '0.7rem',
+                fontWeight: 800,
+                color: '#0F766E',
+                background: 'rgba(15, 118, 110, 0.08)',
+                padding: '0.2rem 0.5rem',
+                borderRadius: '6px',
                 display: 'inline-flex',
                 alignItems: 'center',
-                gap: '5px',
-                boxShadow: '0 1px 3px rgba(123, 17, 42, 0.25)',
+                gap: '4px',
               }}
             >
-              <span style={{ fontSize: '0.7rem' }}>🔻</span> Filters
+              <span>🔍</span> Filters
             </span>
+
+            {/* Financial Year Filter */}
+            <select
+              value={selectedYear}
+              onChange={(e) => setSelectedYear(e.target.value)}
+              style={{
+                fontSize: '0.7rem',
+                fontWeight: 700,
+                padding: '0.24rem 0.55rem',
+                borderRadius: '6px',
+                border: '1px solid #CBD5E1',
+                background: '#F8FAFC',
+                color: '#1E293B',
+                cursor: 'pointer',
+              }}
+              title="Financial Year"
+            >
+              <option value="2026">FY 2026 (Active)</option>
+              <option value="2025">FY 2025 (Previous)</option>
+              <option value="2027">FY 2027 (MTEF Horizon)</option>
+            </select>
 
             {/* Administrative Level Filter */}
             <select
               value={selectedLevel}
               onChange={(e) => setSelectedLevel(e.target.value)}
               style={{
-                fontSize: '0.75rem',
-                fontWeight: 600,
-                padding: '0.35rem 0.85rem',
-                borderRadius: '9999px',
-                border: '1px solid #E2E8F0',
-                background: '#FFFFFF',
+                fontSize: '0.7rem',
+                fontWeight: 700,
+                padding: '0.24rem 0.55rem',
+                borderRadius: '6px',
+                border: '1px solid #CBD5E1',
+                background: '#F8FAFC',
                 color: '#1E293B',
                 cursor: 'pointer',
-                boxShadow: '0 1px 2px rgba(0, 0, 0, 0.03)',
               }}
               title="Administrative Monitoring Tier"
             >
-              <option value="all">All Admin Tiers ▾</option>
+              <option value="all">All 4 Admin Tiers</option>
               <option value="level-1">Level 1: National MoE</option>
               <option value="level-2">Level 2: 9 Provincial Depts</option>
               <option value="level-3">Level 3: 100 Education Zones</option>
@@ -834,19 +618,18 @@ export default function DashboardPage() {
               value={selectedProvince}
               onChange={(e) => setSelectedProvince(e.target.value)}
               style={{
-                fontSize: '0.75rem',
-                fontWeight: 600,
-                padding: '0.35rem 0.85rem',
-                borderRadius: '9999px',
-                border: '1px solid #E2E8F0',
-                background: '#FFFFFF',
+                fontSize: '0.7rem',
+                fontWeight: 700,
+                padding: '0.24rem 0.55rem',
+                borderRadius: '6px',
+                border: '1px solid #CBD5E1',
+                background: '#F8FAFC',
                 color: '#1E293B',
                 cursor: 'pointer',
-                boxShadow: '0 1px 2px rgba(0, 0, 0, 0.03)',
               }}
               title="Filter by Province"
             >
-              <option value="all">All 9 Provinces ▾</option>
+              <option value="all">All 9 Provinces</option>
               <option value="Western">Western Province</option>
               <option value="Central">Central Province</option>
               <option value="Southern">Southern Province</option>
@@ -863,19 +646,18 @@ export default function DashboardPage() {
               value={selectedBranch}
               onChange={(e) => setSelectedBranch(e.target.value)}
               style={{
-                fontSize: '0.75rem',
-                fontWeight: 600,
-                padding: '0.35rem 0.85rem',
-                borderRadius: '9999px',
-                border: '1px solid #E2E8F0',
-                background: '#FFFFFF',
+                fontSize: '0.7rem',
+                fontWeight: 700,
+                padding: '0.24rem 0.55rem',
+                borderRadius: '6px',
+                border: '1px solid #CBD5E1',
+                background: '#F8FAFC',
                 color: '#1E293B',
                 cursor: 'pointer',
-                boxShadow: '0 1px 2px rgba(0, 0, 0, 0.03)',
               }}
               title="Implementing Division / Branch"
             >
-              <option value="all">All Implementing Divisions ▾</option>
+              <option value="all">All Implementing Divisions</option>
               <option value="org-moe-planning">Planning Branch</option>
               <option value="org-moe-ict">ICT & Digital Education</option>
               <option value="org-moe-data">Data Management Branch</option>
@@ -884,17 +666,17 @@ export default function DashboardPage() {
               <option value="org-moe-reforms">Education Reforms Division</option>
             </select>
 
-            {(selectedLevel !== 'all' || selectedProvince !== 'all' || selectedBranch !== 'all') && (
+            {(selectedYear !== '2026' || selectedLevel !== 'all' || selectedProvince !== 'all' || selectedBranch !== 'all') && (
               <button
                 type="button"
                 onClick={handleResetFilters}
                 style={{
                   border: '1px solid #EF4444',
-                  background: '#FEE2E2',
-                  color: '#DC2626',
-                  borderRadius: '9999px',
-                  padding: '0.3rem 0.65rem',
-                  fontSize: '0.72rem',
+                  background: 'rgba(239, 68, 68, 0.08)',
+                  color: '#EF4444',
+                  borderRadius: '6px',
+                  padding: '0.18rem 0.45rem',
+                  fontSize: '0.68rem',
                   fontWeight: 700,
                   cursor: 'pointer',
                 }}
@@ -905,27 +687,36 @@ export default function DashboardPage() {
           </div>
 
           {/* Right: Modern Segmented Tab Bar */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
+          <div
+            style={{
+              background: '#F1F5F9',
+              padding: '3px',
+              borderRadius: '8px',
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '2px',
+            }}
+          >
             <button
               type="button"
               onClick={() => setActiveTab('overview')}
               style={{
                 border: 'none',
-                background: activeTab === 'overview' ? '#7B112A' : 'transparent',
+                background: activeTab === 'overview' ? '#0F766E' : 'transparent',
                 color: activeTab === 'overview' ? '#FFFFFF' : '#475569',
-                boxShadow: activeTab === 'overview' ? '0 1px 3px rgba(123, 17, 42, 0.25)' : 'none',
-                borderRadius: '9999px',
-                padding: '0.35rem 0.95rem',
-                fontSize: '0.75rem',
+                boxShadow: activeTab === 'overview' ? '0 1px 3px rgba(15, 118, 110, 0.25)' : 'none',
+                borderRadius: '6px',
+                padding: '0.18rem 0.5rem',
+                fontSize: '0.7rem',
                 fontWeight: activeTab === 'overview' ? 800 : 600,
                 cursor: 'pointer',
                 display: 'inline-flex',
                 alignItems: 'center',
-                gap: '5px',
+                gap: '0.3rem',
                 transition: 'all 0.15s ease',
               }}
             >
-              <span>📊</span> Executive Overview
+              <span>🏛️</span> Executive Overview
             </button>
 
             <button
@@ -933,21 +724,21 @@ export default function DashboardPage() {
               onClick={() => setActiveTab('timeline-kpis')}
               style={{
                 border: 'none',
-                background: activeTab === 'timeline-kpis' ? '#7B112A' : 'transparent',
+                background: activeTab === 'timeline-kpis' ? '#0F766E' : 'transparent',
                 color: activeTab === 'timeline-kpis' ? '#FFFFFF' : '#475569',
-                boxShadow: activeTab === 'timeline-kpis' ? '0 1px 3px rgba(123, 17, 42, 0.25)' : 'none',
-                borderRadius: '9999px',
-                padding: '0.35rem 0.85rem',
-                fontSize: '0.75rem',
+                boxShadow: activeTab === 'timeline-kpis' ? '0 1px 3px rgba(15, 118, 110, 0.25)' : 'none',
+                borderRadius: '6px',
+                padding: '0.18rem 0.5rem',
+                fontSize: '0.7rem',
                 fontWeight: activeTab === 'timeline-kpis' ? 800 : 600,
                 cursor: 'pointer',
                 display: 'inline-flex',
                 alignItems: 'center',
-                gap: '5px',
+                gap: '0.3rem',
                 transition: 'all 0.15s ease',
               }}
             >
-              <span>📈</span> Timeline & KPIs
+              <span>📊</span> Timeline & KPIs
             </button>
 
             <button
@@ -955,21 +746,21 @@ export default function DashboardPage() {
               onClick={() => setActiveTab('calendar')}
               style={{
                 border: 'none',
-                background: activeTab === 'calendar' ? '#7B112A' : 'transparent',
+                background: activeTab === 'calendar' ? '#0F766E' : 'transparent',
                 color: activeTab === 'calendar' ? '#FFFFFF' : '#475569',
-                boxShadow: activeTab === 'calendar' ? '0 1px 3px rgba(123, 17, 42, 0.25)' : 'none',
-                borderRadius: '9999px',
-                padding: '0.35rem 0.85rem',
-                fontSize: '0.75rem',
+                boxShadow: activeTab === 'calendar' ? '0 1px 3px rgba(15, 118, 110, 0.25)' : 'none',
+                borderRadius: '6px',
+                padding: '0.18rem 0.5rem',
+                fontSize: '0.7rem',
                 fontWeight: activeTab === 'calendar' ? 800 : 600,
                 cursor: 'pointer',
                 display: 'inline-flex',
                 alignItems: 'center',
-                gap: '5px',
+                gap: '0.3rem',
                 transition: 'all 0.15s ease',
               }}
             >
-              <span>📅</span> Calendar
+              <span>📅</span> Full Calendar
             </button>
 
             <button
@@ -977,35 +768,35 @@ export default function DashboardPage() {
               onClick={() => setActiveTab('workshops')}
               style={{
                 border: 'none',
-                background: activeTab === 'workshops' ? '#7B112A' : 'transparent',
+                background: activeTab === 'workshops' ? '#0F766E' : 'transparent',
                 color: activeTab === 'workshops' ? '#FFFFFF' : '#475569',
-                boxShadow: activeTab === 'workshops' ? '0 1px 3px rgba(123, 17, 42, 0.25)' : 'none',
-                borderRadius: '9999px',
-                padding: '0.35rem 0.85rem',
-                fontSize: '0.75rem',
+                boxShadow: activeTab === 'workshops' ? '0 1px 3px rgba(15, 118, 110, 0.25)' : 'none',
+                borderRadius: '6px',
+                padding: '0.18rem 0.5rem',
+                fontSize: '0.7rem',
                 fontWeight: activeTab === 'workshops' ? 800 : 600,
                 cursor: 'pointer',
                 display: 'inline-flex',
                 alignItems: 'center',
-                gap: '5px',
+                gap: '0.3rem',
                 transition: 'all 0.15s ease',
               }}
             >
-              Workshops Directory ({workshops.length})
+              <span>📋</span> Workshops Directory ({workshops.length})
             </button>
           </div>
         </div>
 
         {activeTab === 'overview' && (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.85rem' }}>
+          <>
             {/* ══════════════════════════════════════════════════════════════
-                ROW 1: TOP THREE EXECUTIVE TILES
+                WINDOW 1 (ROW 1): TOP THREE EXECUTIVE TILES
                 Col 1: Achievement Curves | Col 2: Admin Map | Col 3: Calendar
                ══════════════════════════════════════════════════════════════ */}
             <div className="gov-top-3col">
               {/* Tile 1 – Physical & Financial Achievement Curves (relevant to branch) */}
               <PerformanceMonitoringChart
-                branchName={user?.organizationName || 'MOE Data Management Branch'}
+                branchName={user?.organizationName || 'MOE ICT Branch'}
                 monthlyData={telemetryData?.monthlyProgress}
                 metrics={telemetryData?.metrics}
               />
@@ -1026,9 +817,40 @@ export default function DashboardPage() {
             </div>
 
             {/* ══════════════════════════════════════════════════════════════
-                ROW 2: SECOND SET OF THREE MANAGEMENT TILES
+                SECTION DIVIDER / WINDOW 2 TRANSITION BAR
+               ══════════════════════════════════════════════════════════════ */}
+            <div
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                margin: '0.75rem 0 0.5rem',
+                padding: '0.35rem 0.85rem',
+                background: 'linear-gradient(90deg, #F8FAFC 0%, #F1F5F9 100%)',
+                border: '1px solid #E2E8F0',
+                borderRadius: '8px',
+                flexWrap: 'wrap',
+                gap: '0.4rem',
+              }}
+            >
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                <span style={{ fontSize: '0.95rem' }}>📊</span>
+                <span style={{ fontSize: '0.78rem', fontWeight: 800, color: '#0F172A', letterSpacing: '-0.01em' }}>
+                  Implementation Timeline, Progress Monitoring & Management KPIs (Window 2)
+                </span>
+              </div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem', fontSize: '0.68rem', color: '#64748B', fontWeight: 600 }}>
+                <span>Tile 01: Implementation Timeline</span>
+                <span>•</span>
+                <span>Tile 02: Progress Monitoring S-Curve</span>
+                <span>•</span>
+                <span>Tile 03: Management KPIs</span>
+              </div>
+            </div>
+
+            {/* ══════════════════════════════════════════════════════════════
+                WINDOW 2 (ROW 2): SECOND SET OF THREE MANAGEMENT TILES
                 Tile 01: Timeline | Tile 02: Performance Curve | Tile 03: KPIs
-                (Clean, seamless transition matching user mockup without divider)
                ══════════════════════════════════════════════════════════════ */}
             <div className="gov-main-3col">
               {/* Tile 01 – Auto-Generated Implementation Timeline (Left) */}
@@ -1052,7 +874,10 @@ export default function DashboardPage() {
                 kpis={telemetryData?.kpiGroups}
               />
             </div>
-          </div>
+
+            {/* Additional space requested at bottom to arrange cleanly */}
+            <div style={{ height: '24px' }} />
+          </>
         )}
 
         {/* TAB: TIMELINE & MANAGEMENT KPIS (Direct View) */}
@@ -1338,40 +1163,6 @@ export default function DashboardPage() {
             <span>{toastMessage}</span>
           </div>
         )}
-
-        {/* Dashboard Footer Matching Mockup */}
-        <footer
-          style={{
-            marginTop: '2rem',
-            paddingTop: '0.85rem',
-            borderTop: '1px solid #E2E8F0',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            flexWrap: 'wrap',
-            gap: '0.75rem',
-            fontSize: '0.75rem',
-            color: '#64748B',
-          }}
-        >
-          <div style={{ fontWeight: 600, color: '#334155' }}>
-            DMISU+ - MoE, © 2026
-          </div>
-          <a
-            href="mailto:gasithamoe@gmail.com"
-            style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: '0.35rem',
-              color: '#334155',
-              textDecoration: 'none',
-              fontWeight: 600,
-            }}
-          >
-            <span>✉</span>
-            <span>Contact: gasithamoe@gmail.com</span>
-          </a>
-        </footer>
 
       </div>
     </AppShell>

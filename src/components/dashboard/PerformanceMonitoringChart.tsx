@@ -196,9 +196,9 @@ function PerformanceMonitoringChart({ branchName = 'MOE ICT Branch', monthlyData
                 fontWeight: 700,
                 border: 'none',
                 cursor: 'pointer',
-                background: activeFilter === 'both' ? '#7B112A' : 'transparent',
-                color: activeFilter === 'both' ? '#FFFFFF' : '#64748B',
-                boxShadow: activeFilter === 'both' ? '0 1px 3px rgba(123, 17, 42, 0.25)' : 'none',
+                background: activeFilter === 'both' ? '#FFFFFF' : 'transparent',
+                color: activeFilter === 'both' ? '#0F172A' : '#64748B',
+                boxShadow: activeFilter === 'both' ? '0 1px 3px rgba(0,0,0,0.1)' : 'none',
                 transition: 'all 0.15s ease',
               }}
             >

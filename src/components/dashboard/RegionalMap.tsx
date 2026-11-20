@@ -188,9 +188,9 @@ function RegionalMap({ workshops = [], provincesData, onSelectProvince }: Region
                 fontWeight: 700,
                 border: 'none',
                 cursor: 'pointer',
-                background: viewMode === 'map' ? '#7B112A' : 'transparent',
-                color: viewMode === 'map' ? '#FFFFFF' : '#64748B',
-                boxShadow: viewMode === 'map' ? '0 1px 3px rgba(123, 17, 42, 0.25)' : 'none',
+                background: viewMode === 'map' ? '#FFFFFF' : 'transparent',
+                color: viewMode === 'map' ? '#0F172A' : '#64748B',
+                boxShadow: viewMode === 'map' ? '0 1px 3px rgba(0,0,0,0.1)' : 'none',
                 transition: 'all 0.15s ease',
               }}
             >
