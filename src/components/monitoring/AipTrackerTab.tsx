@@ -307,7 +307,7 @@ export default function AipTrackerTab({ selectedYear, onSelectYear }: AipTracker
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.25rem', borderBottom: '1px solid #F1F5F9', paddingBottom: '0.75rem', flexWrap: 'wrap', gap: '0.75rem' }}>
           <div>
             <h3 style={{ margin: 0, fontSize: '1.05rem', fontWeight: 800, color: '#0F172A', display: 'flex', alignItems: 'center', gap: '0.45rem' }}>
-              <span>⭕</span> National Education AIP Lifecycle Process Flow
+              <span>⭕</span> AIP Lifecycle
             </h3>
             <div style={{ fontSize: '0.75rem', color: '#64748B', marginTop: '2px' }}>
               The pulsating glowing circle marks the exact active position of FY {selectedYear} AIP right now. Click any circle to inspect deliverables.
