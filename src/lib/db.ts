@@ -546,6 +546,10 @@ export interface FinancialYear {
   status: 'Planning' | 'Active' | 'Closed';
   isCurrent: boolean;
   description?: string;
+  currentAipStage?: number; // 1 to 7 corresponding to AIP Lifecycle
+  aipStageNotes?: string;
+  aipStageUpdatedAt?: string;
+  aipStageUpdatedBy?: string;
   createdAt: string;
   createdBy: string;
 }

@@ -9,6 +9,7 @@ import { broadcastDataChange } from '@/lib/broadcastSync';
 import { formatMillion, formatRupees, formatDualDeclaration, roundToCentInMn, parseAmountToMn } from '@/lib/financialFormat';
 import { MOE_STANDARD_VOTE_NUMBERS } from '@/lib/sriLankanVotes';
 import VoteManagementTab from '@/components/monitoring/VoteManagementTab';
+import AipTrackerTab from '@/components/monitoring/AipTrackerTab';
 
 interface MonitoringMetric {
   totalActivities: number;
@@ -41,6 +42,7 @@ export default function MonitoringWorkspacePage() {
   );
 
   const [activeTab, setActiveTab] = useState<
+    | 'aip_tracker'
     | 'results_framework'
     | 'performance'
     | 'data_quality'
@@ -53,7 +55,7 @@ export default function MonitoringWorkspacePage() {
     | 'evaluation'
     | 'vote_expenditure'
     | 'vote_management'
-  >(isQaMonitoringOfficer ? 'monthly_returns' : 'results_framework');
+  >(isQaMonitoringOfficer ? 'monthly_returns' : 'aip_tracker');
   const [loading, setLoading] = useState(true);
   const [selectedYear, setSelectedYear] = useState('2027');
 
@@ -194,6 +196,8 @@ export default function MonitoringWorkspacePage() {
         setActiveTab('vote_management');
       } else if (tabParam === 'vote_expenditure') {
         setActiveTab('vote_expenditure');
+      } else if (tabParam === 'aip_tracker' || tabParam === 'track_aip') {
+        setActiveTab('aip_tracker');
       }
     }
   }, [selectedYear]);
@@ -819,6 +823,42 @@ export default function MonitoringWorkspacePage() {
         {/* Tab Navigation */}
         <div style={{ display: 'flex', gap: '0.4rem', borderBottom: '2px solid #EBEBEB', marginBottom: '1.5rem', overflowX: 'auto', paddingBottom: '2px' }}>
           <button
+            onClick={() => setActiveTab('aip_tracker')}
+            className={`tab-btn ${activeTab === 'aip_tracker' ? 'active' : ''}`}
+            style={{
+              padding: '0.75rem 1.15rem',
+              fontWeight: 700,
+              fontSize: '0.88rem',
+              border: 'none',
+              background: activeTab === 'aip_tracker' ? '#F0FDFA' : 'none',
+              cursor: 'pointer',
+              borderBottom: activeTab === 'aip_tracker' ? '3px solid #00534E' : '3px solid transparent',
+              color: activeTab === 'aip_tracker' ? '#00534E' : '#666',
+              whiteSpace: 'nowrap',
+              borderRadius: '4px 4px 0 0',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '0.4rem',
+            }}
+          >
+            <span>🗺️</span> Track AIP Lifecycle
+            <span
+              style={{
+                fontSize: '0.62rem',
+                fontWeight: 800,
+                padding: '0.15rem 0.45rem',
+                borderRadius: '9999px',
+                backgroundColor: activeTab === 'aip_tracker' ? '#00534E' : '#E2E8F0',
+                color: activeTab === 'aip_tracker' ? '#FFFFFF' : '#475569',
+                textTransform: 'uppercase',
+                letterSpacing: '0.04em',
+              }}
+            >
+              Active Flow
+            </span>
+          </button>
+
+          <button
             onClick={() => setActiveTab('results_framework')}
             className={`tab-btn ${activeTab === 'results_framework' ? 'active' : ''}`}
             style={{
@@ -1004,6 +1044,11 @@ export default function MonitoringWorkspacePage() {
             💰 Vote Financial Expenditure
           </button>
         </div>
+
+        {/* ── MODULE: TRACK AIP LIFECYCLE ── */}
+        {activeTab === 'aip_tracker' && (
+          <AipTrackerTab selectedYear={selectedYear} onSelectYear={setSelectedYear} />
+        )}
 
         {/* ── MODULE: VOTE MANAGEMENT ── */}
         {activeTab === 'vote_management' && (

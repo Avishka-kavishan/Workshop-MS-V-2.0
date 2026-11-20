@@ -588,6 +588,7 @@ export const DEFAULT_FINANCIAL_YEARS: FinancialYear[] = [
     endDate: '2026-12-31',
     status: 'Active',
     isCurrent: true,
+    currentAipStage: 7, // Budget / AIP implementation & Monitoring
     description: 'Current Operational Financial Year for Implementation & Execution',
     createdAt: '2026-01-01T00:00:00.000Z',
     createdBy: 'user-superadmin',
@@ -599,6 +600,7 @@ export const DEFAULT_FINANCIAL_YEARS: FinancialYear[] = [
     endDate: '2027-12-31',
     status: 'Planning',
     isCurrent: false,
+    currentAipStage: 5, // AIP Prep by branch
     description: 'Upcoming Financial Year for AIP Preparation, Budget Forecasting & Objective Mapping',
     createdAt: '2026-09-01T00:00:00.000Z',
     createdBy: 'user-superadmin',
@@ -610,6 +612,7 @@ export const DEFAULT_FINANCIAL_YEARS: FinancialYear[] = [
     endDate: '2025-12-31',
     status: 'Closed',
     isCurrent: false,
+    currentAipStage: 7, // Closed / Historical Implementation
     description: 'Past Audited Financial Year - Retained for Historical Comparison & Archival',
     createdAt: '2025-01-01T00:00:00.000Z',
     createdBy: 'user-superadmin',
