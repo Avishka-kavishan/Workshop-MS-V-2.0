@@ -9,7 +9,7 @@ export const dynamic = 'force-dynamic';
 const STAGE_DEFINITIONS: Omit<AipLifecycleStage, 'status' | 'metrics'>[] = [
   {
     stageNumber: 1,
-    name: 'Budget planning preparation',
+    name: 'Budget Planning',
     shortName: 'Budget Proposals',
     actor: 'All Branches (All)',
     actorShort: '(All)',
