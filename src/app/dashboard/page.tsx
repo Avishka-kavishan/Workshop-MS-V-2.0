@@ -65,7 +65,7 @@ export default function DashboardPage() {
   };
 
   // Real-Time Progress Meter State (Controlled by Super Admin)
-  const [showProgressMeter, setShowProgressMeter] = useState<boolean>(() => 
+  const [showProgressMeter, setShowProgressMeter] = useState<boolean>(() =>
     typeof globalDashboardCache?.showProgressMeter === 'boolean' ? globalDashboardCache.showProgressMeter : true
   );
   const [meterSettingsLoading, setMeterSettingsLoading] = useState(false);
@@ -1304,28 +1304,28 @@ export default function DashboardPage() {
             Matching the Reference Image Footer Exactly
            ══════════════════════════════════════════════════════ */}
         {activeTab !== 'overview' && (
-        <div className="gov-dashboard-footer">
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem' }}>
-            <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#10B981', display: 'inline-block', boxShadow: '0 0 6px #10B981' }}></span>
-            <span><strong>LAST UPDATED: {lastUpdatedTime}</strong></span>
+          <div className="gov-dashboard-footer">
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem' }}>
+              <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#10B981', display: 'inline-block', boxShadow: '0 0 6px #10B981' }}></span>
+              <span><strong>LAST UPDATED: {lastUpdatedTime}</strong></span>
+            </div>
+
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem' }}>
+              <span className="gov-footer-badge" style={{ background: '#D1FAE5', color: '#065F46' }}>
+                <span>✓</span>
+                <span>System Status: Operational</span>
+              </span>
+
+              <span className="gov-footer-badge" style={{ background: '#E0F2FE', color: '#0369A1' }}>
+                <span>🔄</span>
+                <span>Data Synced</span>
+              </span>
+
+              <span style={{ fontSize: '0.7rem', color: '#94A3B8', fontWeight: 600 }}>
+                Version 2.4.0 • MoE Core
+              </span>
+            </div>
           </div>
-
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem' }}>
-            <span className="gov-footer-badge" style={{ background: '#D1FAE5', color: '#065F46' }}>
-              <span>✓</span>
-              <span>System Status: Operational</span>
-            </span>
-
-            <span className="gov-footer-badge" style={{ background: '#E0F2FE', color: '#0369A1' }}>
-              <span>🔄</span>
-              <span>Data Synced</span>
-            </span>
-
-            <span style={{ fontSize: '0.7rem', color: '#94A3B8', fontWeight: 600 }}>
-              Version 2.4.0 • MoE Core
-            </span>
-          </div>
-        </div>
         )}
 
         {/* Super Admin Toast Notification */}

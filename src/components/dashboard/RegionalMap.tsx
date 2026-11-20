@@ -82,7 +82,7 @@ function RegionalMap({ workshops = [], provincesData, onSelectProvince }: Region
 
   // Traffic light band filter: 'All' | '100%' | '90-99%' | '80-89%' | '70-79%' | '50-69%' | '<50%'
   const [bandFilter, setBandFilter] = useState<'All' | '100%' | '90-99%' | '80-89%' | '70-79%' | '50-69%' | '<50%'>('All');
-  
+
   // View mode: 'map' or 'table'
   const [viewMode, setViewMode] = useState<'map' | 'table'>('map');
 
@@ -98,7 +98,7 @@ function RegionalMap({ workshops = [], provincesData, onSelectProvince }: Region
           setProvinces(data.provinces);
         }
       })
-      .catch(() => {});
+      .catch(() => { });
   }, [provincesData]);
 
   const filteredProvinces = provinces.filter((p) => {

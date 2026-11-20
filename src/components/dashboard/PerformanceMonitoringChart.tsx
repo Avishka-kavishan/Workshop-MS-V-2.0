@@ -68,7 +68,7 @@ function PerformanceMonitoringChart({ branchName = 'MOE ICT Branch', monthlyData
             setLiveMetrics(resJson.metrics);
           }
         })
-        .catch(() => {});
+        .catch(() => { });
     }
   }, [monthlyData, metrics]);
 
