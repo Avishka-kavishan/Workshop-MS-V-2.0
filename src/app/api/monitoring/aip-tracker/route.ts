@@ -4,6 +4,8 @@ import { authOptions } from '@/lib/auth';
 import { getDb, updateDb } from '@/lib/db';
 import { AipLifecycleStage } from '@/components/monitoring/AipTrackerTab';
 
+export const dynamic = 'force-dynamic';
+
 const STAGE_DEFINITIONS: Omit<AipLifecycleStage, 'status' | 'metrics'>[] = [
   {
     stageNumber: 1,
