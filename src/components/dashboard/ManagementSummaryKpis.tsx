@@ -189,7 +189,7 @@ export default function ManagementSummaryKpis({ kpis }: ManagementSummaryKpisPro
               onClick={() => setActiveSection(tab.id as any)}
               style={{
                 border: 'none',
-                background: isSelected ? '#0F766E' : '#F1F5F9',
+                background: isSelected ? '#7B112A' : '#F1F5F9',
                 color: isSelected ? '#FFFFFF' : '#334155',
                 borderRadius: '6px',
                 padding: '0.18rem 0.45rem',
@@ -265,10 +265,10 @@ export default function ManagementSummaryKpis({ kpis }: ManagementSummaryKpisPro
             <div style={{ marginBottom: '0.45rem' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.64rem', fontWeight: 700, marginBottom: '2px' }}>
                 <span style={{ color: '#475569' }}>Overall AIP Implementation Progress</span>
-                <span style={{ color: '#0F766E' }}>{aip.overallProgressPct}%</span>
+                <span style={{ color: '#7B112A' }}>{aip.overallProgressPct}%</span>
               </div>
               <div style={{ width: '100%', height: '6px', background: '#E2E8F0', borderRadius: '3px', overflow: 'hidden' }}>
-                <div style={{ width: `${aip.overallProgressPct}%`, height: '100%', background: '#0F766E', borderRadius: '3px' }} />
+                <div style={{ width: `${aip.overallProgressPct}%`, height: '100%', background: '#7B112A', borderRadius: '3px' }} />
               </div>
             </div>
 

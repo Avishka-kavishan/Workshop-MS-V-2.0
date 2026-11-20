@@ -26,9 +26,11 @@ import GlobalSearchableSelect from '@/components/common/GlobalSearchableSelect';
 
 interface AppShellProps {
   children: React.ReactNode;
+  hideHeader?: boolean;
+  hideFooter?: boolean;
 }
 
-export default function AppShell({ children }: AppShellProps) {
+export default function AppShell({ children, hideHeader, hideFooter }: AppShellProps) {
   const pathname = usePathname();
   const router = useRouter();
   const { data: session, update } = useSession();
@@ -51,6 +53,15 @@ export default function AppShell({ children }: AppShellProps) {
       console.error('Error fetching user roles:', err);
     }
   };
+
+  useEffect(() => {
+    const handleOpenRoleSwitcher = () => {
+      fetchUserRoles();
+      setShowRoleModal(true);
+    };
+    window.addEventListener('OPEN_ROLE_SWITCHER', handleOpenRoleSwitcher);
+    return () => window.removeEventListener('OPEN_ROLE_SWITCHER', handleOpenRoleSwitcher);
+  }, []);
 
   useEffect(() => {
     if (session?.user) {
@@ -421,19 +432,24 @@ export default function AppShell({ children }: AppShellProps) {
                   href={item.href}
                   className={`nav-rail-item ${active ? 'active' : ''}`}
                   title={item.label}
+                  style={active ? {
+                    background: '#FBF4ED',
+                    color: '#6B0F24',
+                    borderRadius: '10px',
+                  } : undefined}
                 >
                   <div className="nav-rail-icon-box">
                     <IconComp
                       size={22}
-                      color={active ? '#FFBE29' : '#FFFFFF'}
-                      accentColor="#FFBE29"
+                      color={active ? '#6B0F24' : '#FFFFFF'}
+                      accentColor={active ? '#6B0F24' : '#FFBE29'}
                     />
                   </div>
-                  <span className="nav-rail-label" style={{ fontWeight: active ? 700 : 500 }}>
+                  <span className="nav-rail-label" style={{ fontWeight: active ? 800 : 500, color: active ? '#6B0F24' : '#FFFFFF' }}>
                     {item.label}
                   </span>
                   {active && isExpanded && (
-                    <span style={{ marginLeft: 'auto', color: '#FFBE29', fontSize: '1.2rem', lineHeight: 1 }}>•</span>
+                    <span style={{ marginLeft: 'auto', color: '#6B0F24', fontSize: '1.2rem', lineHeight: 1 }}>•</span>
                   )}
                 </Link>
               );
@@ -520,6 +536,32 @@ export default function AppShell({ children }: AppShellProps) {
             gap: '0.65rem',
           }}
         >
+          {/* Ministry of Education Sri Lanka Crest & Branding */}
+          <div
+            style={{
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: isExpanded ? 'flex-start' : 'center',
+              padding: '0.2rem 0.2rem 0.4rem',
+              borderBottom: '1px solid rgba(255, 255, 255, 0.12)',
+            }}
+          >
+            <svg width="28" height="22" viewBox="0 0 64 48" fill="none" stroke="#FFBE29" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <rect x="8" y="22" width="48" height="22" rx="1" />
+              <polygon points="32,4 10,22 54,22" />
+              <line x1="16" y1="26" x2="16" y2="40" />
+              <line x1="24" y1="26" x2="24" y2="40" />
+              <line x1="32" y1="26" x2="32" y2="40" />
+              <line x1="40" y1="26" x2="40" y2="40" />
+              <line x1="48" y1="26" x2="48" y2="40" />
+            </svg>
+            {isExpanded && (
+              <div style={{ fontSize: '0.64rem', fontWeight: 700, color: '#FFE4B5', marginTop: '3px', lineHeight: 1.25 }}>
+                Ministry of Education<br />Sri Lanka
+              </div>
+            )}
+          </div>
+
           {/* User profile capsule */}
           <div
             style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}
@@ -613,9 +655,10 @@ export default function AppShell({ children }: AppShellProps) {
       {/* ══════════════════════════════════════════════════════
           MAIN WORKSPACE CONTENT AREA
          ══════════════════════════════════════════════════════ */}
-      <div className="app-main">
+      <div className="app-main" style={hideHeader ? { background: '#FAF5F2', minHeight: '100vh' } : undefined}>
 
         {/* Top Header Bar */}
+        {!hideHeader && (
         <header className="app-header">
           {/* Left: Clickable Navigation Pane & Breadcrumb */}
           <div ref={navPaneRef} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', minWidth: 0, position: 'relative' }}>
@@ -1143,13 +1186,15 @@ export default function AppShell({ children }: AppShellProps) {
 
           </div>
         </header>
+        )}
 
         {/* Content Body */}
-        <main className="app-content" style={{ flex: 1 }}>
+        <main className="app-content" style={{ flex: 1, ...(hideHeader ? { padding: 0 } : {}) }}>
           {children}
         </main>
 
         {/* Global Application Normalized Footer */}
+        {!hideFooter && (
         <footer
           className="app-footer"
           style={{
@@ -1196,6 +1241,7 @@ export default function AppShell({ children }: AppShellProps) {
             </a>
           </div>
         </footer>
+        )}
 
       </div>
 

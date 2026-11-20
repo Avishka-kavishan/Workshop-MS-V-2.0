@@ -193,7 +193,7 @@ export default function AutoImplementationTimeline({
       {/* Filter Tabs */}
       <div style={{ display: 'flex', alignItems: 'center', gap: '0.3rem', marginBottom: '0.55rem', flexWrap: 'wrap' }}>
         {[
-          { id: 'all', label: `All (${counts.all})` },
+          { id: 'all', label: `All (${counts.all})`, color: '#7B112A' },
           { id: 'Ongoing', label: `Ongoing (${counts.ongo})`, color: '#0284C7' },
           { id: 'Delayed', label: `Delayed (${counts.delay})`, color: '#EF4444' },
           { id: 'Completed', label: `Completed (${counts.comp})`, color: '#10B981' },
@@ -207,7 +207,7 @@ export default function AutoImplementationTimeline({
               onClick={() => setSelectedStatus(tab.id)}
               style={{
                 border: 'none',
-                background: isSelected ? (tab.color || '#0F766E') : '#F1F5F9',
+                background: isSelected ? (tab.color || '#7B112A') : '#F1F5F9',
                 color: isSelected ? '#FFFFFF' : '#334155',
                 borderRadius: '6px',
                 padding: '0.2rem 0.5rem',
@@ -488,7 +488,7 @@ export default function AutoImplementationTimeline({
               <button
                 type="button"
                 className="btn btn-primary btn-sm"
-                style={{ fontSize: '0.75rem', background: '#0F766E', borderColor: '#0F766E' }}
+                style={{ fontSize: '0.75rem', background: '#7B112A', borderColor: '#7B112A' }}
                 onClick={() => setSelectedActivity(null)}
               >
                 Close View

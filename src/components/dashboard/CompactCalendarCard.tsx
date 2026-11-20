@@ -337,7 +337,7 @@ export default function CompactCalendarCard({
       >
         {[
           { id: 'all', label: 'All', color: '#475569' },
-          { id: 'workshop', label: 'Workshops', color: '#0284C7' },
+          { id: 'workshop', label: 'Workshops', color: '#7B112A' },
           { id: 'milestone', label: 'Milestones', color: '#8B5CF6' },
           { id: 'deadline', label: 'Deadlines', color: '#F59E0B' },
           { id: 'meeting', label: 'Reviews', color: '#10B981' },
@@ -408,9 +408,9 @@ export default function CompactCalendarCard({
               onClick={() => setSelectedDateKey(cell.dateKey)}
               style={{
                 background: isSelected
-                  ? '#0F766E'
+                  ? '#7B112A'
                   : isToday
-                  ? '#E0F2FE'
+                  ? '#FEE2E2'
                   : cell.isCurrentMonth
                   ? '#F8FAFC'
                   : '#FFFFFF',
@@ -428,9 +428,9 @@ export default function CompactCalendarCard({
                 justifyContent: 'space-between',
                 cursor: 'pointer',
                 border: isSelected
-                  ? '1px solid #0D9488'
+                  ? '1px solid #7B112A'
                   : isToday
-                  ? '1px solid #38BDF8'
+                  ? '1px solid #DC2626'
                   : '1px solid #F1F5F9',
                 transition: 'all 0.1s ease',
               }}
