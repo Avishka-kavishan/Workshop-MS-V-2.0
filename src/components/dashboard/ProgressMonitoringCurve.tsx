@@ -135,10 +135,10 @@ export default function ProgressMonitoringCurve({
     <div
       style={{
         background: '#FFFFFF',
-        borderRadius: '14px',
-        border: '1px solid #E2E8F0',
-        padding: '0.85rem 1rem',
-        boxShadow: '0 4px 16px rgba(0, 0, 0, 0.04)',
+        borderRadius: '16px',
+        border: '1px solid #F1E5E2',
+        padding: '0.65rem 0.85rem',
+        boxShadow: '0 4px 16px rgba(128, 20, 43, 0.04)',
         display: 'flex',
         flexDirection: 'column',
         height: '100%',
@@ -146,55 +146,49 @@ export default function ProgressMonitoringCurve({
       }}
     >
       {/* Header matching User Mockup: 02. Progress Monitoring */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '0.45rem', flexWrap: 'wrap', gap: '0.4rem' }}>
-        <div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap' }}>
-            <h3 style={{ margin: 0, fontSize: '1rem', fontWeight: 800, color: '#0F172A', letterSpacing: '-0.01em' }}>
-              02. Progress Monitoring
-            </h3>
-            <span
-              style={{
-                fontSize: '0.62rem',
-                fontWeight: 800,
-                padding: '2px 8px',
-                borderRadius: '12px',
-                background: '#DCFCE7',
-                color: '#15803D',
-                border: '1px solid #86EFAC',
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: '3px',
-              }}
-            >
-              <span style={{ width: '5px', height: '5px', borderRadius: '50%', background: '#16A34A', display: 'inline-block' }} />
-              Live data
-            </span>
-          </div>
-          <div style={{ fontSize: '0.68rem', color: '#64748B', marginTop: '2px' }}>
-            Illustrative planned vs actual cumulative progress trajectory
-          </div>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.55rem', flexWrap: 'wrap', gap: '0.4rem' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+          <span style={{ fontSize: '1.05rem', color: '#80142B' }}>📈</span>
+          <h3 style={{ margin: 0, fontSize: '0.96rem', fontWeight: 800, color: '#0F172A', letterSpacing: '-0.01em' }}>
+            02. Progress Monitoring
+          </h3>
         </div>
 
-        {/* Right side up corner: Performance Gap & Tile Actions */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
-          <div
+        {/* Right: Live Data Badge & Dropdown */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.45rem' }}>
+          <span
             style={{
+              fontSize: '0.64rem',
+              fontWeight: 800,
+              padding: '2px 8px',
+              borderRadius: '12px',
+              background: '#DCFCE7',
+              color: '#15803D',
+              border: '1px solid #86EFAC',
               display: 'inline-flex',
               alignItems: 'center',
-              gap: '0.3rem',
-              padding: '0.18rem 0.55rem',
-              borderRadius: '20px',
-              background: isAhead ? '#DCFCE7' : '#FEF3C7',
-              border: `1px solid ${isAhead ? '#86EFAC' : '#FDE68A'}`,
-              fontSize: '0.68rem',
-              fontWeight: 800,
-              color: isAhead ? '#15803D' : '#B45309',
+              gap: '4px',
             }}
-            title="Variance between Verified Actual vs Planned Trajectory"
           >
-            <span>{isAhead ? '▲' : '▼'}</span>
-            <span>Gap: {isAhead ? `+${performanceGap}%` : `${performanceGap}%`}</span>
-          </div>
+            <span style={{ width: '5px', height: '5px', borderRadius: '50%', background: '#16A34A', display: 'inline-block' }} />
+            Live data
+          </span>
+
+          <span
+            style={{
+              fontSize: '0.66rem',
+              fontWeight: 700,
+              padding: '2px 8px',
+              borderRadius: '8px',
+              background: '#FFF5F2',
+              color: '#80142B',
+              border: '1px solid #F2DDD5',
+              cursor: 'pointer',
+            }}
+          >
+            Last 12 Months ⌵
+          </span>
+
           <TileActionMenu
             tileTitle="02. Progress Monitoring"
             exportData={tileExportData}
@@ -203,99 +197,62 @@ export default function ProgressMonitoringCurve({
         </div>
       </div>
 
-      {/* Mode Switcher Buttons & Legend */}
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.4rem', flexWrap: 'wrap', gap: '0.4rem' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
-          {[
-            { id: 'both', label: 'All Curves' },
-            { id: 'physical', label: 'Physical %' },
-            { id: 'financial', label: 'Financial %' },
-          ].map((mode) => {
-            const isSelected = curveMode === mode.id;
-            return (
-              <button
-                key={mode.id}
-                type="button"
-                onClick={() => setCurveMode(mode.id as any)}
-                style={{
-                  border: 'none',
-                  background: isSelected ? '#0F766E' : '#F1F5F9',
-                  color: isSelected ? '#FFFFFF' : '#334155',
-                  borderRadius: '6px',
-                  padding: '0.15rem 0.45rem',
-                  fontSize: '0.64rem',
-                  fontWeight: isSelected ? 800 : 600,
-                  cursor: 'pointer',
-                  transition: 'all 0.15s ease',
-                }}
-              >
-                {mode.label}
-              </button>
-            );
-          })}
+      {/* 4 Stat Boxes Matching Mockup (All Crews, Planned, Actual, Delay) */}
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '0.45rem', marginBottom: '0.55rem' }}>
+        {/* Stat 1: All Crews 277 */}
+        <div style={{ background: '#FFF5F2', border: '1px solid #F2DDD5', borderRadius: '10px', padding: '0.45rem 0.55rem', display: 'flex', alignItems: 'center', gap: '0.45rem' }}>
+          <div style={{ width: '24px', height: '24px', borderRadius: '50%', background: '#FCE7E1', color: '#80142B', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.75rem', fontWeight: 800 }}>
+            ✓
+          </div>
+          <div>
+            <div style={{ fontSize: '0.6rem', color: '#64748B', fontWeight: 700 }}>All Crews</div>
+            <div style={{ fontSize: '0.96rem', fontWeight: 900, color: '#0F172A', lineHeight: 1.1 }}>277</div>
+          </div>
         </div>
 
-        {/* Legend Indicators Matching User Reference (Planned = Blue, Actual = Green) */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', fontSize: '0.68rem', fontWeight: 700 }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-            <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#2563EB', display: 'inline-block' }} />
-            <span style={{ color: '#2563EB' }}>Planned</span>
+        {/* Stat 2: Planned 22 */}
+        <div style={{ background: '#F0FDF4', border: '1px solid #BBF7D0', borderRadius: '10px', padding: '0.45rem 0.55rem', display: 'flex', alignItems: 'center', gap: '0.45rem' }}>
+          <div style={{ width: '24px', height: '24px', borderRadius: '50%', background: '#DCFCE7', color: '#16A34A', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.75rem', fontWeight: 800 }}>
+            📊
           </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-            <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#10B981', display: 'inline-block' }} />
-            <span style={{ color: '#10B981' }}>Actual ({physicalAchievementRate}%)</span>
+          <div>
+            <div style={{ fontSize: '0.6rem', color: '#64748B', fontWeight: 700 }}>Planned</div>
+            <div style={{ fontSize: '0.96rem', fontWeight: 900, color: '#0F172A', lineHeight: 1.1 }}>22</div>
+          </div>
+        </div>
+
+        {/* Stat 3: Actual 74% */}
+        <div style={{ background: '#F0F9FF', border: '1px solid #BAE6FD', borderRadius: '10px', padding: '0.45rem 0.55rem', display: 'flex', alignItems: 'center', gap: '0.45rem' }}>
+          <div style={{ width: '24px', height: '24px', borderRadius: '50%', background: '#E0F2FE', color: '#0284C7', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.75rem', fontWeight: 800 }}>
+            🎯
+          </div>
+          <div>
+            <div style={{ fontSize: '0.6rem', color: '#64748B', fontWeight: 700 }}>Actual</div>
+            <div style={{ fontSize: '0.96rem', fontWeight: 900, color: '#0284C7', lineHeight: 1.1 }}>74%</div>
+          </div>
+        </div>
+
+        {/* Stat 4: Delay 24 */}
+        <div style={{ background: '#FFFBEB', border: '1px solid #FDE68A', borderRadius: '10px', padding: '0.45rem 0.55rem', display: 'flex', alignItems: 'center', gap: '0.45rem' }}>
+          <div style={{ width: '24px', height: '24px', borderRadius: '50%', background: '#FEF3C7', color: '#D97706', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.75rem', fontWeight: 800 }}>
+            ⏰
+          </div>
+          <div>
+            <div style={{ fontSize: '0.6rem', color: '#64748B', fontWeight: 700 }}>Delay</div>
+            <div style={{ fontSize: '0.96rem', fontWeight: 900, color: '#D97706', lineHeight: 1.1 }}>24</div>
           </div>
         </div>
       </div>
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.45rem', flexWrap: 'wrap', gap: '0.4rem' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
-          {[
-            { id: 'both', label: 'Combined S-Curve' },
-            { id: 'physical', label: 'Physical %' },
-            { id: 'financial', label: 'Financial %' },
-          ].map((mode) => {
-            const isSelected = curveMode === mode.id;
-            return (
-              <button
-                key={mode.id}
-                type="button"
-                onClick={() => setCurveMode(mode.id as any)}
-                style={{
-                  border: 'none',
-                  background: isSelected ? '#0F766E' : '#F1F5F9',
-                  color: isSelected ? '#FFFFFF' : '#334155',
-                  borderRadius: '6px',
-                  padding: '0.18rem 0.5rem',
-                  fontSize: '0.64rem',
-                  fontWeight: isSelected ? 800 : 600,
-                  cursor: 'pointer',
-                  transition: 'all 0.15s ease',
-                }}
-              >
-                {mode.label}
-              </button>
-            );
-          })}
-        </div>
 
-        {/* Legend Indicators */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', fontSize: '0.64rem', fontWeight: 700 }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '3px' }}>
-            <span style={{ width: '12px', height: '2px', background: '#F59E0B', borderTop: '1px dashed #F59E0B' }} />
-            <span style={{ color: '#D97706' }}>Planned</span>
-          </div>
-          {(curveMode === 'both' || curveMode === 'physical') && (
-            <div style={{ display: 'flex', alignItems: 'center', gap: '3px' }}>
-              <span style={{ width: '10px', height: '3px', background: '#0F766E', borderRadius: '1px' }} />
-              <span style={{ color: '#0F766E' }}>Physical ({physicalAchievementRate}%)</span>
-            </div>
-          )}
-          {(curveMode === 'both' || curveMode === 'financial') && (
-            <div style={{ display: 'flex', alignItems: 'center', gap: '3px' }}>
-              <span style={{ width: '10px', height: '3px', background: '#0284C7', borderRadius: '1px' }} />
-              <span style={{ color: '#0284C7' }}>Financial ({budgetUtilizationRate}%)</span>
-            </div>
-          )}
+      {/* Legend Indicators Matching Mockup: Planned = Maroon (#80142B), Actual = Green (#10B981) */}
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: '0.85rem', marginBottom: '0.35rem', fontSize: '0.7rem', fontWeight: 700 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+          <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#80142B', display: 'inline-block' }} />
+          <span style={{ color: '#0F172A' }}>Planned</span>
+        </div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+          <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#10B981', display: 'inline-block' }} />
+          <span style={{ color: '#0F172A' }}>Actual</span>
         </div>
       </div>
 
@@ -303,9 +260,9 @@ export default function ProgressMonitoringCurve({
       <div
         style={{
           position: 'relative',
-          background: 'linear-gradient(180deg, #F8FAFC 0%, #FFFFFF 100%)',
-          borderRadius: '8px',
-          border: '1px solid #E2E8F0',
+          background: '#FFFFFF',
+          borderRadius: '10px',
+          border: '1px solid #F1E5E2',
           padding: '0.35rem 0.25rem',
           flex: 1,
           display: 'flex',
@@ -327,7 +284,7 @@ export default function ProgressMonitoringCurve({
                   y1={y}
                   x2={svgWidth - padRight}
                   y2={y}
-                  stroke="#E2E8F0"
+                  stroke="#F5EBE8"
                   strokeWidth="1"
                   strokeDasharray={pct === 0 || pct === 100 ? 'none' : '3 3'}
                 />
@@ -354,7 +311,7 @@ export default function ProgressMonitoringCurve({
                 x={x}
                 y={svgHeight - 8}
                 textAnchor="middle"
-                fill={i === currentMonthIdx ? '#0F766E' : '#64748B'}
+                fill={i === currentMonthIdx ? '#80142B' : '#64748B'}
                 fontSize="8.5"
                 fontWeight={i === currentMonthIdx ? '800' : '600'}
               >
@@ -363,45 +320,31 @@ export default function ProgressMonitoringCurve({
             );
           })}
 
-          {/* 1. Planned Trajectory Path (Dashed Amber) */}
+          {/* 1. Planned Trajectory Path (Maroon) */}
           <path
             d={plannedPath}
             fill="none"
-            stroke="#2563EB"
-            strokeWidth="2"
-            strokeDasharray="4 3"
-            opacity="0.9"
+            stroke="#80142B"
+            strokeWidth="2.5"
+            strokeLinecap="round"
+            strokeLinejoin="round"
           />
 
-          {/* 2. Actual Physical Progress Path (Solid Teal) */}
-          {(curveMode === 'both' || curveMode === 'physical') && (
-            <path
-              d={physicalPath}
-              fill="none"
-              stroke="#10B981"
-              strokeWidth="2.8"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              filter="drop-shadow(0 2px 4px rgba(15, 118, 110, 0.25))"
-            />
-          )}
-
-          {/* 3. Actual Financial Progress Path (Solid Royal Blue) */}
-          {(curveMode === 'both' || curveMode === 'financial') && (
-            <path
-              d={financialPath}
-              fill="none"
-              stroke="#0284C7"
-              strokeWidth="2.4"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              filter="drop-shadow(0 2px 4px rgba(2, 132, 199, 0.2))"
-            />
-          )}
+          {/* 2. Actual Physical Progress Path (Green) */}
+          <path
+            d={physicalPath}
+            fill="none"
+            stroke="#10B981"
+            strokeWidth="2.8"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            filter="drop-shadow(0 2px 4px rgba(16, 185, 129, 0.25))"
+          />
 
           {/* Data Interactive Anchor Nodes */}
           {data.map((pt, i) => {
             const coordPhys = getCoordinates(i, pt.physical);
+            const coordPlan = getCoordinates(i, plannedTrajectory[i] || 0);
             const isHover = hoveredIdx === i;
 
             return (
@@ -418,35 +361,31 @@ export default function ProgressMonitoringCurve({
                     y1={padTop}
                     x2={coordPhys.x}
                     y2={padTop + chartHeight}
-                    stroke="#CBD5E1"
+                    stroke="#F1E5E2"
                     strokeWidth="1.2"
                     strokeDasharray="2 2"
                   />
                 )}
 
-                {/* Physical Dot */}
-                {(curveMode === 'both' || curveMode === 'physical') && (
-                  <circle
-                    cx={coordPhys.x}
-                    cy={coordPhys.y}
-                    r={isHover ? 5 : 3.5}
-                    fill="#10B981"
-                    stroke="#FFFFFF"
-                    strokeWidth="1.5"
-                  />
-                )}
+                {/* Planned Node (Maroon) */}
+                <circle
+                  cx={coordPlan.x}
+                  cy={coordPlan.y}
+                  r={isHover ? 5 : 3.5}
+                  fill="#FFFFFF"
+                  stroke="#80142B"
+                  strokeWidth="2"
+                />
 
-                {/* Financial Dot */}
-                {(curveMode === 'both' || curveMode === 'financial') && (
-                  <circle
-                    cx={getCoordinates(i, pt.financial).x}
-                    cy={getCoordinates(i, pt.financial).y}
-                    r={isHover ? 4.5 : 3}
-                    fill="#0284C7"
-                    stroke="#FFFFFF"
-                    strokeWidth="1.5"
-                  />
-                )}
+                {/* Actual Physical Node (Green) */}
+                <circle
+                  cx={coordPhys.x}
+                  cy={coordPhys.y}
+                  r={isHover ? 5.5 : 4}
+                  fill="#10B981"
+                  stroke="#FFFFFF"
+                  strokeWidth="1.5"
+                />
               </g>
             );
           })}
@@ -476,9 +415,8 @@ export default function ProgressMonitoringCurve({
             <div style={{ fontWeight: 800, color: '#38BDF8', borderBottom: '1px solid rgba(255,255,255,0.15)', paddingBottom: '2px' }}>
               {hoveredPoint.month} Progress Milestone
             </div>
-            <div>Planned Baseline: <strong>{plannedTrajectory[data.indexOf(hoveredPoint)]}%</strong></div>
-            <div style={{ color: '#34D399' }}>Verified Physical: <strong>{hoveredPoint.physical}%</strong></div>
-            <div style={{ color: '#93C5FD' }}>Financial Absorption: <strong>{hoveredPoint.financial}%</strong></div>
+            <div style={{ color: '#F472B6' }}>Planned: <strong>{plannedTrajectory[data.indexOf(hoveredPoint)]}%</strong></div>
+            <div style={{ color: '#34D399' }}>Actual: <strong>{hoveredPoint.physical}%</strong></div>
           </div>
         )}
       </div>
@@ -491,20 +429,20 @@ export default function ProgressMonitoringCurve({
           justifyContent: 'space-between',
           marginTop: '0.55rem',
           paddingTop: '0.45rem',
-          borderTop: '1px solid #E2E8F0',
+          borderTop: '1px solid #F1E5E2',
           fontSize: '0.68rem',
           flexWrap: 'wrap',
           gap: '0.4rem',
         }}
       >
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-          <span style={{ display: 'inline-flex', alignItems: 'center', gap: '3px', color: '#16A34A', fontWeight: 700 }}>
-            <span>●</span> Ahead: 42
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem' }}>
+          <span style={{ display: 'inline-flex', alignItems: 'center', gap: '3px', color: '#16A34A', fontWeight: 800 }}>
+            <span>↑</span> Ahead: 42
           </span>
-          <span style={{ display: 'inline-flex', alignItems: 'center', gap: '3px', color: '#0284C7', fontWeight: 700 }}>
+          <span style={{ display: 'inline-flex', alignItems: 'center', gap: '3px', color: '#80142B', fontWeight: 800 }}>
             <span>●</span> On-Track: 118
           </span>
-          <span style={{ display: 'inline-flex', alignItems: 'center', gap: '3px', color: '#DC2626', fontWeight: 700 }}>
+          <span style={{ display: 'inline-flex', alignItems: 'center', gap: '3px', color: '#DC2626', fontWeight: 800 }}>
             <span>●</span> Delayed: 24
           </span>
         </div>
@@ -513,8 +451,8 @@ export default function ProgressMonitoringCurve({
           href="/monitoring"
           style={{
             fontSize: '0.68rem',
-            fontWeight: 700,
-            color: '#0F766E',
+            fontWeight: 800,
+            color: '#80142B',
             textDecoration: 'none',
             display: 'inline-flex',
             alignItems: 'center',

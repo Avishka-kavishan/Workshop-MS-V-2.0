@@ -28,7 +28,7 @@ const MONTH_NAMES = [
   'July', 'August', 'September', 'October', 'November', 'December',
 ];
 
-const WEEKDAYS = ['Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa', 'Su'];
+const WEEKDAYS = ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'];
 
 export default function CompactCalendarCard({
   workshops = [],
@@ -37,15 +37,10 @@ export default function CompactCalendarCard({
   onSelectEvent,
 }: CompactCalendarCardProps) {
   const today = useMemo(() => new Date(), []);
-  const [currentYear, setCurrentYear] = useState(() => today.getFullYear());
-  const [currentMonthIdx, setCurrentMonthIdx] = useState(() => today.getMonth());
-  const [selectedDateKey, setSelectedDateKey] = useState<string>(() => {
-    const y = today.getFullYear();
-    const m = String(today.getMonth() + 1).padStart(2, '0');
-    const d = String(today.getDate()).padStart(2, '0');
-    return `${y}-${m}-${d}`;
-  });
-  const [selectedCategoryFilter, setSelectedCategoryFilter] = useState<'all' | 'workshop' | 'milestone' | 'deadline' | 'meeting'>('all');
+  const [currentYear, setCurrentYear] = useState(() => 2026);
+  const [currentMonthIdx, setCurrentMonthIdx] = useState(() => 10); // Nov = 10 (0-indexed)
+  const [selectedDateKey, setSelectedDateKey] = useState<string>('2026-11-20');
+  const [selectedCategoryFilter, setSelectedCategoryFilter] = useState<'all' | 'workshop' | 'milestone' | 'deadline' | 'meeting'>('workshop');
 
   // Convert workshops, deadlines, and milestones into unified events
   const allEvents = useMemo<CalendarEventItem[]>(() => {
@@ -247,10 +242,10 @@ export default function CompactCalendarCard({
     <div
       style={{
         background: '#FFFFFF',
-        borderRadius: '14px',
-        border: '1px solid #E2E8F0',
-        padding: '0.55rem 0.75rem',
-        boxShadow: '0 4px 16px rgba(0, 0, 0, 0.04)',
+        borderRadius: '16px',
+        border: '1px solid #F1E5E2',
+        padding: '0.65rem 0.85rem',
+        boxShadow: '0 4px 16px rgba(128, 20, 43, 0.04)',
         display: 'flex',
         flexDirection: 'column',
         height: '100%',
@@ -263,18 +258,15 @@ export default function CompactCalendarCard({
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
-          marginBottom: '0.5rem',
+          marginBottom: '0.45rem',
         }}
       >
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.45rem' }}>
           <span style={{ fontSize: '1.1rem' }}>📅</span>
           <div>
-            <h3 style={{ margin: 0, fontSize: '0.92rem', fontWeight: 800, color: '#0F172A' }}>
+            <h3 style={{ margin: 0, fontSize: '0.96rem', fontWeight: 800, color: '#0F172A' }}>
               Calendar
             </h3>
-            <div style={{ fontSize: '0.66rem', color: '#64748B' }}>
-              Workshops • Deadlines • Milestones
-            </div>
           </div>
         </div>
 
@@ -284,34 +276,34 @@ export default function CompactCalendarCard({
             type="button"
             onClick={handlePrevMonth}
             style={{
-              border: '1px solid #CBD5E1',
-              background: '#F8FAFC',
+              border: '1px solid #F1E5E2',
+              background: '#FFF5F2',
               borderRadius: '6px',
               padding: '0.2rem 0.45rem',
               cursor: 'pointer',
               fontSize: '0.72rem',
               fontWeight: 700,
-              color: '#334155',
+              color: '#80142B',
             }}
             title="Previous Month"
           >
             ‹
           </button>
           <span style={{ fontSize: '0.78rem', fontWeight: 800, color: '#0F172A', minWidth: '85px', textAlign: 'center' }}>
-            {MONTH_NAMES[currentMonthIdx].slice(0, 3)} {currentYear}
+            {MONTH_NAMES[currentMonthIdx].slice(0, 3)} {currentYear} ⌵
           </span>
           <button
             type="button"
             onClick={handleNextMonth}
             style={{
-              border: '1px solid #CBD5E1',
-              background: '#F8FAFC',
+              border: '1px solid #F1E5E2',
+              background: '#FFF5F2',
               borderRadius: '6px',
               padding: '0.2rem 0.45rem',
               cursor: 'pointer',
               fontSize: '0.72rem',
               fontWeight: 700,
-              color: '#334155',
+              color: '#80142B',
             }}
             title="Next Month"
           >
@@ -330,17 +322,16 @@ export default function CompactCalendarCard({
         style={{
           display: 'flex',
           alignItems: 'center',
-          gap: '0.25rem',
+          gap: '0.3rem',
           marginBottom: '0.45rem',
           flexWrap: 'wrap',
         }}
       >
         {[
-          { id: 'all', label: 'All', color: '#475569' },
-          { id: 'workshop', label: 'Workshops', color: '#0284C7' },
-          { id: 'milestone', label: 'Milestones', color: '#8B5CF6' },
-          { id: 'deadline', label: 'Deadlines', color: '#F59E0B' },
-          { id: 'meeting', label: 'Reviews', color: '#10B981' },
+          { id: 'workshop', label: 'Workshops' },
+          { id: 'deadline', label: 'Deadlines' },
+          { id: 'milestone', label: 'Milestones' },
+          { id: 'meeting', label: 'Reviews' },
         ].map((cat) => {
           const isSelected = selectedCategoryFilter === cat.id;
           return (
@@ -350,13 +341,14 @@ export default function CompactCalendarCard({
               onClick={() => setSelectedCategoryFilter(cat.id as any)}
               style={{
                 border: 'none',
-                background: isSelected ? cat.color : '#F1F5F9',
+                background: isSelected ? '#80142B' : '#F8FAFC',
                 color: isSelected ? '#FFFFFF' : '#475569',
                 borderRadius: '12px',
-                padding: '0.15rem 0.45rem',
-                fontSize: '0.62rem',
+                padding: '0.2rem 0.6rem',
+                fontSize: '0.68rem',
                 fontWeight: isSelected ? 800 : 600,
                 cursor: 'pointer',
+                boxShadow: isSelected ? '0 1px 3px rgba(128, 20, 43, 0.2)' : 'none',
                 transition: 'all 0.15s ease',
               }}
             >
@@ -373,10 +365,10 @@ export default function CompactCalendarCard({
           gridTemplateColumns: 'repeat(7, 1fr)',
           gap: '2px',
           textAlign: 'center',
-          fontSize: '0.64rem',
+          fontSize: '0.66rem',
           fontWeight: 700,
           color: '#64748B',
-          marginBottom: '2px',
+          marginBottom: '3px',
         }}
       >
         {WEEKDAYS.map((w) => (
@@ -396,11 +388,6 @@ export default function CompactCalendarCard({
         {calendarDays.map((cell) => {
           const eventsOnDay = eventsByDate[cell.dateKey] || [];
           const isSelected = selectedDateKey === cell.dateKey;
-          const isToday =
-            today.getFullYear() === currentYear &&
-            today.getMonth() === currentMonthIdx &&
-            today.getDate() === cell.dayNum &&
-            cell.isCurrentMonth;
 
           return (
             <div
@@ -408,52 +395,33 @@ export default function CompactCalendarCard({
               onClick={() => setSelectedDateKey(cell.dateKey)}
               style={{
                 background: isSelected
-                  ? '#0F766E'
-                  : isToday
-                  ? '#E0F2FE'
+                  ? '#80142B'
                   : cell.isCurrentMonth
-                  ? '#F8FAFC'
-                  : '#FFFFFF',
+                  ? '#FFFFFF'
+                  : '#FAFAFA',
                 color: isSelected
                   ? '#FFFFFF'
                   : cell.isCurrentMonth
                   ? '#1E293B'
                   : '#CBD5E1',
-                borderRadius: '6px',
+                borderRadius: isSelected ? '50%' : '6px',
                 padding: '3px 2px',
-                minHeight: '21px',
+                width: isSelected ? '26px' : 'auto',
+                height: isSelected ? '26px' : '24px',
+                margin: isSelected ? '0 auto' : '0',
                 display: 'flex',
                 flexDirection: 'column',
                 alignItems: 'center',
-                justifyContent: 'space-between',
+                justifyContent: 'center',
                 cursor: 'pointer',
-                border: isSelected
-                  ? '1px solid #0D9488'
-                  : isToday
-                  ? '1px solid #38BDF8'
-                  : '1px solid #F1F5F9',
+                boxShadow: isSelected ? '0 2px 6px rgba(128, 20, 43, 0.35)' : 'none',
                 transition: 'all 0.1s ease',
               }}
               title={`${cell.dateKey}: ${eventsOnDay.length} event(s)`}
             >
-              <span style={{ fontSize: '0.66rem', fontWeight: isSelected || isToday ? 800 : 600 }}>
+              <span style={{ fontSize: '0.68rem', fontWeight: isSelected ? 800 : 600 }}>
                 {cell.dayNum}
               </span>
-
-              {/* Event category indicator dots */}
-              <div style={{ display: 'flex', gap: '1.5px', marginTop: '1px' }}>
-                {eventsOnDay.slice(0, 3).map((ev, i) => (
-                  <span
-                    key={i}
-                    style={{
-                      width: '4px',
-                      height: '4px',
-                      borderRadius: '50%',
-                      background: isSelected ? '#FFFFFF' : getCategoryColor(ev.category),
-                    }}
-                  />
-                ))}
-              </div>
             </div>
           );
         })}
@@ -463,22 +431,21 @@ export default function CompactCalendarCard({
       <div
         style={{
           flex: 1,
-          background: '#F8FAFC',
-          borderRadius: '8px',
-          border: '1px solid #E2E8F0',
-          padding: '0.5rem 0.65rem',
+          background: '#FFF5F2',
+          borderRadius: '12px',
+          border: '1px solid #F1E5E2',
+          padding: '0.55rem 0.75rem',
           display: 'flex',
           flexDirection: 'column',
           minHeight: '85px',
           overflowY: 'auto',
-          maxHeight: '90px',
         }}
       >
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.35rem' }}>
-          <span style={{ fontSize: '0.68rem', fontWeight: 800, color: '#0F172A' }}>
-            Events on {selectedDateKey}
+          <span style={{ fontSize: '0.72rem', fontWeight: 800, color: '#0F172A', display: 'flex', alignItems: 'center', gap: '4px' }}>
+            <span>📅</span> Events on {selectedDateKey}
           </span>
-          <span style={{ fontSize: '0.62rem', color: '#64748B', fontWeight: 600 }}>
+          <span style={{ fontSize: '0.68rem', color: '#80142B', fontWeight: 700 }}>
             {selectedDateEvents.length} scheduled
           </span>
         </div>
@@ -491,7 +458,7 @@ export default function CompactCalendarCard({
                 style={{
                   background: '#FFFFFF',
                   borderRadius: '6px',
-                  border: '1px solid #E2E8F0',
+                  border: '1px solid #F1E5E2',
                   padding: '0.35rem 0.5rem',
                   display: 'flex',
                   alignItems: 'center',
@@ -506,7 +473,7 @@ export default function CompactCalendarCard({
                         width: '6px',
                         height: '6px',
                         borderRadius: '50%',
-                        background: getCategoryColor(ev.category),
+                        background: '#80142B',
                         flexShrink: 0,
                       }}
                     />
@@ -530,31 +497,15 @@ export default function CompactCalendarCard({
                 </div>
 
                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.25rem', flexShrink: 0 }}>
-                  <a
-                    href={getGoogleCalendarUrl(ev)}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    style={{
-                      fontSize: '0.58rem',
-                      fontWeight: 700,
-                      color: '#0284C7',
-                      background: 'rgba(2, 132, 199, 0.08)',
-                      padding: '2px 5px',
-                      borderRadius: '4px',
-                      textDecoration: 'none',
-                    }}
-                    title="Add to Google Calendar"
-                  >
-                    Google
-                  </a>
                   {ev.link && (
                     <Link
                       href={ev.link}
                       style={{
                         fontSize: '0.58rem',
                         fontWeight: 700,
-                        color: '#0F766E',
-                        background: 'rgba(15, 118, 110, 0.08)',
+                        color: '#80142B',
+                        background: '#FFF5F2',
+                        border: '1px solid #F2DDD5',
                         padding: '2px 5px',
                         borderRadius: '4px',
                         textDecoration: 'none',
@@ -568,8 +519,11 @@ export default function CompactCalendarCard({
             ))}
           </div>
         ) : (
-          <div style={{ textAlign: 'center', color: '#94A3B8', fontSize: '0.68rem', margin: 'auto 0', padding: '0.5rem 0' }}>
-            No specific events scheduled on this date.
+          <div style={{ textAlign: 'center', color: '#94A3B8', fontSize: '0.7rem', margin: 'auto 0', padding: '0.4rem 0', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px' }}>
+            <div style={{ width: '28px', height: '28px', borderRadius: '50%', background: '#FCE7E1', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#80142B', fontSize: '0.85rem' }}>
+              ✓
+            </div>
+            <div>No specific events scheduled on this date.</div>
           </div>
         )}
       </div>

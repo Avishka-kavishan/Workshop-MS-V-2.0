@@ -154,9 +154,9 @@ function RegionalMap({ workshops = [], provincesData, onSelectProvince }: Region
       style={{
         background: '#FFFFFF',
         borderRadius: '16px',
-        border: '1px solid #E2E8F0',
-        padding: '0.55rem 0.75rem',
-        boxShadow: '0 4px 16px rgba(0, 0, 0, 0.04)',
+        border: '1px solid #F1E5E2',
+        padding: '0.65rem 0.85rem',
+        boxShadow: '0 4px 16px rgba(128, 20, 43, 0.04)',
         display: 'flex',
         flexDirection: 'column',
         height: '100%',
@@ -166,10 +166,10 @@ function RegionalMap({ workshops = [], provincesData, onSelectProvince }: Region
       }}
     >
       {/* ──── Header ──── */}
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.55rem', flexWrap: 'wrap', gap: '0.5rem' }}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.45rem', flexWrap: 'wrap', gap: '0.5rem' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
           <div>
-            <h3 style={{ margin: 0, fontSize: '1rem', fontWeight: 800, color: '#0F172A', letterSpacing: '-0.01em' }}>
+            <h3 style={{ margin: 0, fontSize: '0.96rem', fontWeight: 800, color: '#0F172A', letterSpacing: '-0.01em' }}>
               Province-Wise Progress
             </h3>
           </div>
@@ -177,20 +177,20 @@ function RegionalMap({ workshops = [], provincesData, onSelectProvince }: Region
 
         {/* Right side up corner: View Mode Toggle & Tile Actions */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.45rem' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '2px', background: '#F1F5F9', padding: '3px', borderRadius: '8px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '2px', background: '#F8FAFC', padding: '3px', borderRadius: '8px', border: '1px solid #F1E5E2' }}>
             <button
               type="button"
               onClick={() => setViewMode('map')}
               style={{
-                padding: '0.2rem 0.55rem',
+                padding: '0.22rem 0.6rem',
                 borderRadius: '6px',
                 fontSize: '0.72rem',
                 fontWeight: 700,
                 border: 'none',
                 cursor: 'pointer',
-                background: viewMode === 'map' ? '#FFFFFF' : 'transparent',
-                color: viewMode === 'map' ? '#0F172A' : '#64748B',
-                boxShadow: viewMode === 'map' ? '0 1px 3px rgba(0,0,0,0.1)' : 'none',
+                background: viewMode === 'map' ? '#80142B' : 'transparent',
+                color: viewMode === 'map' ? '#FFFFFF' : '#64748B',
+                boxShadow: viewMode === 'map' ? '0 1px 3px rgba(128, 20, 43, 0.2)' : 'none',
                 transition: 'all 0.15s ease',
               }}
             >
@@ -200,15 +200,15 @@ function RegionalMap({ workshops = [], provincesData, onSelectProvince }: Region
               type="button"
               onClick={() => setViewMode('table')}
               style={{
-                padding: '0.2rem 0.55rem',
+                padding: '0.22rem 0.6rem',
                 borderRadius: '6px',
                 fontSize: '0.72rem',
                 fontWeight: 700,
                 border: 'none',
                 cursor: 'pointer',
-                background: viewMode === 'table' ? '#FFFFFF' : 'transparent',
-                color: viewMode === 'table' ? '#0F172A' : '#64748B',
-                boxShadow: viewMode === 'table' ? '0 1px 3px rgba(0,0,0,0.1)' : 'none',
+                background: viewMode === 'table' ? '#80142B' : 'transparent',
+                color: viewMode === 'table' ? '#FFFFFF' : '#64748B',
+                boxShadow: viewMode === 'table' ? '0 1px 3px rgba(128, 20, 43, 0.2)' : 'none',
                 transition: 'all 0.15s ease',
               }}
             >
@@ -230,9 +230,9 @@ function RegionalMap({ workshops = [], provincesData, onSelectProvince }: Region
             flex: 1,
             minHeight: 0,
             position: 'relative',
-            background: 'linear-gradient(180deg, #F0F9FF 0%, #E6F3FA 100%)',
+            background: '#FFF5F2',
             borderRadius: '12px',
-            border: '1px solid #BAE6FD',
+            border: '1px solid #F2DDD5',
             padding: '0.5rem',
             display: 'flex',
             alignItems: 'center',
@@ -249,10 +249,10 @@ function RegionalMap({ workshops = [], provincesData, onSelectProvince }: Region
               zIndex: 5,
               background: 'rgba(255, 255, 255, 0.95)',
               backdropFilter: 'blur(8px)',
-              border: '1px solid #BAE6FD',
+              border: '1px solid #F2DDD5',
               borderRadius: '8px',
               padding: '4px 7px',
-              boxShadow: '0 2px 8px rgba(2, 132, 199, 0.08)',
+              boxShadow: '0 2px 8px rgba(128, 20, 43, 0.08)',
               display: 'flex',
               flexDirection: 'column',
               alignItems: 'center',
@@ -283,16 +283,16 @@ function RegionalMap({ workshops = [], provincesData, onSelectProvince }: Region
               width: '102px',
               background: 'rgba(255, 255, 255, 0.95)',
               backdropFilter: 'blur(8px)',
-              border: '1px solid #BAE6FD',
+              border: '1px solid #F2DDD5',
               borderRadius: '10px',
               padding: '0.55rem 0.65rem',
-              boxShadow: '0 2px 8px rgba(2, 132, 199, 0.08)',
+              boxShadow: '0 2px 8px rgba(128, 20, 43, 0.08)',
               display: 'flex',
               flexDirection: 'column',
               gap: '4px',
             }}
           >
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderBottom: '1px solid #E2E8F0', paddingBottom: '3px', marginBottom: '3px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderBottom: '1px solid #F1E5E2', paddingBottom: '3px', marginBottom: '3px' }}>
               <span style={{ fontSize: '0.66rem', fontWeight: 800, color: '#0F172A', letterSpacing: '0.04em', textTransform: 'uppercase' }}>
                 Legend
               </span>
@@ -302,7 +302,7 @@ function RegionalMap({ workshops = [], provincesData, onSelectProvince }: Region
                   onClick={() => setBandFilter('All')}
                   style={{
                     border: 'none',
-                    background: '#0F172A',
+                    background: '#80142B',
                     color: '#fff',
                     borderRadius: '4px',
                     fontSize: '0.56rem',
@@ -325,7 +325,7 @@ function RegionalMap({ workshops = [], provincesData, onSelectProvince }: Region
                 { band: '80-89%', label: '80–89%', color: '#EAB308', desc: '80–89% Satisfactory' },
                 { band: '70-79%', label: '70–79%', color: '#F59E0B', desc: '70–79% Attention Needed' },
                 { band: '50-69%', label: '50–69%', color: '#F87171', desc: '50–69% Underperforming' },
-                { band: '<50%', label: '< 50%', color: '#DC2626', desc: '< 50% Critical Deficit' },
+                { band: '<50%', label: '< 50%', color: '#80142B', desc: '< 50% Critical Deficit' },
               ].map((tier) => {
                 const isSelected = bandFilter === tier.band;
                 return (
@@ -338,8 +338,8 @@ function RegionalMap({ workshops = [], provincesData, onSelectProvince }: Region
                       gap: '7px',
                       padding: '3px 5px',
                       borderRadius: '5px',
-                      background: isSelected ? 'rgba(2, 132, 199, 0.12)' : 'transparent',
-                      border: isSelected ? '1px solid #0284C7' : '1px solid transparent',
+                      background: isSelected ? 'rgba(128, 20, 43, 0.12)' : 'transparent',
+                      border: isSelected ? '1px solid #80142B' : '1px solid transparent',
                       cursor: 'pointer',
                       transition: 'all 0.15s ease',
                     }}
@@ -355,7 +355,7 @@ function RegionalMap({ workshops = [], provincesData, onSelectProvince }: Region
                         boxShadow: `0 0 3px ${tier.color}66`,
                       }}
                     />
-                    <span style={{ fontSize: '0.72rem', fontWeight: isSelected ? 800 : 700, color: isSelected ? '#0284C7' : '#334155', whiteSpace: 'nowrap' }}>
+                    <span style={{ fontSize: '0.72rem', fontWeight: isSelected ? 800 : 700, color: isSelected ? '#80142B' : '#334155', whiteSpace: 'nowrap' }}>
                       {tier.label}
                     </span>
                   </div>
@@ -385,17 +385,17 @@ function RegionalMap({ workshops = [], provincesData, onSelectProvince }: Region
                 maxHeight: '100%',
                 width: '100%',
                 maxWidth: '100%',
-                filter: 'drop-shadow(0 4px 14px rgba(2, 132, 199, 0.18))',
+                filter: 'drop-shadow(0 4px 14px rgba(128, 20, 43, 0.12))',
               }}
             >
               {/* Official geoBoundaries ADM0 Coastline Backdrop */}
               <path
                 d={SRI_LANKA_ADM0_PATH}
-                fill="rgba(186, 230, 253, 0.4)"
-                stroke="#0284C7"
+                fill="#FFE8E2"
+                stroke="#E8B4A8"
                 strokeWidth="2.4"
                 strokeLinejoin="round"
-                filter="drop-shadow(0 2px 8px rgba(2, 132, 199, 0.2))"
+                filter="drop-shadow(0 2px 8px rgba(128, 20, 43, 0.1))"
               />
 
               {/* ── 9 Interactive Province geoBoundaries SVG Polygons ── */}
@@ -406,23 +406,25 @@ function RegionalMap({ workshops = [], provincesData, onSelectProvince }: Region
                 const isMatch = bandFilter === 'All' || getTrafficLight(prov.progressPct).band === bandFilter;
                 const isHover = hoveredProvince?.id === prov.id;
                 const tl = getTrafficLight(prov.progressPct);
+                // Monochromatic maroon/burgundy palette matching mockup
+                const provinceFill = isMatch ? (bandFilter === 'All' ? '#8D153A' : tl.bg) : '#CBD5E1';
 
                 return (
                   <path
                     key={`poly-${prov.id}`}
                     d={pathD}
-                    fill={isMatch ? tl.bg : '#CBD5E1'}
+                    fill={provinceFill}
                     fillOpacity={
                       !isMatch
                         ? 0.22
                         : isHover
                         ? 0.98
                         : hoveredProvince
-                        ? 0.55
-                        : 0.88
+                        ? 0.65
+                        : 0.92
                     }
-                    stroke={isHover ? '#FFFFFF' : isMatch ? 'rgba(255, 255, 255, 0.9)' : 'rgba(255, 255, 255, 0.4)'}
-                    strokeWidth={isHover ? 2.6 : 1.2}
+                    stroke={isHover ? '#FFFFFF' : '#FFFFFF'}
+                    strokeWidth={isHover ? 2.6 : 1.6}
                     strokeLinejoin="round"
                     style={{
                       cursor: 'pointer',
@@ -467,11 +469,11 @@ function RegionalMap({ workshops = [], provincesData, onSelectProvince }: Region
                       x={px}
                       y={py - 1.5}
                       textAnchor="middle"
-                      fill={isHover ? '#0F172A' : '#1E293B'}
-                      fontSize="4.8"
+                      fill="#FFFFFF"
+                      fontSize="4.6"
                       fontWeight="800"
                       fontFamily="system-ui, -apple-system, sans-serif"
-                      stroke="#FFFFFF"
+                      stroke="#4A0E17"
                       strokeWidth="1.2"
                       paintOrder="stroke"
                       strokeLinejoin="round"
@@ -480,12 +482,12 @@ function RegionalMap({ workshops = [], provincesData, onSelectProvince }: Region
                       <tspan x={px} dy="0">{baseName}</tspan>
                       <tspan
                         x={px}
-                        dy="5.2"
-                        fontSize="3.9"
+                        dy="4.8"
+                        fontSize="3.6"
                         fontWeight="700"
-                        fill={isHover ? '#334155' : '#475569'}
-                        stroke="#FFFFFF"
-                        strokeWidth="1.0"
+                        fill="#FDE8E8"
+                        stroke="#4A0E17"
+                        strokeWidth="0.9"
                         paintOrder="stroke"
                         strokeLinejoin="round"
                       >

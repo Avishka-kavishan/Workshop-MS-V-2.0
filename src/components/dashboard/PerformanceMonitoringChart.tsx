@@ -25,13 +25,17 @@ export interface PerformanceMonitoringChartProps {
 
 const DEFAULT_MONTHLY_PROGRESS: MonthlyProgressPoint[] = [
   { month: 'Jan', physical: 10, financial: 8 },
-  { month: 'Feb', physical: 28, financial: 22 },
-  { month: 'Mar', physical: 35, financial: 31 },
-  { month: 'Apr', physical: 42, financial: 38 },
-  { month: 'May', physical: 58, financial: 48 },
-  { month: 'Jun', physical: 66, financial: 56 },
-  { month: 'Jul', physical: 75, financial: 68 },
-  { month: 'Aug', physical: 87, financial: 85 },
+  { month: 'Feb', physical: 22, financial: 18 },
+  { month: 'Mar', physical: 30, financial: 26 },
+  { month: 'Apr', physical: 38, financial: 34 },
+  { month: 'May', physical: 45, financial: 42 },
+  { month: 'Jun', physical: 52, financial: 50 },
+  { month: 'Jul', physical: 60, financial: 58 },
+  { month: 'Aug', physical: 67, financial: 66 },
+  { month: 'Sep', physical: 71, financial: 70 },
+  { month: 'Oct', physical: 73, financial: 74 },
+  { month: 'Nov', physical: 74, financial: 79 },
+  { month: 'Dec', physical: 78, financial: 84 },
 ];
 
 function PerformanceMonitoringChart({ branchName = 'MOE ICT Branch', monthlyData, metrics }: PerformanceMonitoringChartProps = {}) {
@@ -113,7 +117,7 @@ function PerformanceMonitoringChart({ branchName = 'MOE ICT Branch', monthlyData
   const physAreaPath = `${physLinePath} L ${physPoints[physPoints.length - 1].x} ${height - paddingY} L ${physPoints[0].x} ${height - paddingY} Z`;
   const finAreaPath = `${finLinePath} L ${finPoints[finPoints.length - 1].x} ${height - paddingY} L ${finPoints[0].x} ${height - paddingY} Z`;
 
-  const yLabels = [0, 20, 50, 100];
+  const yLabels = [0, 25, 50, 75, 100];
 
   const tileExportData: TileExportData = {
     filename: `MoE_Physical_Financial_Curves_${branchName.replace(/\s+/g, '_')}`,
@@ -141,9 +145,9 @@ function PerformanceMonitoringChart({ branchName = 'MOE ICT Branch', monthlyData
       style={{
         background: '#FFFFFF',
         borderRadius: '16px',
-        border: '1px solid #E2E8F0',
-        padding: '0.55rem 0.75rem',
-        boxShadow: '0 4px 16px rgba(0, 0, 0, 0.04)',
+        border: '1px solid #F1E5E2',
+        padding: '0.65rem 0.85rem',
+        boxShadow: '0 4px 16px rgba(128, 20, 43, 0.04)',
         display: 'flex',
         flexDirection: 'column',
         justifyContent: 'space-between',
@@ -154,51 +158,53 @@ function PerformanceMonitoringChart({ branchName = 'MOE ICT Branch', monthlyData
       }}
     >
       {/* ──── Header ──── */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.45rem', flexWrap: 'wrap', gap: '0.5rem' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.35rem', flexWrap: 'wrap', gap: '0.5rem' }}>
         <div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.45rem', flexWrap: 'wrap' }}>
-            <span style={{ fontSize: '1.05rem' }}>📈</span>
+            <span style={{ fontSize: '1.05rem' }}>🏆</span>
             <h3 style={{ margin: 0, fontSize: '0.96rem', fontWeight: 800, color: '#0F172A', letterSpacing: '-0.01em' }}>
               Physical & Financial Achievement Curves
             </h3>
+          </div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.45rem', marginTop: '3px' }}>
             <span
               style={{
                 fontSize: '0.64rem',
-                fontWeight: 800,
-                padding: '1px 7px',
+                fontWeight: 700,
+                padding: '1px 8px',
                 borderRadius: '12px',
-                background: '#F0FDF4',
-                color: '#15803D',
-                border: '1px solid #BBF7D0',
+                background: '#FFF5F2',
+                color: '#80142B',
+                border: '1px solid #F2DDD5',
                 display: 'inline-flex',
                 alignItems: 'center',
                 gap: '3px',
               }}
             >
-              <span>🏛️</span> {branchName}
+              <span>📍</span> MOE Data Management Branch
             </span>
           </div>
-          <p style={{ margin: '2px 0 0', fontSize: '0.71rem', color: '#64748B' }}>
+          <p style={{ margin: '3px 0 0', fontSize: '0.7rem', color: '#64748B' }}>
             Physical Implementation vs Financial Disbursement Trajectory
           </p>
         </div>
 
         {/* Right side up corner: View Mode Segmented Control & Tile Actions */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '2px', background: '#F1F5F9', padding: '3px', borderRadius: '8px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '3px', background: '#F8FAFC', padding: '3px', borderRadius: '8px', border: '1px solid #F1E5E2' }}>
             <button
               type="button"
               onClick={() => setActiveFilter('both')}
               style={{
-                padding: '0.2rem 0.55rem',
+                padding: '0.22rem 0.6rem',
                 borderRadius: '6px',
                 fontSize: '0.7rem',
                 fontWeight: 700,
                 border: 'none',
                 cursor: 'pointer',
-                background: activeFilter === 'both' ? '#FFFFFF' : 'transparent',
-                color: activeFilter === 'both' ? '#0F172A' : '#64748B',
-                boxShadow: activeFilter === 'both' ? '0 1px 3px rgba(0,0,0,0.1)' : 'none',
+                background: activeFilter === 'both' ? '#80142B' : 'transparent',
+                color: activeFilter === 'both' ? '#FFFFFF' : '#64748B',
+                boxShadow: activeFilter === 'both' ? '0 1px 3px rgba(128, 20, 43, 0.2)' : 'none',
                 transition: 'all 0.15s ease',
               }}
             >
@@ -208,33 +214,33 @@ function PerformanceMonitoringChart({ branchName = 'MOE ICT Branch', monthlyData
               type="button"
               onClick={() => setActiveFilter('physical')}
               style={{
-                padding: '0.2rem 0.55rem',
+                padding: '0.22rem 0.6rem',
                 borderRadius: '6px',
                 fontSize: '0.7rem',
                 fontWeight: 700,
                 border: 'none',
                 cursor: 'pointer',
-                background: activeFilter === 'physical' ? '#FFFFFF' : 'transparent',
-                color: activeFilter === 'physical' ? '#0F766E' : '#64748B',
-                boxShadow: activeFilter === 'physical' ? '0 1px 3px rgba(0,0,0,0.1)' : 'none',
+                background: activeFilter === 'physical' ? '#80142B' : 'transparent',
+                color: activeFilter === 'physical' ? '#FFFFFF' : '#64748B',
+                boxShadow: activeFilter === 'physical' ? '0 1px 3px rgba(128, 20, 43, 0.2)' : 'none',
                 transition: 'all 0.15s ease',
               }}
             >
-              Physical ({liveMetrics?.physicalAchievementRate ?? 87}%)
+              Physical ({liveMetrics?.physicalAchievementRate ?? 74}%)
             </button>
             <button
               type="button"
               onClick={() => setActiveFilter('financial')}
               style={{
-                padding: '0.2rem 0.55rem',
+                padding: '0.22rem 0.6rem',
                 borderRadius: '6px',
                 fontSize: '0.7rem',
                 fontWeight: 700,
                 border: 'none',
                 cursor: 'pointer',
-                background: activeFilter === 'financial' ? '#FFFFFF' : 'transparent',
-                color: activeFilter === 'financial' ? '#8D153A' : '#64748B',
-                boxShadow: activeFilter === 'financial' ? '0 1px 3px rgba(0,0,0,0.1)' : 'none',
+                background: activeFilter === 'financial' ? '#80142B' : 'transparent',
+                color: activeFilter === 'financial' ? '#FFFFFF' : '#64748B',
+                boxShadow: activeFilter === 'financial' ? '0 1px 3px rgba(128, 20, 43, 0.2)' : 'none',
                 transition: 'all 0.15s ease',
               }}
             >
@@ -249,20 +255,32 @@ function PerformanceMonitoringChart({ branchName = 'MOE ICT Branch', monthlyData
         </div>
       </div>
 
+      {/* Legend directly above chart */}
+      <div style={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', gap: '0.85rem', marginBottom: '0.35rem', fontSize: '0.72rem', fontWeight: 700 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
+          <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#80142B', display: 'inline-block' }} />
+          <span style={{ color: '#0F172A' }}>Physical</span>
+        </div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
+          <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#E07A2B', display: 'inline-block' }} />
+          <span style={{ color: '#0F172A' }}>Financial</span>
+        </div>
+      </div>
+
       {/* ──── SVG Dual Line / Area Chart Container ──── */}
       <div style={{ position: 'relative', width: '100%', overflow: 'hidden' }}>
         <svg viewBox={`0 0 ${width} ${height}`} style={{ width: '100%', height: 'auto', display: 'block' }}>
           <defs>
-            {/* Teal Gradient for Physical Progress Area */}
-            <linearGradient id="chartTealGrad" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stopColor="#0F766E" stopOpacity="0.22" />
-              <stop offset="100%" stopColor="#0F766E" stopOpacity="0.0" />
+            {/* Maroon Gradient for Physical Progress Area */}
+            <linearGradient id="chartMaroonGrad" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stopColor="#80142B" stopOpacity="0.18" />
+              <stop offset="100%" stopColor="#80142B" stopOpacity="0.0" />
             </linearGradient>
 
             {/* Amber Gradient for Financial Progress Area */}
             <linearGradient id="chartAmberGrad" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stopColor="#D97706" stopOpacity="0.18" />
-              <stop offset="100%" stopColor="#D97706" stopOpacity="0.0" />
+              <stop offset="0%" stopColor="#E07A2B" stopOpacity="0.16" />
+              <stop offset="100%" stopColor="#E07A2B" stopOpacity="0.0" />
             </linearGradient>
           </defs>
 
@@ -276,7 +294,7 @@ function PerformanceMonitoringChart({ branchName = 'MOE ICT Branch', monthlyData
                   y1={y}
                   x2={width - paddingX}
                   y2={y}
-                  stroke="#F1F5F9"
+                  stroke="#F5EBE8"
                   strokeWidth="1"
                   strokeDasharray={val === 0 ? '' : '3 3'}
                 />
@@ -297,7 +315,7 @@ function PerformanceMonitoringChart({ branchName = 'MOE ICT Branch', monthlyData
 
           {/* Area Gradients */}
           {(activeFilter === 'both' || activeFilter === 'physical') && (
-            <path d={physAreaPath} fill="url(#chartTealGrad)" />
+            <path d={physAreaPath} fill="url(#chartMaroonGrad)" />
           )}
           {(activeFilter === 'both' || activeFilter === 'financial') && (
             <path d={finAreaPath} fill="url(#chartAmberGrad)" />
@@ -308,20 +326,19 @@ function PerformanceMonitoringChart({ branchName = 'MOE ICT Branch', monthlyData
             <path
               d={finLinePath}
               fill="none"
-              stroke="#D97706"
+              stroke="#E07A2B"
               strokeWidth="2.8"
-              strokeDasharray={activeFilter === 'both' ? '4 3' : 'none'}
               strokeLinecap="round"
               strokeLinejoin="round"
             />
           )}
 
-          {/* Physical Progress Line (Teal) */}
+          {/* Physical Progress Line (Maroon) */}
           {(activeFilter === 'both' || activeFilter === 'physical') && (
             <path
               d={physLinePath}
               fill="none"
-              stroke="#0F766E"
+              stroke="#80142B"
               strokeWidth="3"
               strokeLinecap="round"
               strokeLinejoin="round"
@@ -358,20 +375,20 @@ function PerformanceMonitoringChart({ branchName = 'MOE ICT Branch', monthlyData
                     cy={pYFin}
                     r={isHover ? 5.5 : 3.5}
                     fill="#FFFFFF"
-                    stroke="#D97706"
+                    stroke="#E07A2B"
                     strokeWidth="2.5"
                     style={{ transition: 'all 0.15s ease' }}
                   />
                 )}
 
-                {/* Physical Point (Teal) */}
+                {/* Physical Point (Maroon) */}
                 {(activeFilter === 'both' || activeFilter === 'physical') && (
                   <circle
                     cx={pX}
                     cy={pYPhys}
                     r={isHover ? 5.5 : 4}
                     fill="#FFFFFF"
-                    stroke="#0F766E"
+                    stroke="#80142B"
                     strokeWidth="2.5"
                     style={{ transition: 'all 0.15s ease' }}
                   />
@@ -384,7 +401,7 @@ function PerformanceMonitoringChart({ branchName = 'MOE ICT Branch', monthlyData
                   textAnchor="middle"
                   fontSize="10"
                   fontWeight="700"
-                  fill={isHover ? '#0F172A' : '#64748B'}
+                  fill={isHover ? '#80142B' : '#64748B'}
                   fontFamily="system-ui, sans-serif"
                 >
                   {item.month}
@@ -417,7 +434,7 @@ function PerformanceMonitoringChart({ branchName = 'MOE ICT Branch', monthlyData
             }}
           >
             <span>{hoveredPoint.month} 2026:</span>
-            <span style={{ color: '#2DD4BF' }}>● Physical: <strong>{hoveredPoint.physical}%</strong></span>
+            <span style={{ color: '#F472B6' }}>● Physical: <strong>{hoveredPoint.physical}%</strong></span>
             <span style={{ color: '#FBBF24' }}>● Financial: <strong>{hoveredPoint.financial}%</strong></span>
             <span style={{ color: '#94A3B8', fontSize: '0.68rem' }}>
               ({hoveredPoint.physical >= hoveredPoint.financial ? '+' : ''}{(hoveredPoint.physical - hoveredPoint.financial).toFixed(1)}% Gap)

@@ -51,28 +51,28 @@ export default function ManagementSummaryKpis({ kpis }: ManagementSummaryKpisPro
   const [activeSection, setActiveSection] = useState<'all' | 'workshops' | 'aip' | 'budget' | 'amendments' | 'additional'>('all');
 
   const ws = kpis?.workshops || {
-    totalWorkshops: 186,
-    activeWorkshops: 9,
-    completedWorkshops: 56,
-    pendingWorkshops: 121,
-    completionRatePct: 30,
+    totalWorkshops: 277,
+    activeWorkshops: 22,
+    completedWorkshops: 98,
+    pendingWorkshops: 154,
+    completionRatePct: 35,
   };
 
   const aip = kpis?.aip || {
-    totalActivities: 184,
-    completedActivities: 68,
-    ongoingActivities: 76,
-    pendingActivities: 24,
-    delayedActivities: 16,
-    overallProgressPct: 73.5,
+    totalActivities: 241,
+    completedActivities: 7,
+    ongoingActivities: 78,
+    pendingActivities: 156,
+    delayedActivities: 21,
+    overallProgressPct: 74,
   };
 
   const budget = kpis?.budget || {
-    totalApprovedBudgetMn: 4634.1,
-    totalExpenditureMn: 1441.7,
-    budgetUtilizationPct: 31.0,
+    totalApprovedBudgetMn: 6392.325,
+    totalExpenditureMn: 1222.866557,
+    budgetUtilizationPct: 29.0,
     pendingBudgetRevisions: 4,
-    approvedBudgetAmendments: 12,
+    approvedBudgetAmendments: 1,
   };
 
   const amendments = kpis?.amendments || {
@@ -127,10 +127,10 @@ export default function ManagementSummaryKpis({ kpis }: ManagementSummaryKpisPro
     <div
       style={{
         background: '#FFFFFF',
-        borderRadius: '14px',
-        border: '1px solid #E2E8F0',
-        padding: '0.85rem 1rem',
-        boxShadow: '0 4px 16px rgba(0, 0, 0, 0.04)',
+        borderRadius: '16px',
+        border: '1px solid #F1E5E2',
+        padding: '0.65rem 0.85rem',
+        boxShadow: '0 4px 16px rgba(128, 20, 43, 0.04)',
         display: 'flex',
         flexDirection: 'column',
         height: '100%',
@@ -138,43 +138,41 @@ export default function ManagementSummaryKpis({ kpis }: ManagementSummaryKpisPro
       }}
     >
       {/* Header */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '0.45rem', flexWrap: 'wrap', gap: '0.4rem' }}>
-        <div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
-            <span style={{ fontSize: '1.05rem' }}>🎯</span>
-            <h3 style={{ margin: 0, fontSize: '0.92rem', fontWeight: 800, color: '#0F172A' }}>
-              Management Summary & KPIs
-            </h3>
-            <span
-              style={{
-                fontSize: '0.62rem',
-                fontWeight: 700,
-                padding: '1px 6px',
-                borderRadius: '8px',
-                background: '#F1F5F9',
-                color: '#475569',
-              }}
-            >
-              Tile 03
-            </span>
-          </div>
-          <div style={{ fontSize: '0.68rem', color: '#64748B', marginTop: '1px' }}>
-            Workshops, AIP, Budget absorption, Amendments & Administrative actions
-          </div>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.45rem', flexWrap: 'wrap', gap: '0.4rem' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.45rem' }}>
+          <span style={{ fontSize: '1.05rem', color: '#80142B' }}>📊</span>
+          <h3 style={{ margin: 0, fontSize: '0.96rem', fontWeight: 800, color: '#0F172A' }}>
+            Management Summary & KPIs
+          </h3>
         </div>
 
         {/* Right side up corner: Tile Actions */}
-        <TileActionMenu
-          tileTitle="Management Summary & KPIs"
-          exportData={tileExportData}
-          position="right"
-        />
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+          <span
+            style={{
+              fontSize: '0.66rem',
+              fontWeight: 700,
+              padding: '2px 8px',
+              borderRadius: '8px',
+              background: '#FFF5F2',
+              color: '#80142B',
+              border: '1px solid #F2DDD5',
+            }}
+          >
+            Tile 03 ⌵
+          </span>
+          <TileActionMenu
+            tileTitle="Management Summary & KPIs"
+            exportData={tileExportData}
+            position="right"
+          />
+        </div>
       </div>
 
       {/* Category Pills Switcher */}
       <div style={{ display: 'flex', alignItems: 'center', gap: '0.25rem', marginBottom: '0.55rem', flexWrap: 'wrap' }}>
         {[
-          { id: 'all', label: 'All 5 Groups' },
+          { id: 'all', label: 'All Groups' },
           { id: 'workshops', label: 'Workshops' },
           { id: 'aip', label: 'AIP Plan' },
           { id: 'budget', label: 'Budget' },
@@ -189,13 +187,14 @@ export default function ManagementSummaryKpis({ kpis }: ManagementSummaryKpisPro
               onClick={() => setActiveSection(tab.id as any)}
               style={{
                 border: 'none',
-                background: isSelected ? '#0F766E' : '#F1F5F9',
-                color: isSelected ? '#FFFFFF' : '#334155',
+                background: isSelected ? '#80142B' : '#F8FAFC',
+                color: isSelected ? '#FFFFFF' : '#475569',
                 borderRadius: '6px',
-                padding: '0.18rem 0.45rem',
-                fontSize: '0.64rem',
+                padding: '0.18rem 0.5rem',
+                fontSize: '0.65rem',
                 fontWeight: isSelected ? 800 : 600,
                 cursor: 'pointer',
+                boxShadow: isSelected ? '0 1px 3px rgba(128, 20, 43, 0.2)' : 'none',
                 transition: 'all 0.15s ease',
               }}
             >
@@ -212,38 +211,38 @@ export default function ManagementSummaryKpis({ kpis }: ManagementSummaryKpisPro
           overflowY: 'auto',
           display: 'flex',
           flexDirection: 'column',
-          gap: '0.6rem',
+          gap: '0.55rem',
           paddingRight: '2px',
           maxHeight: '410px',
         }}
       >
         {/* GROUP A: Workshop Management */}
         {(activeSection === 'all' || activeSection === 'workshops') && (
-          <div style={{ background: '#F8FAFC', borderRadius: '8px', border: '1px solid #E2E8F0', padding: '0.55rem 0.7rem' }}>
+          <div style={{ background: '#FFF5F2', borderRadius: '10px', border: '1px solid #F2DDD5', padding: '0.55rem 0.7rem' }}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.4rem' }}>
               <div style={{ fontSize: '0.72rem', fontWeight: 800, color: '#0F172A', display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
                 <span>👥</span> A. Workshop Management
               </div>
-              <Link href="/workshops" style={{ fontSize: '0.62rem', fontWeight: 700, color: '#0284C7', textDecoration: 'none' }}>
+              <Link href="/workshops" style={{ fontSize: '0.62rem', fontWeight: 700, color: '#80142B', textDecoration: 'none' }}>
                 Directory →
               </Link>
             </div>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '0.35rem' }}>
-              <div style={{ background: '#FFFFFF', padding: '0.35rem', borderRadius: '6px', border: '1px solid #E2E8F0', textAlign: 'center' }}>
+              <div style={{ background: '#FFFFFF', padding: '0.35rem', borderRadius: '6px', border: '1px solid #F1E5E2', textAlign: 'center' }}>
                 <div style={{ fontSize: '0.6rem', color: '#64748B', fontWeight: 600 }}>Total</div>
-                <div style={{ fontSize: '0.95rem', fontWeight: 800, color: '#0F172A' }}>{ws.totalWorkshops}</div>
+                <div style={{ fontSize: '0.96rem', fontWeight: 800, color: '#0F172A' }}>{ws.totalWorkshops}</div>
               </div>
-              <div style={{ background: '#FFFFFF', padding: '0.35rem', borderRadius: '6px', border: '1px solid #E2E8F0', textAlign: 'center' }}>
+              <div style={{ background: '#FFFFFF', padding: '0.35rem', borderRadius: '6px', border: '1px solid #F1E5E2', textAlign: 'center' }}>
                 <div style={{ fontSize: '0.6rem', color: '#0369A1', fontWeight: 600 }}>Ongoing</div>
-                <div style={{ fontSize: '0.95rem', fontWeight: 800, color: '#0284C7' }}>{ws.activeWorkshops}</div>
+                <div style={{ fontSize: '0.96rem', fontWeight: 800, color: '#0284C7' }}>{ws.activeWorkshops}</div>
               </div>
-              <div style={{ background: '#FFFFFF', padding: '0.35rem', borderRadius: '6px', border: '1px solid #E2E8F0', textAlign: 'center' }}>
+              <div style={{ background: '#FFFFFF', padding: '0.35rem', borderRadius: '6px', border: '1px solid #F1E5E2', textAlign: 'center' }}>
                 <div style={{ fontSize: '0.6rem', color: '#065F46', fontWeight: 600 }}>Completed</div>
-                <div style={{ fontSize: '0.95rem', fontWeight: 800, color: '#10B981' }}>{ws.completedWorkshops}</div>
+                <div style={{ fontSize: '0.96rem', fontWeight: 800, color: '#10B981' }}>{ws.completedWorkshops}</div>
               </div>
-              <div style={{ background: '#FFFFFF', padding: '0.35rem', borderRadius: '6px', border: '1px solid #E2E8F0', textAlign: 'center' }}>
+              <div style={{ background: '#FFFFFF', padding: '0.35rem', borderRadius: '6px', border: '1px solid #F1E5E2', textAlign: 'center' }}>
                 <div style={{ fontSize: '0.6rem', color: '#D97706', fontWeight: 600 }}>Upcoming</div>
-                <div style={{ fontSize: '0.95rem', fontWeight: 800, color: '#F59E0B' }}>{ws.pendingWorkshops}</div>
+                <div style={{ fontSize: '0.96rem', fontWeight: 800, color: '#F59E0B' }}>{ws.pendingWorkshops}</div>
               </div>
             </div>
           </div>
@@ -251,45 +250,45 @@ export default function ManagementSummaryKpis({ kpis }: ManagementSummaryKpisPro
 
         {/* GROUP B: Annual Implementation Plan (AIP) */}
         {(activeSection === 'all' || activeSection === 'aip') && (
-          <div style={{ background: '#F8FAFC', borderRadius: '8px', border: '1px solid #E2E8F0', padding: '0.55rem 0.7rem' }}>
+          <div style={{ background: '#FFF5F2', borderRadius: '10px', border: '1px solid #F2DDD5', padding: '0.55rem 0.7rem' }}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.4rem' }}>
               <div style={{ fontSize: '0.72rem', fontWeight: 800, color: '#0F172A', display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
                 <span>📋</span> B. Annual Implementation Plan (AIP)
               </div>
-              <Link href="/annual-plan" style={{ fontSize: '0.62rem', fontWeight: 700, color: '#0284C7', textDecoration: 'none' }}>
+              <Link href="/annual-plan" style={{ fontSize: '0.62rem', fontWeight: 700, color: '#80142B', textDecoration: 'none' }}>
                 AIP Matrix →
               </Link>
             </div>
 
             {/* Overall AIP Progress Bar */}
             <div style={{ marginBottom: '0.45rem' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.64rem', fontWeight: 700, marginBottom: '2px' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.64rem', fontWeight: 700, marginBottom: '3px' }}>
                 <span style={{ color: '#475569' }}>Overall AIP Implementation Progress</span>
-                <span style={{ color: '#0F766E' }}>{aip.overallProgressPct}%</span>
+                <span style={{ color: '#80142B' }}>{aip.overallProgressPct}%</span>
               </div>
-              <div style={{ width: '100%', height: '6px', background: '#E2E8F0', borderRadius: '3px', overflow: 'hidden' }}>
-                <div style={{ width: `${aip.overallProgressPct}%`, height: '100%', background: '#0F766E', borderRadius: '3px' }} />
+              <div style={{ width: '100%', height: '7px', background: '#F1E5E2', borderRadius: '4px', overflow: 'hidden' }}>
+                <div style={{ width: `${aip.overallProgressPct}%`, height: '100%', background: '#80142B', borderRadius: '4px' }} />
               </div>
             </div>
 
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: '0.3rem' }}>
-              <div style={{ background: '#FFFFFF', padding: '0.3rem', borderRadius: '6px', border: '1px solid #E2E8F0', textAlign: 'center' }}>
+              <div style={{ background: '#FFFFFF', padding: '0.3rem', borderRadius: '6px', border: '1px solid #F1E5E2', textAlign: 'center' }}>
                 <div style={{ fontSize: '0.56rem', color: '#64748B', fontWeight: 600 }}>Total</div>
                 <div style={{ fontSize: '0.88rem', fontWeight: 800, color: '#0F172A' }}>{aip.totalActivities}</div>
               </div>
-              <div style={{ background: '#FFFFFF', padding: '0.3rem', borderRadius: '6px', border: '1px solid #E2E8F0', textAlign: 'center' }}>
+              <div style={{ background: '#FFFFFF', padding: '0.3rem', borderRadius: '6px', border: '1px solid #F1E5E2', textAlign: 'center' }}>
                 <div style={{ fontSize: '0.56rem', color: '#065F46', fontWeight: 600 }}>Done</div>
                 <div style={{ fontSize: '0.88rem', fontWeight: 800, color: '#10B981' }}>{aip.completedActivities}</div>
               </div>
-              <div style={{ background: '#FFFFFF', padding: '0.3rem', borderRadius: '6px', border: '1px solid #E2E8F0', textAlign: 'center' }}>
+              <div style={{ background: '#FFFFFF', padding: '0.3rem', borderRadius: '6px', border: '1px solid #F1E5E2', textAlign: 'center' }}>
                 <div style={{ fontSize: '0.56rem', color: '#0284C7', fontWeight: 600 }}>Ongoing</div>
                 <div style={{ fontSize: '0.88rem', fontWeight: 800, color: '#0284C7' }}>{aip.ongoingActivities}</div>
               </div>
-              <div style={{ background: '#FFFFFF', padding: '0.3rem', borderRadius: '6px', border: '1px solid #E2E8F0', textAlign: 'center' }}>
+              <div style={{ background: '#FFFFFF', padding: '0.3rem', borderRadius: '6px', border: '1px solid #F1E5E2', textAlign: 'center' }}>
                 <div style={{ fontSize: '0.56rem', color: '#64748B', fontWeight: 600 }}>Pending</div>
                 <div style={{ fontSize: '0.88rem', fontWeight: 800, color: '#64748B' }}>{aip.pendingActivities}</div>
               </div>
-              <div style={{ background: '#FFFFFF', padding: '0.3rem', borderRadius: '6px', border: '1px solid #E2E8F0', textAlign: 'center' }}>
+              <div style={{ background: '#FFFFFF', padding: '0.3rem', borderRadius: '6px', border: '1px solid #F1E5E2', textAlign: 'center' }}>
                 <div style={{ fontSize: '0.56rem', color: '#DC2626', fontWeight: 600 }}>Delayed</div>
                 <div style={{ fontSize: '0.88rem', fontWeight: 800, color: '#DC2626' }}>{aip.delayedActivities}</div>
               </div>
@@ -299,37 +298,37 @@ export default function ManagementSummaryKpis({ kpis }: ManagementSummaryKpisPro
 
         {/* GROUP C: Budget Management */}
         {(activeSection === 'all' || activeSection === 'budget') && (
-          <div style={{ background: '#F8FAFC', borderRadius: '8px', border: '1px solid #E2E8F0', padding: '0.55rem 0.7rem' }}>
+          <div style={{ background: '#FFF5F2', borderRadius: '10px', border: '1px solid #F2DDD5', padding: '0.55rem 0.7rem' }}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.4rem' }}>
               <div style={{ fontSize: '0.72rem', fontWeight: 800, color: '#0F172A', display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
                 <span>💰</span> C. Budget Management
               </div>
-              <Link href="/budget-forecasting" style={{ fontSize: '0.62rem', fontWeight: 700, color: '#0284C7', textDecoration: 'none' }}>
+              <Link href="/budget-forecasting" style={{ fontSize: '0.62rem', fontWeight: 700, color: '#80142B', textDecoration: 'none' }}>
                 Budget Workspace →
               </Link>
             </div>
 
             {/* Budget Utilization Bar */}
             <div style={{ marginBottom: '0.45rem' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.64rem', fontWeight: 700, marginBottom: '2px' }}>
-                <span style={{ color: '#475569' }}>Absorption: Rs. {formatMillion(budget.totalExpenditureMn)} M / Rs. {formatMillion(budget.totalApprovedBudgetMn)} M</span>
-                <span style={{ color: '#0284C7' }}>{budget.budgetUtilizationPct}%</span>
+              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.64rem', fontWeight: 700, marginBottom: '3px' }}>
+                <span style={{ color: '#475569' }}>Allocation: Rs. 1,222,866,557 / Rs. 6,392,325,000</span>
+                <span style={{ color: '#80142B' }}>29%</span>
               </div>
-              <div style={{ width: '100%', height: '6px', background: '#E2E8F0', borderRadius: '3px', overflow: 'hidden' }}>
-                <div style={{ width: `${budget.budgetUtilizationPct}%`, height: '100%', background: '#0284C7', borderRadius: '3px' }} />
+              <div style={{ width: '100%', height: '7px', background: '#F1E5E2', borderRadius: '4px', overflow: 'hidden' }}>
+                <div style={{ width: `29%`, height: '100%', background: '#80142B', borderRadius: '4px' }} />
               </div>
             </div>
 
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '0.35rem' }}>
-              <div style={{ background: '#FFFFFF', padding: '0.35rem', borderRadius: '6px', border: '1px solid #E2E8F0', textAlign: 'center' }}>
+              <div style={{ background: '#FFFFFF', padding: '0.35rem', borderRadius: '6px', border: '1px solid #F1E5E2', textAlign: 'center' }}>
                 <div style={{ fontSize: '0.58rem', color: '#64748B', fontWeight: 600 }}>Approved Budget</div>
-                <div style={{ fontSize: '0.85rem', fontWeight: 800, color: '#0F172A' }}>Rs. {formatMillion(budget.totalApprovedBudgetMn)} M</div>
+                <div style={{ fontSize: '0.76rem', fontWeight: 800, color: '#0F172A' }}>Rs. 6,392,325,000</div>
               </div>
-              <div style={{ background: '#FFFFFF', padding: '0.35rem', borderRadius: '6px', border: '1px solid #E2E8F0', textAlign: 'center' }}>
+              <div style={{ background: '#FFFFFF', padding: '0.35rem', borderRadius: '6px', border: '1px solid #F1E5E2', textAlign: 'center' }}>
                 <div style={{ fontSize: '0.58rem', color: '#D97706', fontWeight: 600 }}>Pending Revisions</div>
                 <div style={{ fontSize: '0.85rem', fontWeight: 800, color: '#D97706' }}>{budget.pendingBudgetRevisions}</div>
               </div>
-              <div style={{ background: '#FFFFFF', padding: '0.35rem', borderRadius: '6px', border: '1px solid #E2E8F0', textAlign: 'center' }}>
+              <div style={{ background: '#FFFFFF', padding: '0.35rem', borderRadius: '6px', border: '1px solid #F1E5E2', textAlign: 'center' }}>
                 <div style={{ fontSize: '0.58rem', color: '#065F46', fontWeight: 600 }}>Approved Amend.</div>
                 <div style={{ fontSize: '0.85rem', fontWeight: 800, color: '#10B981' }}>{budget.approvedBudgetAmendments}</div>
               </div>
