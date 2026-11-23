@@ -375,16 +375,17 @@ function RegionalMap({ workshops = [], provincesData, onSelectProvince }: Region
               minHeight: 0,
               minWidth: 0,
               overflow: 'hidden',
+              padding: '0.4rem 0.6rem',
             }}
           >
             <svg
-              viewBox="10 0 220 370"
+              viewBox="-25 -25 290 425"
               preserveAspectRatio="xMidYMid meet"
               style={{
                 height: '100%',
-                maxHeight: '100%',
-                width: '100%',
-                maxWidth: '100%',
+                maxHeight: '320px',
+                width: 'auto',
+                maxWidth: '88%',
                 filter: 'drop-shadow(0 4px 14px rgba(128, 20, 43, 0.12))',
               }}
             >
