@@ -1,3 +1,4 @@
+
 'use client';
 
 import React, { useState } from 'react';
@@ -419,10 +420,10 @@ function RegionalMap({ workshops = [], provincesData, onSelectProvince }: Region
                       !isMatch
                         ? 0.22
                         : isHover
-                        ? 0.98
-                        : hoveredProvince
-                        ? 0.65
-                        : 0.92
+                          ? 0.98
+                          : hoveredProvince
+                            ? 0.65
+                            : 0.92
                     }
                     stroke={isHover ? '#FFFFFF' : '#FFFFFF'}
                     strokeWidth={isHover ? 2.6 : 1.6}
