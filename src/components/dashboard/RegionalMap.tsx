@@ -502,56 +502,80 @@ function RegionalMap({ workshops = [], provincesData, onSelectProvince }: Region
             </svg>
           </div>
 
-          {/* Floating Live Hover Tooltip Card */}
-          {activeProv && (
-            <div
-              style={{
-                position: 'absolute',
-                bottom: '8px',
-                left: '8px',
-                right: '180px',
-                background: 'rgba(15, 23, 42, 0.94)',
-                backdropFilter: 'blur(8px)',
-                color: '#FFFFFF',
-                borderRadius: '8px',
-                padding: '0.5rem 0.75rem',
-                fontSize: '0.74rem',
-                boxShadow: '0 4px 14px rgba(0,0,0,0.3)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-                animation: 'fadeIn 0.15s ease',
-                zIndex: 10,
-                pointerEvents: 'none',
-              }}
-            >
-              <div>
-                <div style={{ fontWeight: 800, fontSize: '0.82rem', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
-                  <span>{activeProv.name} ({activeProv.code})</span>
+          {/* Floating Live Hover Tooltip Card (Matching System Brand Aesthetic) */}
+          {activeProv && (() => {
+            const tl = getTrafficLight(activeProv.progressPct);
+            return (
+              <div
+                style={{
+                  position: 'absolute',
+                  bottom: '10px',
+                  left: '10px',
+                  right: '180px',
+                  background: 'rgba(255, 255, 255, 0.97)',
+                  backdropFilter: 'blur(10px)',
+                  color: '#0F172A',
+                  borderRadius: '12px',
+                  border: '1px solid #EADBDE',
+                  borderLeft: '4px solid #80142B',
+                  padding: '0.55rem 0.85rem',
+                  fontSize: '0.74rem',
+                  boxShadow: '0 8px 24px rgba(128, 20, 43, 0.12), 0 2px 8px rgba(0, 0, 0, 0.05)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  animation: 'fadeIn 0.15s ease',
+                  zIndex: 10,
+                  pointerEvents: 'none',
+                  gap: '0.5rem',
+                }}
+              >
+                <div>
+                  <div style={{ fontWeight: 800, fontSize: '0.84rem', display: 'flex', alignItems: 'center', gap: '0.45rem', flexWrap: 'wrap' }}>
+                    <span style={{ color: '#0F172A' }}>{activeProv.name} ({activeProv.code})</span>
+                    <span
+                      style={{
+                        fontSize: '0.66rem',
+                        padding: '0.12rem 0.5rem',
+                        borderRadius: '12px',
+                        background: tl.lightBg,
+                        color: tl.border,
+                        border: `1px solid ${tl.border}`,
+                        fontWeight: 800,
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: '4px',
+                      }}
+                    >
+                      <span style={{ width: '5px', height: '5px', borderRadius: '50%', background: tl.bg, display: 'inline-block' }} />
+                      {activeProv.progressPct}% • {tl.label}
+                    </span>
+                  </div>
+                  <div style={{ color: '#64748B', fontSize: '0.68rem', marginTop: '2px', lineHeight: 1.3 }}>
+                    Capital: <strong style={{ color: '#0F172A' }}>{activeProv.capital}</strong> • Focus: {activeProv.keyInitiative.slice(0, 38)}...
+                  </div>
+                </div>
+                <div style={{ textAlign: 'right', flexShrink: 0 }}>
                   <span
                     style={{
-                      fontSize: '0.64rem',
-                      padding: '0.1rem 0.4rem',
-                      borderRadius: '4px',
-                      background: getTrafficLight(activeProv.progressPct).bg,
-                      color: '#FFFFFF',
-                      fontWeight: 700,
+                      background: '#FFF5F2',
+                      border: '1px solid #F2DDD5',
+                      color: '#80142B',
+                      fontWeight: 800,
+                      fontSize: '0.7rem',
+                      padding: '0.22rem 0.55rem',
+                      borderRadius: '6px',
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '4px',
                     }}
                   >
-                    {activeProv.progressPct}% • {getTrafficLight(activeProv.progressPct).label}
+                    Click to Inspect ➔
                   </span>
                 </div>
-                <div style={{ color: '#94A3B8', fontSize: '0.68rem', marginTop: '2px' }}>
-                  Capital: <strong style={{ color: '#E2E8F0' }}>{activeProv.capital}</strong> • Focus: {activeProv.keyInitiative.slice(0, 36)}...
-                </div>
               </div>
-              <div style={{ textAlign: 'right', flexShrink: 0, paddingLeft: '0.5rem' }}>
-                <span style={{ color: '#38BDF8', fontWeight: 800, fontSize: '0.72rem' }}>
-                  Click to Inspect ➔
-                </span>
-              </div>
-            </div>
-          )}
+            );
+          })()}
         </div>
       )}
 
