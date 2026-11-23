@@ -340,7 +340,6 @@ export default function AutoImplementationTimeline({
             <span style={{ fontSize: '0.86rem', fontWeight: 800, color: '#0F172A' }}>
               Auto Implementation Timeline
             </span>
-            <span style={{ fontSize: '0.62rem', color: '#64748B' }}>| Tile 01</span>
           </div>
           <div style={{ fontSize: '0.66rem', color: '#64748B', marginTop: '1px' }}>
             AIP activities, schedule timeframes & quarterly milestone delivery
