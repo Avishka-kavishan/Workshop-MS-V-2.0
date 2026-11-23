@@ -10,19 +10,12 @@ export interface IconProps {
   style?: React.CSSProperties;
 }
 
-// 1. Dashboard: Speedometer / Gauge dial with needle and indicator bar
-export function DashboardIcon({ size = 24, className = '', color = '#FFFFFF', accentColor = '#FFBE29', style }: IconProps) {
+// 1. Dashboard: Home outline icon matching official IPMIS reference
+export function DashboardIcon({ size = 24, className = '', color = '#FFFFFF', style }: IconProps) {
   return (
-    <svg width={size} height={size} viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" className={className} style={style}>
-      {/* Outer gauge dial ring */}
-      <circle cx="16" cy="16" r="13" stroke={color} strokeWidth="2.4" />
-      {/* Gauge ticks */}
-      <path d="M8 20 A10 10 0 1 1 24 20" stroke={color} strokeWidth="1.8" strokeDasharray="2 3" strokeLinecap="round" />
-      {/* Speedometer needle */}
-      <path d="M16 16 L22 10" stroke={accentColor} strokeWidth="2.5" strokeLinecap="round" />
-      <circle cx="16" cy="16" r="2.8" fill={accentColor} />
-      {/* Bottom indicator pill */}
-      <rect x="10" y="22" width="12" height="3" rx="1.5" fill={accentColor} />
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" className={className} style={style}>
+      <path d="M3 9.5L12 3l9 6.5V20a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V9.5z" />
+      <polyline points="9 22 9 12 15 12 15 22" />
     </svg>
   );
 }

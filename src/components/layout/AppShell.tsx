@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useSession, signOut } from 'next-auth/react';
 import {
+  DashboardIcon,
   BudgetPlanningIcon,
   AnnualPlanIcon,
   MonitoringIcon,
@@ -240,6 +241,7 @@ export default function AppShell({ children }: AppShellProps) {
 
   // Primary System Pillars (Matching the Architecture Flow - Reports restricted to Admins/Governance)
   const primaryNavItems = [
+    { href: '/dashboard', label: 'Dashboard', icon: DashboardIcon },
     { href: '/budget-forecasting', label: 'Budget Planning', icon: BudgetPlanningIcon },
     { href: '/annual-plan', label: 'Annual Plan (AIP)', icon: AnnualPlanIcon },
     { href: '/monitoring', label: 'Monitoring & Verification', icon: MonitoringIcon },
@@ -276,6 +278,7 @@ export default function AppShell({ children }: AppShellProps) {
 
   // Get active breadcrumb icon
   const getActivePageDetails = () => {
+    if (pathname === '/dashboard') return { title: 'Dashboard', href: '/dashboard', parent: null };
     if (pathname === '/vote-management') return { title: 'Vote Management', href: '/vote-management', parent: { title: 'Planning Division', href: '/annual-plan' } };
     if (pathname === '/budget-forecasting') return { title: 'Budget Forecasting & Formulation', href: '/budget-forecasting', parent: null };
     if (pathname === '/annual-plan') return { title: 'Annual Implementation Plan (AIP)', href: '/annual-plan', parent: null };
@@ -301,6 +304,7 @@ export default function AppShell({ children }: AppShellProps) {
   };
 
   const getActiveBreadcrumbIcon = () => {
+    if (pathname === '/dashboard') return <DashboardIcon size={16} color="var(--primary)" />;
     if (pathname.startsWith('/admin/audit-logs') || pathname === '/audit-logs') return <AuditVaultIcon size={16} color="var(--primary)" />;
     if (pathname === '/vote-management') return <VoteManagementIcon size={16} color="var(--primary)" />;
     if (pathname === '/budget-forecasting') return <BudgetPlanningIcon size={16} color="var(--primary)" />;
@@ -421,8 +425,8 @@ export default function AppShell({ children }: AppShellProps) {
                   <div className="nav-rail-icon-box">
                     <IconComp
                       size={22}
-                      color={active ? '#FFBE29' : '#FFFFFF'}
-                      accentColor="#FFBE29"
+                      color={active ? '#80142B' : '#FFFFFF'}
+                      accentColor={active ? '#80142B' : '#FFBE29'}
                     />
                   </div>
                   <span className="nav-rail-label" style={{ fontWeight: active ? 700 : 500 }}>
@@ -457,8 +461,8 @@ export default function AppShell({ children }: AppShellProps) {
                     <div className="nav-rail-icon-box">
                       <IconComp
                         size={22}
-                        color={active ? '#FFBE29' : '#FFFFFF'}
-                        accentColor="#FFBE29"
+                        color={active ? '#80142B' : '#FFFFFF'}
+                        accentColor={active ? '#80142B' : '#FFBE29'}
                       />
                     </div>
                     <span className="nav-rail-label" style={{ fontWeight: active ? 700 : 500 }}>
@@ -617,9 +621,9 @@ export default function AppShell({ children }: AppShellProps) {
           <div ref={navPaneRef} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', minWidth: 0, position: 'relative' }}>
             <div className="header-breadcrumb" style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', fontSize: '0.85rem', color: 'var(--text-tertiary)', overflow: 'hidden', whiteSpace: 'nowrap', textOverflow: 'ellipsis' }}>
 
-              {/* Root Institutional & System Link (Clickable Navigation to Home) */}
+              {/* Root Institutional & System Link (Clickable Navigation to Dashboard) */}
               <Link
-                href="/budget-forecasting"
+                href="/dashboard"
                 className="header-breadcrumb-root header-breadcrumb-link"
                 style={{
                   fontWeight: 600,
@@ -633,7 +637,7 @@ export default function AppShell({ children }: AppShellProps) {
                   transition: 'all 0.15s ease',
                   cursor: 'pointer',
                 }}
-                title="IPMIS Home"
+                title="Return to IPMIS Dashboard Home"
               >
                 <img
                   src="/logo-emblem.png"
