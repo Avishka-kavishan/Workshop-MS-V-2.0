@@ -415,45 +415,17 @@ export default function DashboardPage() {
       >
         {/* ══════════════════════════════════════════════════════
             1. TOP EXECUTIVE HEADER
-            Matching Reference Design Exactly
            ══════════════════════════════════════════════════════ */}
         <div
           style={{
             display: 'flex',
             alignItems: 'center',
-            justifyContent: 'space-between',
+            justifyContent: 'flex-end',
             padding: '0.45rem 0 0.65rem',
             flexWrap: 'wrap',
             gap: '0.75rem',
           }}
         >
-          {/* Left: IPMIS Branding Title */}
-          <div>
-            <h1
-              style={{
-                margin: 0,
-                fontSize: '1.55rem',
-                fontWeight: 900,
-                color: '#1E1B18',
-                letterSpacing: '-0.025em',
-                lineHeight: 1.15,
-              }}
-            >
-              IPMIS
-            </h1>
-            <div
-              style={{
-                fontSize: '0.78rem',
-                color: '#685F5C',
-                fontWeight: 600,
-                marginTop: '1px',
-                letterSpacing: '-0.01em',
-              }}
-            >
-              Integrated Planning &amp; Monitoring Information System
-            </div>
-          </div>
-
           {/* Right: Current Role Capsule, Live Sync Badge, Bell & Avatar */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem', flexWrap: 'wrap' }}>
             {/* Current Role Capsule */}
