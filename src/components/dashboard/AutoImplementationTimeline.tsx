@@ -372,11 +372,11 @@ export default function AutoImplementationTimeline({
       {/* Filter Tabs */}
       <div style={{ display: 'flex', alignItems: 'center', gap: '0.25rem', marginBottom: '0.55rem', flexWrap: 'wrap' }}>
         {[
-          { id: 'all', label: `All (${counts.all || 35})` },
-          { id: 'Ongoing', label: `Ongoing (${counts.ongo || 20})` },
-          { id: 'Delayed', label: `Delayed (${counts.delay || 2})` },
-          { id: 'Completed', label: `Completed (${counts.comp || 3})` },
-          { id: 'Upcoming', label: `Upcoming (${counts.upcom || 4})` },
+          { id: 'all', label: `All (${counts.all})` },
+          { id: 'Ongoing', label: `Ongoing (${counts.ongo})` },
+          { id: 'Delayed', label: `Delayed (${counts.delay})` },
+          { id: 'Completed', label: `Completed (${counts.comp})` },
+          { id: 'Upcoming', label: `Upcoming (${counts.upcom})` },
         ].map((tab) => {
           const isSelected = selectedStatus === tab.id;
           return (

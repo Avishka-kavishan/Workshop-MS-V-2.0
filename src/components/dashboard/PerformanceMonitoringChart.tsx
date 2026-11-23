@@ -132,12 +132,12 @@ function PerformanceMonitoringChart({ branchName = 'MOE ICT Branch', monthlyData
       d.physical >= 70 ? 'Optimal' : d.physical >= 40 ? 'Moderate' : 'Initiating',
     ]),
     summaryStats: [
-      { label: 'Physical Progress', value: `${liveMetrics?.physicalAchievementRate || 73}%`, highlight: true },
-      { label: 'Financial Disbursement', value: `${liveMetrics?.budgetUtilizationRate || 31}%` },
-      { label: 'Variance Gap', value: `+${(liveMetrics?.physicalAchievementRate || 73) - (liveMetrics?.budgetUtilizationRate || 31)}%` },
-      { label: 'Completed Workshops', value: `${liveMetrics?.completedWorkshops || 56}` },
+      { label: 'Physical Progress', value: `${liveMetrics?.physicalAchievementRate || 0}%`, highlight: true },
+      { label: 'Financial Disbursement', value: `${liveMetrics?.budgetUtilizationRate || 0}%` },
+      { label: 'Variance Gap', value: `${((liveMetrics?.physicalAchievementRate || 0) - (liveMetrics?.budgetUtilizationRate || 0)) >= 0 ? '+' : ''}${(liveMetrics?.physicalAchievementRate || 0) - (liveMetrics?.budgetUtilizationRate || 0)}%` },
+      { label: 'Completed Workshops', value: `${liveMetrics?.completedWorkshops || 0}` },
     ],
-    copySummaryText: `Physical & Financial Curves (${branchName}): Physical ${liveMetrics?.physicalAchievementRate || 73}% vs Financial ${liveMetrics?.budgetUtilizationRate || 31}%. Net Variance: +${(liveMetrics?.physicalAchievementRate || 73) - (liveMetrics?.budgetUtilizationRate || 31)}%.`,
+    copySummaryText: `Physical & Financial Curves (${branchName}): Physical ${liveMetrics?.physicalAchievementRate || 0}% vs Financial ${liveMetrics?.budgetUtilizationRate || 0}%. Net Variance: ${((liveMetrics?.physicalAchievementRate || 0) - (liveMetrics?.budgetUtilizationRate || 0)) >= 0 ? '+' : ''}${(liveMetrics?.physicalAchievementRate || 0) - (liveMetrics?.budgetUtilizationRate || 0)}%.`,
   };
 
   return (

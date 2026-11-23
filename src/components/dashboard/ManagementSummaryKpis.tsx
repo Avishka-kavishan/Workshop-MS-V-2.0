@@ -112,10 +112,10 @@ export default function ManagementSummaryKpis({ kpis }: ManagementSummaryKpisPro
     subtitle: 'High-Level Monitoring: Workshops, AIP, Budget Absorption, Amendments & Operational Actions',
     headers: ['Domain / Category', 'Key Performance Indicator', 'Target / Approved', 'Achieved / Actual', 'Variance / Pending', 'Rate / Percentage (%)', 'Institutional Status'],
     rows: [
-      ['Workshops', 'Total Workshops', 186, ws.completedWorkshops, ws.pendingWorkshops, `${ws.completionRatePct || 30}%`, 'Active'],
+      ['Workshops', 'Total Workshops', ws.totalWorkshops, ws.completedWorkshops, ws.pendingWorkshops, `${ws.completionRatePct || 0}%`, 'Active'],
       ['Workshops', 'Active Field Sessions', '-', ws.activeWorkshops, '-', '-', 'Ongoing'],
-      ['Workshops', 'Completed Workshops', ws.totalWorkshops, ws.completedWorkshops, ws.pendingWorkshops, `${Math.round((ws.completedWorkshops / ws.totalWorkshops) * 100)}%`, 'Verified'],
-      ['AIP Activities', 'Total AIP Activities', 184, aip.completedActivities, aip.pendingActivities, `${aip.overallProgressPct}%`, 'On Track'],
+      ['Workshops', 'Completed Workshops', ws.totalWorkshops, ws.completedWorkshops, ws.pendingWorkshops, `${ws.totalWorkshops > 0 ? Math.round((ws.completedWorkshops / ws.totalWorkshops) * 100) : 0}%`, 'Verified'],
+      ['AIP Activities', 'Total AIP Activities', aip.totalActivities, aip.completedActivities, aip.pendingActivities, `${aip.overallProgressPct}%`, 'On Track'],
       ['AIP Activities', 'Ongoing Activities', '-', aip.ongoingActivities, '-', '-', 'In Progress'],
       ['AIP Activities', 'Delayed Activities', 0, aip.delayedActivities, `+${aip.delayedActivities}`, '-', 'Intervention Required'],
       ['Budget Management', 'Total Approved Budget (LKR Mn)', budget.totalApprovedBudgetMn, budget.totalExpenditureMn, budget.totalApprovedBudgetMn - budget.totalExpenditureMn, `${budget.budgetUtilizationPct}%`, 'Allocated'],
