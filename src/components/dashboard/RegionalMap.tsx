@@ -71,6 +71,42 @@ export const SRI_LANKA_PROVINCE_PATHS: Record<string, string> = {
     'M 62 282 L 85 278 L 102 290 L 124 288 L 146 298 L 168 275 C 158 298, 142 320, 128 332 C 112 342, 94 344, 82 334 C 70 322, 64 300, 62 282 Z',
 };
 
+// ══════════════════════════════════════════════════════════════════════════════
+// OFFICIAL SRI LANKAN PROVINCIAL FLAGS
+// ══════════════════════════════════════════════════════════════════════════════
+export const PROVINCE_FLAG_MAP: Record<string, string> = {
+  WP: '/flags/provinces/wp.png',
+  CP: '/flags/provinces/cp.png',
+  SP: '/flags/provinces/sp.png',
+  NC: '/flags/provinces/nc.png',
+  NCP: '/flags/provinces/nc.png',
+  NW: '/flags/provinces/nw.svg',
+  NWP: '/flags/provinces/nw.svg',
+  NP: '/flags/provinces/np.svg',
+  EP: '/flags/provinces/ep.png',
+  SAB: '/flags/provinces/sab.png',
+  SGP: '/flags/provinces/sab.png',
+  UVA: '/flags/provinces/uva.svg',
+  UP: '/flags/provinces/uva.svg',
+};
+
+export const getProvinceFlag = (code?: string, name?: string): string => {
+  if (code && PROVINCE_FLAG_MAP[code.toUpperCase()]) {
+    return PROVINCE_FLAG_MAP[code.toUpperCase()];
+  }
+  const cleanName = (name || '').toLowerCase();
+  if (cleanName.includes('west') && !cleanName.includes('north')) return '/flags/provinces/wp.png';
+  if (cleanName.includes('central') && !cleanName.includes('north')) return '/flags/provinces/cp.png';
+  if (cleanName.includes('south') && !cleanName.includes('sabar')) return '/flags/provinces/sp.png';
+  if (cleanName.includes('north central')) return '/flags/provinces/nc.png';
+  if (cleanName.includes('north west') || cleanName.includes('wayamba')) return '/flags/provinces/nw.svg';
+  if (cleanName.includes('north')) return '/flags/provinces/np.svg';
+  if (cleanName.includes('east')) return '/flags/provinces/ep.png';
+  if (cleanName.includes('sabaragamuwa')) return '/flags/provinces/sab.png';
+  if (cleanName.includes('uva')) return '/flags/provinces/uva.svg';
+  return '/logo-emblem.png';
+};
+
 function RegionalMap({ workshops = [], provincesData, onSelectProvince }: RegionalMapProps) {
   const { data: session } = useSession();
   const isLoggedIn = Boolean(session?.user);
@@ -532,6 +568,22 @@ function RegionalMap({ workshops = [], provincesData, onSelectProvince }: Region
               >
                 <div>
                   <div style={{ fontWeight: 800, fontSize: '0.84rem', display: 'flex', alignItems: 'center', gap: '0.45rem', flexWrap: 'wrap' }}>
+                    <img
+                      src={getProvinceFlag(activeProv.code, activeProv.name)}
+                      alt=""
+                      style={{
+                        width: '20px',
+                        height: '14px',
+                        borderRadius: '3px',
+                        objectFit: 'cover',
+                        border: '1px solid #E2E8F0',
+                        boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
+                        flexShrink: 0,
+                      }}
+                      onError={(e) => {
+                        (e.currentTarget as HTMLImageElement).style.display = 'none';
+                      }}
+                    />
                     <span style={{ color: '#0F172A' }}>{activeProv.name} ({activeProv.code})</span>
                     <span
                       style={{
@@ -600,7 +652,22 @@ function RegionalMap({ workshops = [], provincesData, onSelectProvince }: Region
                     style={{ borderBottom: '1px solid #F1F5F9' }}
                   >
                     <td style={{ padding: '0.5rem 0.65rem', fontWeight: 700, color: '#0F172A' }}>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.45rem' }}>
+                        <img
+                          src={getProvinceFlag(prov.code, prov.name)}
+                          alt=""
+                          style={{
+                            width: '20px',
+                            height: '14px',
+                            borderRadius: '3px',
+                            objectFit: 'cover',
+                            border: '1px solid #E2E8F0',
+                            flexShrink: 0,
+                          }}
+                          onError={(e) => {
+                            (e.currentTarget as HTMLImageElement).style.display = 'none';
+                          }}
+                        />
                         <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: tl.bg }} />
                         <span>{prov.name}</span>
                         <span style={{ fontSize: '0.66rem', color: '#64748B' }}>({prov.code})</span>
@@ -634,7 +701,7 @@ function RegionalMap({ workshops = [], provincesData, onSelectProvince }: Region
                         type="button"
                         onClick={() => openDrillDown(prov)}
                         style={{
-                          background: '#0F766E',
+                          background: '#80142B',
                           color: '#FFFFFF',
                           border: 'none',
                           borderRadius: '4px',
@@ -707,18 +774,33 @@ function RegionalMap({ workshops = [], provincesData, onSelectProvince }: Region
                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
                   <div
                     style={{
-                      width: '40px',
-                      height: '40px',
-                      borderRadius: '12px',
-                      background: 'rgba(255, 255, 255, 0.15)',
+                      width: '46px',
+                      height: '32px',
+                      borderRadius: '6px',
+                      overflow: 'hidden',
+                      boxShadow: '0 2px 8px rgba(0, 0, 0, 0.28)',
+                      border: '1.5px solid rgba(255, 255, 255, 0.55)',
+                      background: 'rgba(255, 255, 255, 0.18)',
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
-                      fontSize: '1.25rem',
-                      border: '1px solid rgba(255, 255, 255, 0.25)',
+                      flexShrink: 0,
                     }}
+                    title={`${activeDrillProvince.name} Official Provincial Flag`}
                   >
-                    🚦
+                    <img
+                      src={getProvinceFlag(activeDrillProvince.code, activeDrillProvince.name)}
+                      alt={`${activeDrillProvince.name} Flag`}
+                      style={{
+                        width: '100%',
+                        height: '100%',
+                        objectFit: 'cover',
+                        display: 'block',
+                      }}
+                      onError={(e) => {
+                        (e.currentTarget as HTMLImageElement).src = '/logo-emblem.png';
+                      }}
+                    />
                   </div>
                   <div>
                     <h2 style={{ margin: 0, fontSize: '1.25rem', fontWeight: 800, color: '#FFFFFF', display: 'flex', alignItems: 'center', gap: '0.6rem', letterSpacing: '-0.01em' }}>
