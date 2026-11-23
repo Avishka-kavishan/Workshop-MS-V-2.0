@@ -55,21 +55,6 @@ export default function AutoImplementationTimeline({
     };
   }, [showTileDropdown]);
 
-  const handleJumpToTile = (tileId: string) => {
-    setShowTileDropdown(false);
-    if (typeof document !== 'undefined') {
-      const el = document.getElementById(tileId);
-      if (el) {
-        el.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        el.style.transition = 'box-shadow 0.3s ease';
-        el.style.boxShadow = '0 0 0 3px #80142B, 0 8px 24px rgba(128, 20, 43, 0.2)';
-        setTimeout(() => {
-          el.style.boxShadow = '';
-        }, 1500);
-      }
-    }
-  };
-
   // Filtered list
   const filteredList = useMemo(() => {
     return activities.filter((act) => {
@@ -229,7 +214,7 @@ export default function AutoImplementationTimeline({
                   position: 'absolute',
                   top: 'calc(100% + 6px)',
                   right: 0,
-                  width: '235px',
+                  width: '215px',
                   background: '#FFFFFF',
                   border: '1px solid #EADBDE',
                   borderRadius: '12px',
@@ -241,108 +226,8 @@ export default function AutoImplementationTimeline({
                   gap: '2px',
                 }}
               >
-                {/* Section 1: Dashboard Tile Navigation */}
+                {/* Quarter Horizon Filter */}
                 <div style={{ padding: '4px 8px 2px', fontSize: '0.6rem', fontWeight: 800, color: '#80142B', letterSpacing: '0.04em', textTransform: 'uppercase' }}>
-                  Management Row Tiles
-                </div>
-
-                {/* Tile 01 */}
-                <div
-                  style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'space-between',
-                    padding: '6px 8px',
-                    borderRadius: '8px',
-                    background: '#FFF5F2',
-                    color: '#80142B',
-                    fontSize: '0.74rem',
-                    fontWeight: 700,
-                  }}
-                >
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                    <span>📶</span>
-                    <span>Tile 01: Implementation Timeline</span>
-                  </div>
-                  <span style={{ fontSize: '0.65rem', background: '#80142B', color: '#FFFFFF', padding: '1px 5px', borderRadius: '4px', fontWeight: 800 }}>
-                    Active ✓
-                  </span>
-                </div>
-
-                {/* Tile 02 */}
-                <button
-                  type="button"
-                  onClick={() => handleJumpToTile('dashboard-tile-02')}
-                  style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'space-between',
-                    padding: '6px 8px',
-                    borderRadius: '8px',
-                    background: 'transparent',
-                    border: 'none',
-                    color: '#1E293B',
-                    fontSize: '0.74rem',
-                    fontWeight: 600,
-                    cursor: 'pointer',
-                    textAlign: 'left',
-                    transition: 'all 0.12s ease',
-                  }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.background = '#FFF5F2';
-                    e.currentTarget.style.color = '#80142B';
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.background = 'transparent';
-                    e.currentTarget.style.color = '#1E293B';
-                  }}
-                >
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                    <span>📈</span>
-                    <span>Tile 02: Performance Curve</span>
-                  </div>
-                  <span style={{ fontSize: '0.7rem', color: '#94A3B8' }}>↗</span>
-                </button>
-
-                {/* Tile 03 */}
-                <button
-                  type="button"
-                  onClick={() => handleJumpToTile('dashboard-tile-03')}
-                  style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'space-between',
-                    padding: '6px 8px',
-                    borderRadius: '8px',
-                    background: 'transparent',
-                    border: 'none',
-                    color: '#1E293B',
-                    fontSize: '0.74rem',
-                    fontWeight: 600,
-                    cursor: 'pointer',
-                    textAlign: 'left',
-                    transition: 'all 0.12s ease',
-                  }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.background = '#FFF5F2';
-                    e.currentTarget.style.color = '#80142B';
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.background = 'transparent';
-                    e.currentTarget.style.color = '#1E293B';
-                  }}
-                >
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                    <span>📊</span>
-                    <span>Tile 03: Summary & KPIs</span>
-                  </div>
-                  <span style={{ fontSize: '0.7rem', color: '#94A3B8' }}>↗</span>
-                </button>
-
-                <div style={{ height: '1px', background: '#F1E5E2', margin: '4px 0' }} />
-
-                {/* Section 2: Quarter Horizon Filter */}
-                <div style={{ padding: '2px 8px', fontSize: '0.6rem', fontWeight: 800, color: '#80142B', letterSpacing: '0.04em', textTransform: 'uppercase' }}>
                   Filter Milestone Horizon
                 </div>
 
