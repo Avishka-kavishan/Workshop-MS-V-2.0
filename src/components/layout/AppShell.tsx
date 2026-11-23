@@ -22,6 +22,7 @@ import {
   VoteManagementIcon,
 } from '@/components/icons/NavIcons';
 import GlobalSearchableSelect from '@/components/common/GlobalSearchableSelect';
+import { getBranchAbbreviation, getBranchColor } from '@/lib/branchUtils';
 
 interface AppShellProps {
   children: React.ReactNode;
@@ -153,6 +154,8 @@ export default function AppShell({ children }: AppShellProps) {
   const [unreadCount, setUnreadCount] = useState(0);
 
   const user = session?.user as any;
+  const branchAbbr = getBranchAbbreviation(user?.organizationName || 'MOE Data Management Branch');
+  const branchColor = getBranchColor(branchAbbr || user?.organizationName || 'MOE');
 
   const isExpanded = isHovered;
 
@@ -1160,7 +1163,7 @@ export default function AppShell({ children }: AppShellProps) {
               )}
             </div>
 
-            {/* Profile Avatar (First Image Mockup Design) */}
+            {/* Profile Avatar / Branch Initials Badge */}
             <div ref={profileMenuRef} style={{ position: 'relative' }}>
               <button
                 type="button"
@@ -1169,24 +1172,24 @@ export default function AppShell({ children }: AppShellProps) {
                   width: '36px',
                   height: '36px',
                   borderRadius: '50%',
-                  overflow: 'hidden',
                   border: '2px solid #EADBDE',
-                  background: '#F5EBE8',
+                  background: branchColor.bg,
+                  color: branchColor.text,
                   padding: 0,
                   cursor: 'pointer',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
+                  fontWeight: 800,
+                  fontSize: '0.74rem',
+                  letterSpacing: '0.04em',
                   transition: 'transform 0.15s ease, box-shadow 0.15s ease',
-                  boxShadow: '0 1px 4px rgba(0,0,0,0.08)',
+                  boxShadow: '0 1px 4px rgba(0,0,0,0.12)',
+                  userSelect: 'none',
                 }}
                 title={`${user?.name || 'Authorized Officer'} (${user?.organizationName || 'MOE Data Management Branch'})`}
               >
-                <img
-                  src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&auto=format&fit=crop&q=80"
-                  alt="Profile"
-                  style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                />
+                {branchAbbr}
               </button>
 
               {showProfileMenu && (
@@ -1204,22 +1207,27 @@ export default function AppShell({ children }: AppShellProps) {
                     zIndex: 100,
                   }}
                 >
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', marginBottom: '0.65rem' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem', marginBottom: '0.65rem' }}>
                     <div
                       style={{
                         width: '38px',
                         height: '38px',
                         borderRadius: '50%',
-                        overflow: 'hidden',
-                        border: '1.5px solid #80142B',
+                        background: branchColor.bg,
+                        color: branchColor.text,
+                        border: '1.5px solid #EADBDE',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        fontWeight: 800,
+                        fontSize: '0.8rem',
+                        letterSpacing: '0.04em',
                         flexShrink: 0,
+                        boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
+                        userSelect: 'none',
                       }}
                     >
-                      <img
-                        src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&auto=format&fit=crop&q=80"
-                        alt="Profile"
-                        style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                      />
+                      {branchAbbr}
                     </div>
                     <div>
                       <div style={{ fontWeight: 800, fontSize: '0.82rem', color: '#1E1B18', lineHeight: 1.2 }}>
