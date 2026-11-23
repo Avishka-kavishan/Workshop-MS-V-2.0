@@ -5418,13 +5418,9 @@ export default function AnnualPlanPage() {
                     </label>
                     <SearchableSelect
                       disabled={isBaselineLocked}
-                      value={MOE_STANDARD_VOTE_NUMBERS.some((v) => v.voteNumber === formVoteNumber) ? formVoteNumber : 'custom'}
-                      onChange={(e) => {
-                        if (e.target.value !== 'custom') {
-                          setFormVoteNumber(e.target.value);
-                        }
-                      }}
-                      style={{ width: '100%', marginBottom: '4px' }}
+                      value={formVoteNumber}
+                      onChange={(e) => setFormVoteNumber(e.target.value)}
+                      style={{ width: '100%' }}
                     >
                       <option value="">-- Pick Standard Vote (Searchable) --</option>
                       {MOE_STANDARD_VOTE_NUMBERS.map((v) => (
@@ -5432,16 +5428,7 @@ export default function AnnualPlanPage() {
                           {v.voteNumber} • {v.projectName.slice(0, 30)} ({v.category})
                         </option>
                       ))}
-                      <option value="custom">-- Custom Vote Number --</option>
                     </SearchableSelect>
-                    <input
-                      type="text"
-                      disabled={isBaselineLocked}
-                      value={formVoteNumber}
-                      onChange={(e) => setFormVoteNumber(e.target.value)}
-                      placeholder="e.g. 126-02-03-2502"
-                      style={{ width: '100%', padding: '0.45rem', border: '1px solid #d1d5db', borderRadius: '6px', fontSize: '0.85rem', fontFamily: 'monospace' }}
-                    />
                   </div>
 
                   <div>
@@ -6296,16 +6283,6 @@ export default function AnnualPlanPage() {
                     </option>
                   ))}
                 </select>
-                <div style={{ fontSize: '0.74rem', color: '#64748B' }}>
-                  Or enter custom vote number:
-                </div>
-                <input
-                  type="text"
-                  value={quickVoteSelected}
-                  onChange={(e) => setQuickVoteSelected(e.target.value)}
-                  placeholder="e.g. 126-02-03-2502"
-                  style={{ width: '100%', padding: '0.45rem', border: '1px solid #cbd5e1', borderRadius: '6px', fontSize: '0.85rem', fontFamily: 'monospace', marginTop: '3px' }}
-                />
               </div>
 
               <div style={{ background: '#F8FAFC', border: '1px solid #E2E8F0', borderRadius: '6px', padding: '0.65rem 0.85rem', marginBottom: '1rem', fontSize: '0.78rem' }}>

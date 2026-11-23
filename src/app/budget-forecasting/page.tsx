@@ -3706,18 +3706,16 @@ export default function BudgetPlanningWorkspacePage() {
                           <label className="form-label">Official Vote Number *</label>
                           <select
                             className="form-input"
-                            style={{ marginBottom: '4px', background: '#F0FDFA', color: '#00534E', fontWeight: 600, fontSize: '0.8rem' }}
-                            value={MOE_STANDARD_VOTE_NUMBERS.some((v) => v.voteNumber === reviewForm.assignedVoteNumber) ? reviewForm.assignedVoteNumber : 'custom'}
+                            style={{ background: '#F0FDFA', color: '#00534E', fontWeight: 600, fontSize: '0.8rem' }}
+                            value={reviewForm.assignedVoteNumber}
                             onChange={(e) => {
-                              if (e.target.value !== 'custom') {
-                                const details = getVoteDetails(e.target.value);
-                                setReviewForm({
-                                  ...reviewForm,
-                                  assignedVoteNumber: e.target.value,
-                                  assignedObjectCode: details.objectCode,
-                                  assignedFundingSource: details.fundingSource,
-                                });
-                              }
+                              const details = getVoteDetails(e.target.value);
+                              setReviewForm({
+                                ...reviewForm,
+                                assignedVoteNumber: e.target.value,
+                                assignedObjectCode: details.objectCode,
+                                assignedFundingSource: details.fundingSource,
+                              });
                             }}
                           >
                             <option value="">-- Pick Standard Vote --</option>
@@ -3726,16 +3724,7 @@ export default function BudgetPlanningWorkspacePage() {
                                 {v.voteNumber} • {v.projectName.slice(0, 30)} ({v.objectCode})
                               </option>
                             ))}
-                            <option value="custom">-- Custom Vote Number --</option>
                           </select>
-                          <input
-                            type="text"
-                            className="form-input"
-                            value={reviewForm.assignedVoteNumber}
-                            onChange={(e) => setReviewForm({ ...reviewForm, assignedVoteNumber: e.target.value })}
-                            placeholder="e.g. 126-02-03-2502"
-                            required
-                          />
                         </div>
 
                         <div className="form-group">
