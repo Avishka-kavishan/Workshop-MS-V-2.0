@@ -872,9 +872,12 @@ export default function DashboardPage() {
               <div id="dashboard-tile-02" style={{ height: '100%', borderRadius: '16px' }}>
                 <ProgressMonitoringCurve
                   monthlyData={telemetryData?.monthlyProgress}
-                  physicalAchievementRate={telemetryData?.metrics?.physicalAchievementRate}
-                  budgetUtilizationRate={telemetryData?.metrics?.budgetUtilizationRate}
-                  nationalExecutionRate={telemetryData?.metrics?.nationalExecutionRate}
+                  physicalAchievementRate={telemetryData?.metrics?.physicalAchievementRate ?? 0}
+                  budgetUtilizationRate={telemetryData?.metrics?.budgetUtilizationRate ?? 0}
+                  nationalExecutionRate={telemetryData?.metrics?.nationalExecutionRate ?? 0}
+                  totalActivities={telemetryData?.kpiGroups?.workshops?.totalWorkshops ?? 0}
+                  plannedActivities={telemetryData?.kpiGroups?.workshops?.pendingWorkshops ?? 0}
+                  delayedActivities={telemetryData?.kpiGroups?.aip?.delayedActivities ?? 0}
                 />
               </div>
 
@@ -899,9 +902,12 @@ export default function DashboardPage() {
             />
             <ProgressMonitoringCurve
               monthlyData={telemetryData?.monthlyProgress}
-              physicalAchievementRate={telemetryData?.metrics?.physicalAchievementRate}
-              budgetUtilizationRate={telemetryData?.metrics?.budgetUtilizationRate}
-              nationalExecutionRate={telemetryData?.metrics?.nationalExecutionRate}
+              physicalAchievementRate={telemetryData?.metrics?.physicalAchievementRate ?? 0}
+              budgetUtilizationRate={telemetryData?.metrics?.budgetUtilizationRate ?? 0}
+              nationalExecutionRate={telemetryData?.metrics?.nationalExecutionRate ?? 0}
+              totalActivities={telemetryData?.kpiGroups?.workshops?.totalWorkshops ?? 0}
+              plannedActivities={telemetryData?.kpiGroups?.workshops?.pendingWorkshops ?? 0}
+              delayedActivities={telemetryData?.kpiGroups?.aip?.delayedActivities ?? 0}
             />
             <ManagementSummaryKpis
               kpis={telemetryData?.kpiGroups}

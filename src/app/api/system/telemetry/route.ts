@@ -146,22 +146,24 @@ export async function GET(req: NextRequest) {
       provActFin = roundToCentInMn(provActFin);
 
       const provCompletedWs = provWs.filter((w) => w.status === 'Completed').length;
-      const provWsCount = provWs.length || baseProv.workshopsCount;
-      const provActsCount = provActs.length || baseProv.activitiesCount;
+      const provWsCount = provWs.length;
+      const provActsCount = provActs.length;
 
-      const avgProvActPhys = provPhysCount > 0 ? Math.round(provPhysSum / provPhysCount) : baseProv.progressPct;
-      const wsCompPct = provWsCount > 0 ? ((provCompletedWs + (provWs.filter((w) => w.status === 'In Progress').length * 0.5)) / provWsCount) * 100 : 75;
+      const avgProvActPhys = provPhysCount > 0 ? Math.round(provPhysSum / provPhysCount) : 0;
+      const wsCompPct = provWsCount > 0 ? ((provCompletedWs + (provWs.filter((w) => w.status === 'In Progress').length * 0.5)) / provWsCount) * 100 : 0;
 
       // Calibration: weighted combination of activity physical milestone + workshop delivery
-      const finalProgressPct = Math.min(100, Math.max(30, Math.round(avgProvActPhys * 0.7 + wsCompPct * 0.3)));
+      const finalProgressPct = (avgProvActPhys > 0 || wsCompPct > 0)
+        ? Math.min(100, Math.round(avgProvActPhys * 0.7 + wsCompPct * 0.3))
+        : 0;
 
       const finalAllocatedMn = provActEst > 0
         ? roundToCentInMn(provActEst)
-        : baseProv.budgetAllocatedMn;
+        : 0;
 
       const finalSpentMn = provActFin > 0
         ? roundToCentInMn(provActFin)
-        : baseProv.budgetSpentMn;
+        : 0;
 
       // Update Zones under this province
       const updatedZones: ZoneMonitoringData[] = baseProv.zones.map((zone) => {
@@ -207,11 +209,12 @@ export async function GET(req: NextRequest) {
 
     // Cumulative monthly trajectory
     let cumWsCompleted = 0;
+    const hasProgressData = allWorkshops.length > 0 || allActivities.length > 0;
     const monthlyProgress = months.map((month, idx) => {
       cumWsCompleted += monthlyWsTotals[idx].completed;
       // Trajectory values matching standard physical milestone and disbursement rates
-      const targetPhysical = [10, 28, 35, 42, 58, 66, 75, 87, 90, 93, 95, 98][idx];
-      const targetFinancial = [8, 22, 31, 38, 48, 56, 68, 85, 88, 90, 92, 95][idx];
+      const targetPhysical = hasProgressData ? [10, 28, 35, 42, 58, 66, 75, 87, 90, 93, 95, 98][idx] : 0;
+      const targetFinancial = hasProgressData ? [8, 22, 31, 38, 48, 56, 68, 85, 88, 90, 92, 95][idx] : 0;
 
       return {
         month,
@@ -222,38 +225,7 @@ export async function GET(req: NextRequest) {
     });
 
     // 6. Recent Monitoring Observations & Activity Log
-    const recentMonitoring = (allObservations.length > 0 ? allObservations : [
-      {
-        id: 'act-1',
-        title: 'Water Supply & Sanitation Project',
-        location: 'Central Province • Matale',
-        status: 'Completed',
-        progressPct: 100,
-        timeAgo: '2 hours ago',
-        category: 'Infrastructure',
-        notes: 'Potable water filtration units installed and verified by Regional Engineer.',
-      },
-      {
-        id: 'act-2',
-        title: 'Science Lab Modernization & Solar Retrofit',
-        location: 'Western Province • Gampaha',
-        status: 'In Progress',
-        progressPct: 65,
-        timeAgo: '5 hours ago',
-        category: 'Facilities',
-        notes: 'Equipment delivered; electrical wiring underway with 65% completion.',
-      },
-      {
-        id: 'act-3',
-        title: 'Teacher ICT Capacity Building Workshop',
-        location: 'Southern Province • Galle Zone',
-        status: 'Completed',
-        progressPct: 100,
-        timeAgo: '1 day ago',
-        category: 'Pedagogy',
-        notes: '52 teachers completed 3-day practical training on smart board teaching.',
-      },
-    ]).slice(0, 10);
+    const recentMonitoring = allObservations.slice(0, 10);
 
     // 5 Management KPI Groups
     // A. Workshop Management

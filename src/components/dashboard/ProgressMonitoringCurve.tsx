@@ -16,29 +16,37 @@ interface ProgressMonitoringCurveProps {
   physicalAchievementRate?: number;
   budgetUtilizationRate?: number;
   nationalExecutionRate?: number;
+  totalActivities?: number;
+  plannedActivities?: number;
+  actualAchievementPct?: number;
+  delayedActivities?: number;
   onDrillDown?: () => void;
 }
 
 const DEFAULT_MONTHLY_DATA: MonthlyProgressPoint[] = [
-  { month: 'Jan', physical: 10, financial: 8, workshopsHeld: 4 },
-  { month: 'Feb', physical: 28, financial: 22, workshopsHeld: 12 },
-  { month: 'Mar', physical: 35, financial: 31, workshopsHeld: 24 },
-  { month: 'Apr', physical: 42, financial: 38, workshopsHeld: 35 },
-  { month: 'May', physical: 58, financial: 48, workshopsHeld: 52 },
-  { month: 'Jun', physical: 66, financial: 56, workshopsHeld: 70 },
-  { month: 'Jul', physical: 75, financial: 68, workshopsHeld: 88 },
-  { month: 'Aug', physical: 87, financial: 85, workshopsHeld: 105 },
-  { month: 'Sep', physical: 90, financial: 88, workshopsHeld: 125 },
-  { month: 'Oct', physical: 93, financial: 90, workshopsHeld: 145 },
-  { month: 'Nov', physical: 95, financial: 92, workshopsHeld: 168 },
-  { month: 'Dec', physical: 98, financial: 95, workshopsHeld: 186 },
+  { month: 'Jan', physical: 0, financial: 0, workshopsHeld: 0 },
+  { month: 'Feb', physical: 0, financial: 0, workshopsHeld: 0 },
+  { month: 'Mar', physical: 0, financial: 0, workshopsHeld: 0 },
+  { month: 'Apr', physical: 0, financial: 0, workshopsHeld: 0 },
+  { month: 'May', physical: 0, financial: 0, workshopsHeld: 0 },
+  { month: 'Jun', physical: 0, financial: 0, workshopsHeld: 0 },
+  { month: 'Jul', physical: 0, financial: 0, workshopsHeld: 0 },
+  { month: 'Aug', physical: 0, financial: 0, workshopsHeld: 0 },
+  { month: 'Sep', physical: 0, financial: 0, workshopsHeld: 0 },
+  { month: 'Oct', physical: 0, financial: 0, workshopsHeld: 0 },
+  { month: 'Nov', physical: 0, financial: 0, workshopsHeld: 0 },
+  { month: 'Dec', physical: 0, financial: 0, workshopsHeld: 0 },
 ];
 
 export default function ProgressMonitoringCurve({
   monthlyData,
-  physicalAchievementRate = 73.5,
-  budgetUtilizationRate = 31.0,
-  nationalExecutionRate = 54.1,
+  physicalAchievementRate = 0,
+  budgetUtilizationRate = 0,
+  nationalExecutionRate = 0,
+  totalActivities = 0,
+  plannedActivities = 0,
+  actualAchievementPct,
+  delayedActivities = 0,
   onDrillDown,
 }: ProgressMonitoringCurveProps) {
   const [curveMode, setCurveMode] = useState<'both' | 'physical' | 'financial'>('both');
@@ -94,10 +102,11 @@ export default function ProgressMonitoringCurve({
 
   // Baseline Planned Trajectory (Standard approved MoE MTEF S-Curve)
   const plannedTrajectory = [8, 20, 32, 44, 55, 65, 75, 84, 90, 94, 97, 100];
+  const hasActivities = totalActivities > 0 || plannedActivities > 0 || (monthlyData && monthlyData.some((d) => (d.workshopsHeld || 0) > 0 || d.physical > 0 || d.financial > 0));
 
   // Current month index (Nov = 10 in 0-indexed)
   const currentMonthIdx = 10;
-  const currentPlanned = plannedTrajectory[currentMonthIdx] || 95;
+  const currentPlanned = hasActivities ? (plannedTrajectory[currentMonthIdx] || 95) : 0;
   const currentActual = physicalAchievementRate;
   const performanceGap = Math.round((currentActual - currentPlanned) * 10) / 10;
   const isAhead = performanceGap >= 0;
@@ -124,12 +133,12 @@ export default function ProgressMonitoringCurve({
   const plannedPath = useMemo(() => {
     return data
       .map((pt, i) => {
-        const plannedVal = PLANNED_BY_MONTH[pt.month] ?? 50;
+        const plannedVal = hasActivities ? (PLANNED_BY_MONTH[pt.month] ?? 0) : 0;
         const { x, y } = getCoordinates(i, plannedVal);
         return `${i === 0 ? 'M' : 'L'} ${x.toFixed(1)} ${y.toFixed(1)}`;
       })
       .join(' ');
-  }, [data]);
+  }, [data, hasActivities]);
 
   const physicalPath = useMemo(() => {
     return data
@@ -344,49 +353,51 @@ export default function ProgressMonitoringCurve({
         </div>
       </div>
 
-      {/* 4 Stat Boxes Matching Mockup (All Crews, Planned, Actual, Delay) */}
+      {/* 4 Stat Boxes (All Crews, Planned, Actual, Delay) */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '0.45rem', marginBottom: '0.55rem' }}>
-        {/* Stat 1: All Crews 277 */}
+        {/* Stat 1: All Crews */}
         <div style={{ background: '#FFF5F2', border: '1px solid #F2DDD5', borderRadius: '10px', padding: '0.45rem 0.55rem', display: 'flex', alignItems: 'center', gap: '0.45rem' }}>
           <div style={{ width: '24px', height: '24px', borderRadius: '50%', background: '#FCE7E1', color: '#80142B', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.75rem', fontWeight: 800 }}>
             ✓
           </div>
           <div>
             <div style={{ fontSize: '0.6rem', color: '#64748B', fontWeight: 700 }}>All Crews</div>
-            <div style={{ fontSize: '0.96rem', fontWeight: 900, color: '#0F172A', lineHeight: 1.1 }}>277</div>
+            <div style={{ fontSize: '0.96rem', fontWeight: 900, color: '#0F172A', lineHeight: 1.1 }}>{totalActivities}</div>
           </div>
         </div>
 
-        {/* Stat 2: Planned 22 */}
+        {/* Stat 2: Planned */}
         <div style={{ background: '#F0FDF4', border: '1px solid #BBF7D0', borderRadius: '10px', padding: '0.45rem 0.55rem', display: 'flex', alignItems: 'center', gap: '0.45rem' }}>
           <div style={{ width: '24px', height: '24px', borderRadius: '50%', background: '#DCFCE7', color: '#16A34A', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.75rem', fontWeight: 800 }}>
             📊
           </div>
           <div>
             <div style={{ fontSize: '0.6rem', color: '#64748B', fontWeight: 700 }}>Planned</div>
-            <div style={{ fontSize: '0.96rem', fontWeight: 900, color: '#0F172A', lineHeight: 1.1 }}>22</div>
+            <div style={{ fontSize: '0.96rem', fontWeight: 900, color: '#0F172A', lineHeight: 1.1 }}>{plannedActivities}</div>
           </div>
         </div>
 
-        {/* Stat 3: Actual 74% */}
+        {/* Stat 3: Actual */}
         <div style={{ background: '#F0F9FF', border: '1px solid #BAE6FD', borderRadius: '10px', padding: '0.45rem 0.55rem', display: 'flex', alignItems: 'center', gap: '0.45rem' }}>
           <div style={{ width: '24px', height: '24px', borderRadius: '50%', background: '#E0F2FE', color: '#0284C7', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.75rem', fontWeight: 800 }}>
             🎯
           </div>
           <div>
             <div style={{ fontSize: '0.6rem', color: '#64748B', fontWeight: 700 }}>Actual</div>
-            <div style={{ fontSize: '0.96rem', fontWeight: 900, color: '#0284C7', lineHeight: 1.1 }}>74%</div>
+            <div style={{ fontSize: '0.96rem', fontWeight: 900, color: '#0284C7', lineHeight: 1.1 }}>
+              {actualAchievementPct !== undefined ? actualAchievementPct : Math.round(physicalAchievementRate || 0)}%
+            </div>
           </div>
         </div>
 
-        {/* Stat 4: Delay 24 */}
+        {/* Stat 4: Delay */}
         <div style={{ background: '#FFFBEB', border: '1px solid #FDE68A', borderRadius: '10px', padding: '0.45rem 0.55rem', display: 'flex', alignItems: 'center', gap: '0.45rem' }}>
           <div style={{ width: '24px', height: '24px', borderRadius: '50%', background: '#FEF3C7', color: '#D97706', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.75rem', fontWeight: 800 }}>
             ⏰
           </div>
           <div>
             <div style={{ fontSize: '0.6rem', color: '#64748B', fontWeight: 700 }}>Delay</div>
-            <div style={{ fontSize: '0.96rem', fontWeight: 900, color: '#D97706', lineHeight: 1.1 }}>24</div>
+            <div style={{ fontSize: '0.96rem', fontWeight: 900, color: '#D97706', lineHeight: 1.1 }}>{delayedActivities}</div>
           </div>
         </div>
       </div>

@@ -3,7 +3,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
 import TileActionMenu, { TileExportData } from '@/components/dashboard/TileActionMenu';
-import { formatMillion } from '@/lib/financialFormat';
+import { formatMillion, formatRupees } from '@/lib/financialFormat';
 
 export interface ManagementKpiData {
   workshops?: {
@@ -67,43 +67,43 @@ export default function ManagementSummaryKpis({ kpis }: ManagementSummaryKpisPro
   }, [showTileDropdown]);
 
   const ws = kpis?.workshops || {
-    totalWorkshops: 277,
-    activeWorkshops: 22,
-    completedWorkshops: 98,
-    pendingWorkshops: 154,
-    completionRatePct: 35,
+    totalWorkshops: 0,
+    activeWorkshops: 0,
+    completedWorkshops: 0,
+    pendingWorkshops: 0,
+    completionRatePct: 0,
   };
 
   const aip = kpis?.aip || {
-    totalActivities: 241,
-    completedActivities: 7,
-    ongoingActivities: 78,
-    pendingActivities: 156,
-    delayedActivities: 21,
-    overallProgressPct: 74,
+    totalActivities: 0,
+    completedActivities: 0,
+    ongoingActivities: 0,
+    pendingActivities: 0,
+    delayedActivities: 0,
+    overallProgressPct: 0,
   };
 
   const budget = kpis?.budget || {
-    totalApprovedBudgetMn: 6392.325,
-    totalExpenditureMn: 1222.866557,
-    budgetUtilizationPct: 29.0,
-    pendingBudgetRevisions: 4,
-    approvedBudgetAmendments: 1,
+    totalApprovedBudgetMn: 0,
+    totalExpenditureMn: 0,
+    budgetUtilizationPct: 0,
+    pendingBudgetRevisions: 0,
+    approvedBudgetAmendments: 0,
   };
 
   const amendments = kpis?.amendments || {
-    totalAmendments: 3,
-    pendingAmendments: 1,
-    approvedAmendments: 2,
+    totalAmendments: 0,
+    pendingAmendments: 0,
+    approvedAmendments: 0,
     rejectedAmendments: 0,
   };
 
   const add = kpis?.additional || {
-    upcomingMilestones: 14,
-    overdueActivities: 8,
-    pendingProgressReports: 11,
-    activitiesAwaitingVerification: 115,
-    outstandingAdministrativeActions: 5,
+    upcomingMilestones: 0,
+    overdueActivities: 0,
+    pendingProgressReports: 0,
+    activitiesAwaitingVerification: 0,
+    outstandingAdministrativeActions: 0,
   };
 
   const tileExportData: TileExportData = {
@@ -439,18 +439,22 @@ export default function ManagementSummaryKpis({ kpis }: ManagementSummaryKpisPro
             {/* Budget Utilization Bar */}
             <div style={{ marginBottom: '0.45rem' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.64rem', fontWeight: 700, marginBottom: '3px' }}>
-                <span style={{ color: '#475569' }}>Allocation: Rs. 1,222,866,557 / Rs. 6,392,325,000</span>
-                <span style={{ color: '#80142B' }}>29%</span>
+                <span style={{ color: '#475569' }}>
+                  Allocation: {budget.totalExpenditureMn > 0 ? formatRupees(budget.totalExpenditureMn, true) : 'Rs. 0.00'} / {budget.totalApprovedBudgetMn > 0 ? formatRupees(budget.totalApprovedBudgetMn, true) : 'Rs. 0.00'}
+                </span>
+                <span style={{ color: '#80142B' }}>{budget.budgetUtilizationPct || 0}%</span>
               </div>
               <div style={{ width: '100%', height: '7px', background: '#F1E5E2', borderRadius: '4px', overflow: 'hidden' }}>
-                <div style={{ width: `29%`, height: '100%', background: '#80142B', borderRadius: '4px' }} />
+                <div style={{ width: `${Math.min(100, budget.budgetUtilizationPct || 0)}%`, height: '100%', background: '#80142B', borderRadius: '4px' }} />
               </div>
             </div>
 
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '0.35rem' }}>
               <div style={{ background: '#FFFFFF', padding: '0.35rem', borderRadius: '6px', border: '1px solid #F1E5E2', textAlign: 'center' }}>
                 <div style={{ fontSize: '0.58rem', color: '#64748B', fontWeight: 600 }}>Approved Budget</div>
-                <div style={{ fontSize: '0.76rem', fontWeight: 800, color: '#0F172A' }}>Rs. 6,392,325,000</div>
+                <div style={{ fontSize: '0.76rem', fontWeight: 800, color: '#0F172A' }}>
+                  {budget.totalApprovedBudgetMn > 0 ? formatRupees(budget.totalApprovedBudgetMn, true) : 'Rs. 0.00'}
+                </div>
               </div>
               <div style={{ background: '#FFFFFF', padding: '0.35rem', borderRadius: '6px', border: '1px solid #F1E5E2', textAlign: 'center' }}>
                 <div style={{ fontSize: '0.58rem', color: '#D97706', fontWeight: 600 }}>Pending Revisions</div>
