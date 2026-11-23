@@ -199,47 +199,47 @@ export default function ProgressMonitoringCurve({
 
       {/* 4 Stat Boxes Matching Mockup (All Crews, Planned, Actual, Delay) */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '0.45rem', marginBottom: '0.55rem' }}>
-        {/* Stat 1: All Crews 277 */}
+        {/* Stat 1: All Crews 277 (Maroon) */}
         <div style={{ background: '#FFF5F2', border: '1px solid #F2DDD5', borderRadius: '10px', padding: '0.45rem 0.55rem', display: 'flex', alignItems: 'center', gap: '0.45rem' }}>
           <div style={{ width: '24px', height: '24px', borderRadius: '50%', background: '#FCE7E1', color: '#80142B', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.75rem', fontWeight: 800 }}>
             ✓
           </div>
           <div>
             <div style={{ fontSize: '0.6rem', color: '#64748B', fontWeight: 700 }}>All Crews</div>
-            <div style={{ fontSize: '0.96rem', fontWeight: 900, color: '#0F172A', lineHeight: 1.1 }}>277</div>
+            <div style={{ fontSize: '0.96rem', fontWeight: 900, color: '#80142B', lineHeight: 1.1 }}>277</div>
           </div>
         </div>
 
-        {/* Stat 2: Planned 22 */}
-        <div style={{ background: '#F0FDF4', border: '1px solid #BBF7D0', borderRadius: '10px', padding: '0.45rem 0.55rem', display: 'flex', alignItems: 'center', gap: '0.45rem' }}>
-          <div style={{ width: '24px', height: '24px', borderRadius: '50%', background: '#DCFCE7', color: '#16A34A', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.75rem', fontWeight: 800 }}>
+        {/* Stat 2: Planned 22 (Brown / Earth) */}
+        <div style={{ background: '#FEF3C7', border: '1px solid #FDE68A', borderRadius: '10px', padding: '0.45rem 0.55rem', display: 'flex', alignItems: 'center', gap: '0.45rem' }}>
+          <div style={{ width: '24px', height: '24px', borderRadius: '50%', background: '#FDE68A', color: '#78350F', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.75rem', fontWeight: 800 }}>
             📊
           </div>
           <div>
-            <div style={{ fontSize: '0.6rem', color: '#64748B', fontWeight: 700 }}>Planned</div>
-            <div style={{ fontSize: '0.96rem', fontWeight: 900, color: '#0F172A', lineHeight: 1.1 }}>22</div>
+            <div style={{ fontSize: '0.6rem', color: '#78350F', fontWeight: 700 }}>Planned</div>
+            <div style={{ fontSize: '0.96rem', fontWeight: 900, color: '#78350F', lineHeight: 1.1 }}>22</div>
           </div>
         </div>
 
-        {/* Stat 3: Actual 74% */}
-        <div style={{ background: '#F0F9FF', border: '1px solid #BAE6FD', borderRadius: '10px', padding: '0.45rem 0.55rem', display: 'flex', alignItems: 'center', gap: '0.45rem' }}>
-          <div style={{ width: '24px', height: '24px', borderRadius: '50%', background: '#E0F2FE', color: '#0284C7', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.75rem', fontWeight: 800 }}>
+        {/* Stat 3: Actual 74% (Green) */}
+        <div style={{ background: '#F0FDF4', border: '1px solid #BBF7D0', borderRadius: '10px', padding: '0.45rem 0.55rem', display: 'flex', alignItems: 'center', gap: '0.45rem' }}>
+          <div style={{ width: '24px', height: '24px', borderRadius: '50%', background: '#DCFCE7', color: '#16A34A', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.75rem', fontWeight: 800 }}>
             🎯
           </div>
           <div>
-            <div style={{ fontSize: '0.6rem', color: '#64748B', fontWeight: 700 }}>Actual</div>
-            <div style={{ fontSize: '0.96rem', fontWeight: 900, color: '#0284C7', lineHeight: 1.1 }}>74%</div>
+            <div style={{ fontSize: '0.6rem', color: '#15803D', fontWeight: 700 }}>Actual</div>
+            <div style={{ fontSize: '0.96rem', fontWeight: 900, color: '#16A34A', lineHeight: 1.1 }}>74%</div>
           </div>
         </div>
 
-        {/* Stat 4: Delay 24 */}
-        <div style={{ background: '#FFFBEB', border: '1px solid #FDE68A', borderRadius: '10px', padding: '0.45rem 0.55rem', display: 'flex', alignItems: 'center', gap: '0.45rem' }}>
-          <div style={{ width: '24px', height: '24px', borderRadius: '50%', background: '#FEF3C7', color: '#D97706', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.75rem', fontWeight: 800 }}>
+        {/* Stat 4: Delay 24 (Orange) */}
+        <div style={{ background: '#FFF7ED', border: '1px solid #FED7AA', borderRadius: '10px', padding: '0.45rem 0.55rem', display: 'flex', alignItems: 'center', gap: '0.45rem' }}>
+          <div style={{ width: '24px', height: '24px', borderRadius: '50%', background: '#FFEDD5', color: '#EA580C', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.75rem', fontWeight: 800 }}>
             ⏰
           </div>
           <div>
-            <div style={{ fontSize: '0.6rem', color: '#64748B', fontWeight: 700 }}>Delay</div>
-            <div style={{ fontSize: '0.96rem', fontWeight: 900, color: '#D97706', lineHeight: 1.1 }}>24</div>
+            <div style={{ fontSize: '0.6rem', color: '#EA580C', fontWeight: 700 }}>Delay</div>
+            <div style={{ fontSize: '0.96rem', fontWeight: 900, color: '#EA580C', lineHeight: 1.1 }}>24</div>
           </div>
         </div>
       </div>

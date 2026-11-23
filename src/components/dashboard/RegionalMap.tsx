@@ -321,12 +321,12 @@ function RegionalMap({ workshops = [], provincesData, onSelectProvince }: Region
             {/* 6 Performance Tiers - Percentage Values Only */}
             <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
               {[
-                { band: '100%', label: '100%', color: '#16A34A', desc: '100% Target Met' },
-                { band: '90-99%', label: '90–99%', color: '#65A30D', desc: '90–99% High Progress' },
-                { band: '80-89%', label: '80–89%', color: '#EAB308', desc: '80–89% Satisfactory' },
-                { band: '70-79%', label: '70–79%', color: '#F59E0B', desc: '70–79% Attention Needed' },
-                { band: '50-69%', label: '50–69%', color: '#F87171', desc: '50–69% Underperforming' },
-                { band: '<50%', label: '< 50%', color: '#80142B', desc: '< 50% Critical Deficit' },
+                { band: '100%', label: '100%', color: '#16A34A', desc: '100% Target Met (Green)' },
+                { band: '90-99%', label: '90–99%', color: '#22C55E', desc: '90–99% High Progress (Green)' },
+                { band: '80-89%', label: '80–89%', color: '#EAB308', desc: '80–89% Satisfactory (Yellow/Gold)' },
+                { band: '70-79%', label: '70–79%', color: '#EA580C', desc: '70–79% Attention Needed (Orange)' },
+                { band: '50-69%', label: '50–69%', color: '#854D0E', desc: '50–69% Underperforming (Brown)' },
+                { band: '<50%', label: '< 50%', color: '#80142B', desc: '< 50% Critical Deficit (Maroon)' },
               ].map((tier) => {
                 const isSelected = bandFilter === tier.band;
                 return (
@@ -408,8 +408,8 @@ function RegionalMap({ workshops = [], provincesData, onSelectProvince }: Region
                 const isMatch = bandFilter === 'All' || getTrafficLight(prov.progressPct).band === bandFilter;
                 const isHover = hoveredProvince?.id === prov.id;
                 const tl = getTrafficLight(prov.progressPct);
-                // Monochromatic maroon/burgundy palette matching mockup
-                const provinceFill = isMatch ? (bandFilter === 'All' ? '#8D153A' : tl.bg) : '#CBD5E1';
+                // Multi-tiered balanced system palette (Green, Yellow/Gold, Orange, Brown, Maroon)
+                const provinceFill = isMatch ? tl.bg : '#CBD5E1';
 
                 return (
                   <path

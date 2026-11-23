@@ -477,7 +477,7 @@ export default function DashboardPage() {
             </div>
           </div>
 
-          {/* Card 2: 241 Activities */}
+          {/* Card 2: 241 Activities (Orange Accent & Green Trend) */}
           <div
             style={{
               background: '#FFFFFF',
@@ -496,8 +496,8 @@ export default function DashboardPage() {
                   width: '36px',
                   height: '36px',
                   borderRadius: '10px',
-                  background: '#FDF2F4',
-                  color: '#8D153A',
+                  background: '#FFEDD5',
+                  color: '#EA580C',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
@@ -519,7 +519,7 @@ export default function DashboardPage() {
             <svg width="60" height="26" viewBox="0 0 60 26" fill="none">
               <path
                 d="M 2 20 Q 15 18, 25 10 T 45 6 T 58 14"
-                stroke="#8D153A"
+                stroke="#EA580C"
                 strokeWidth="2"
                 fill="none"
                 strokeLinecap="round"
@@ -527,7 +527,7 @@ export default function DashboardPage() {
             </svg>
           </div>
 
-          {/* Card 3: 28% Plan Progress */}
+          {/* Card 3: 28% Plan Progress (Green Accent) */}
           <div
             style={{
               background: '#FFFFFF',
@@ -577,7 +577,7 @@ export default function DashboardPage() {
             </svg>
           </div>
 
-          {/* Card 4: FY 2026 (Active) ⌵ */}
+          {/* Card 4: FY 2026 (Brown & Gold Accent) */}
           <div
             style={{
               background: '#FFFFFF',
@@ -591,7 +591,21 @@ export default function DashboardPage() {
             }}
           >
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.55rem' }}>
-              <span style={{ fontSize: '1.1rem' }}>📅</span>
+              <div
+                style={{
+                  width: '36px',
+                  height: '36px',
+                  borderRadius: '10px',
+                  background: '#FEF3C7',
+                  color: '#78350F',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  fontSize: '1.1rem',
+                }}
+              >
+                📅
+              </div>
               <select
                 value={selectedYear}
                 onChange={(e) => setSelectedYear(e.target.value)}
@@ -600,7 +614,7 @@ export default function DashboardPage() {
                   background: 'transparent',
                   fontSize: '0.86rem',
                   fontWeight: 800,
-                  color: '#1E1B18',
+                  color: '#78350F',
                   cursor: 'pointer',
                   outline: 'none',
                 }}
@@ -611,7 +625,7 @@ export default function DashboardPage() {
                 <option value="2028">FY 2028</option>
               </select>
             </div>
-            <span style={{ color: '#685F5C', fontSize: '0.7rem' }}>⌵</span>
+            <span style={{ color: '#D97706', fontSize: '0.75rem', fontWeight: 900 }}>⌵</span>
           </div>
         </div>
 

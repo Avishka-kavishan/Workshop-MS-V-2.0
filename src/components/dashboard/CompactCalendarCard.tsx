@@ -198,11 +198,11 @@ export default function CompactCalendarCard({
 
   const getCategoryColor = (cat: string) => {
     switch (cat) {
-      case 'workshop': return '#0284C7'; // Blue/Teal
-      case 'milestone': return '#8B5CF6'; // Purple
-      case 'deadline': return '#F59E0B'; // Amber
-      case 'meeting': return '#10B981'; // Green
-      default: return '#64748B';
+      case 'workshop': return '#80142B'; // Maroon
+      case 'deadline': return '#EA580C'; // Orange
+      case 'milestone': return '#D97706'; // Yellow (Gold)
+      case 'meeting': return '#16A34A'; // Green
+      default: return '#78350F'; // Brown
     }
   };
 
@@ -328,10 +328,10 @@ export default function CompactCalendarCard({
         }}
       >
         {[
-          { id: 'workshop', label: 'Workshops' },
-          { id: 'deadline', label: 'Deadlines' },
-          { id: 'milestone', label: 'Milestones' },
-          { id: 'meeting', label: 'Reviews' },
+          { id: 'workshop', label: 'Workshops', color: '#80142B' },
+          { id: 'deadline', label: 'Deadlines', color: '#EA580C' },
+          { id: 'milestone', label: 'Milestones', color: '#D97706' },
+          { id: 'meeting', label: 'Reviews', color: '#16A34A' },
         ].map((cat) => {
           const isSelected = selectedCategoryFilter === cat.id;
           return (
@@ -340,15 +340,15 @@ export default function CompactCalendarCard({
               type="button"
               onClick={() => setSelectedCategoryFilter(cat.id as any)}
               style={{
-                border: 'none',
-                background: isSelected ? '#80142B' : '#F8FAFC',
+                border: isSelected ? 'none' : '1px solid #F1E5E2',
+                background: isSelected ? cat.color : '#FDF9F7',
                 color: isSelected ? '#FFFFFF' : '#475569',
                 borderRadius: '12px',
                 padding: '0.24rem 0.65rem',
                 fontSize: '0.72rem',
                 fontWeight: isSelected ? 800 : 600,
                 cursor: 'pointer',
-                boxShadow: isSelected ? '0 1px 3px rgba(128, 20, 43, 0.2)' : 'none',
+                boxShadow: isSelected ? `0 2px 6px ${cat.color}33` : 'none',
                 transition: 'all 0.15s ease',
               }}
             >
