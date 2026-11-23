@@ -37,11 +37,11 @@ export function getTrafficLight(progressPct: number): TrafficLightColorInfo {
   }
   if (pct >= 90) {
     return {
-      bg: '#22C55E', // Light Green
-      lightBg: 'rgba(34, 197, 94, 0.14)',
-      border: '#16A34A',
+      bg: '#65A30D', // Light Green
+      lightBg: 'rgba(101, 163, 13, 0.14)',
+      border: '#4D7C0F',
       textColor: '#FFFFFF',
-      badgeColor: '#15803D',
+      badgeColor: '#3F6212',
       label: '90-99% High Progress',
       band: '90-99%',
       icon: '🟢',
@@ -49,10 +49,10 @@ export function getTrafficLight(progressPct: number): TrafficLightColorInfo {
   }
   if (pct >= 80) {
     return {
-      bg: '#EAB308', // Yellow (Gold)
+      bg: '#EAB308', // Yellow
       lightBg: 'rgba(234, 179, 8, 0.16)',
       border: '#CA8A04',
-      textColor: '#FFFFFF',
+      textColor: '#854D0E',
       badgeColor: '#854D0E',
       label: '80-89% Satisfactory',
       band: '80-89%',
@@ -61,11 +61,11 @@ export function getTrafficLight(progressPct: number): TrafficLightColorInfo {
   }
   if (pct >= 70) {
     return {
-      bg: '#EA580C', // Orange
-      lightBg: 'rgba(234, 88, 12, 0.16)',
-      border: '#C2410C',
+      bg: '#F59E0B', // Amber
+      lightBg: 'rgba(245, 158, 11, 0.16)',
+      border: '#D97706',
       textColor: '#FFFFFF',
-      badgeColor: '#9A3412',
+      badgeColor: '#92400E',
       label: '70-79% Attention Needed',
       band: '70-79%',
       icon: '🟠',
@@ -73,22 +73,22 @@ export function getTrafficLight(progressPct: number): TrafficLightColorInfo {
   }
   if (pct >= 50) {
     return {
-      bg: '#854D0E', // Brown
-      lightBg: 'rgba(133, 77, 14, 0.16)',
-      border: '#78350F',
+      bg: '#F87171', // Light Red / Coral
+      lightBg: 'rgba(248, 113, 113, 0.18)',
+      border: '#EF4444',
       textColor: '#FFFFFF',
-      badgeColor: '#78350F',
+      badgeColor: '#991B1B',
       label: '50-69% Underperforming',
       band: '50-69%',
-      icon: '🟤',
+      icon: '🔴',
     };
   }
   return {
-    bg: '#80142B', // Maroon
-    lightBg: 'rgba(128, 20, 43, 0.16)',
-    border: '#5C0F20',
+    bg: '#DC2626', // Red
+    lightBg: 'rgba(220, 38, 38, 0.18)',
+    border: '#B91C1C',
     textColor: '#FFFFFF',
-    badgeColor: '#5C0F20',
+    badgeColor: '#7F1D1D',
     label: '< 50% Critical Deficit',
     band: '<50%',
     icon: '🔴',

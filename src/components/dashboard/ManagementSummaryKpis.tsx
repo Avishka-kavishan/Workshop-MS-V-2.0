@@ -172,12 +172,12 @@ export default function ManagementSummaryKpis({ kpis }: ManagementSummaryKpisPro
       {/* Category Pills Switcher */}
       <div style={{ display: 'flex', alignItems: 'center', gap: '0.25rem', marginBottom: '0.55rem', flexWrap: 'wrap' }}>
         {[
-          { id: 'all', label: 'All Groups', color: '#80142B' },
-          { id: 'workshops', label: 'Workshops', color: '#80142B' },
-          { id: 'aip', label: 'AIP Plan', color: '#16A34A' },
-          { id: 'budget', label: 'Budget', color: '#EA580C' },
-          { id: 'amendments', label: 'Amendments', color: '#D97706' },
-          { id: 'additional', label: 'Actions', color: '#78350F' },
+          { id: 'all', label: 'All Groups' },
+          { id: 'workshops', label: 'Workshops' },
+          { id: 'aip', label: 'AIP Plan' },
+          { id: 'budget', label: 'Budget' },
+          { id: 'amendments', label: 'Amendments' },
+          { id: 'additional', label: 'Actions' },
         ].map((tab) => {
           const isSelected = activeSection === tab.id;
           return (
@@ -186,15 +186,15 @@ export default function ManagementSummaryKpis({ kpis }: ManagementSummaryKpisPro
               type="button"
               onClick={() => setActiveSection(tab.id as any)}
               style={{
-                border: isSelected ? 'none' : '1px solid #F1E5E2',
-                background: isSelected ? tab.color : '#FDF9F7',
+                border: 'none',
+                background: isSelected ? '#80142B' : '#F8FAFC',
                 color: isSelected ? '#FFFFFF' : '#475569',
                 borderRadius: '6px',
                 padding: '0.18rem 0.5rem',
                 fontSize: '0.65rem',
                 fontWeight: isSelected ? 800 : 600,
                 cursor: 'pointer',
-                boxShadow: isSelected ? `0 1px 4px ${tab.color}33` : 'none',
+                boxShadow: isSelected ? '0 1px 3px rgba(128, 20, 43, 0.2)' : 'none',
                 transition: 'all 0.15s ease',
               }}
             >
@@ -233,16 +233,16 @@ export default function ManagementSummaryKpis({ kpis }: ManagementSummaryKpisPro
                 <div style={{ fontSize: '0.96rem', fontWeight: 800, color: '#0F172A' }}>{ws.totalWorkshops}</div>
               </div>
               <div style={{ background: '#FFFFFF', padding: '0.35rem', borderRadius: '6px', border: '1px solid #F1E5E2', textAlign: 'center' }}>
-                <div style={{ fontSize: '0.6rem', color: '#EA580C', fontWeight: 600 }}>Ongoing</div>
-                <div style={{ fontSize: '0.96rem', fontWeight: 800, color: '#EA580C' }}>{ws.activeWorkshops}</div>
+                <div style={{ fontSize: '0.6rem', color: '#0369A1', fontWeight: 600 }}>Ongoing</div>
+                <div style={{ fontSize: '0.96rem', fontWeight: 800, color: '#0284C7' }}>{ws.activeWorkshops}</div>
               </div>
               <div style={{ background: '#FFFFFF', padding: '0.35rem', borderRadius: '6px', border: '1px solid #F1E5E2', textAlign: 'center' }}>
-                <div style={{ fontSize: '0.6rem', color: '#15803D', fontWeight: 600 }}>Completed</div>
-                <div style={{ fontSize: '0.96rem', fontWeight: 800, color: '#16A34A' }}>{ws.completedWorkshops}</div>
+                <div style={{ fontSize: '0.6rem', color: '#065F46', fontWeight: 600 }}>Completed</div>
+                <div style={{ fontSize: '0.96rem', fontWeight: 800, color: '#10B981' }}>{ws.completedWorkshops}</div>
               </div>
               <div style={{ background: '#FFFFFF', padding: '0.35rem', borderRadius: '6px', border: '1px solid #F1E5E2', textAlign: 'center' }}>
                 <div style={{ fontSize: '0.6rem', color: '#D97706', fontWeight: 600 }}>Upcoming</div>
-                <div style={{ fontSize: '0.96rem', fontWeight: 800, color: '#D97706' }}>{ws.pendingWorkshops}</div>
+                <div style={{ fontSize: '0.96rem', fontWeight: 800, color: '#F59E0B' }}>{ws.pendingWorkshops}</div>
               </div>
             </div>
           </div>
@@ -277,20 +277,20 @@ export default function ManagementSummaryKpis({ kpis }: ManagementSummaryKpisPro
                 <div style={{ fontSize: '0.88rem', fontWeight: 800, color: '#0F172A' }}>{aip.totalActivities}</div>
               </div>
               <div style={{ background: '#FFFFFF', padding: '0.3rem', borderRadius: '6px', border: '1px solid #F1E5E2', textAlign: 'center' }}>
-                <div style={{ fontSize: '0.56rem', color: '#15803D', fontWeight: 600 }}>Done</div>
-                <div style={{ fontSize: '0.88rem', fontWeight: 800, color: '#16A34A' }}>{aip.completedActivities}</div>
+                <div style={{ fontSize: '0.56rem', color: '#065F46', fontWeight: 600 }}>Done</div>
+                <div style={{ fontSize: '0.88rem', fontWeight: 800, color: '#10B981' }}>{aip.completedActivities}</div>
               </div>
               <div style={{ background: '#FFFFFF', padding: '0.3rem', borderRadius: '6px', border: '1px solid #F1E5E2', textAlign: 'center' }}>
-                <div style={{ fontSize: '0.56rem', color: '#EA580C', fontWeight: 600 }}>Ongoing</div>
-                <div style={{ fontSize: '0.88rem', fontWeight: 800, color: '#EA580C' }}>{aip.ongoingActivities}</div>
+                <div style={{ fontSize: '0.56rem', color: '#0284C7', fontWeight: 600 }}>Ongoing</div>
+                <div style={{ fontSize: '0.88rem', fontWeight: 800, color: '#0284C7' }}>{aip.ongoingActivities}</div>
               </div>
               <div style={{ background: '#FFFFFF', padding: '0.3rem', borderRadius: '6px', border: '1px solid #F1E5E2', textAlign: 'center' }}>
                 <div style={{ fontSize: '0.56rem', color: '#64748B', fontWeight: 600 }}>Pending</div>
                 <div style={{ fontSize: '0.88rem', fontWeight: 800, color: '#64748B' }}>{aip.pendingActivities}</div>
               </div>
               <div style={{ background: '#FFFFFF', padding: '0.3rem', borderRadius: '6px', border: '1px solid #F1E5E2', textAlign: 'center' }}>
-                <div style={{ fontSize: '0.56rem', color: '#80142B', fontWeight: 600 }}>Delayed</div>
-                <div style={{ fontSize: '0.88rem', fontWeight: 800, color: '#80142B' }}>{aip.delayedActivities}</div>
+                <div style={{ fontSize: '0.56rem', color: '#DC2626', fontWeight: 600 }}>Delayed</div>
+                <div style={{ fontSize: '0.88rem', fontWeight: 800, color: '#DC2626' }}>{aip.delayedActivities}</div>
               </div>
             </div>
           </div>
@@ -375,30 +375,30 @@ export default function ManagementSummaryKpis({ kpis }: ManagementSummaryKpisPro
               <div style={{ fontSize: '0.72rem', fontWeight: 800, color: '#0F172A', display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
                 <span>⚡</span> E. Additional Management Indicators
               </div>
-              <Link href="/monitoring" style={{ fontSize: '0.62rem', fontWeight: 700, color: '#80142B', textDecoration: 'none' }}>
+              <Link href="/monitoring" style={{ fontSize: '0.62rem', fontWeight: 700, color: '#0284C7', textDecoration: 'none' }}>
                 Action Logs →
               </Link>
             </div>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: '0.3rem' }}>
               <div style={{ background: '#FFFFFF', padding: '0.3rem', borderRadius: '6px', border: '1px solid #E2E8F0', textAlign: 'center' }}>
-                <div style={{ fontSize: '0.54rem', color: '#D97706', fontWeight: 600 }}>Milestones</div>
-                <div style={{ fontSize: '0.85rem', fontWeight: 800, color: '#D97706' }}>{add.upcomingMilestones}</div>
+                <div style={{ fontSize: '0.54rem', color: '#64748B', fontWeight: 600 }}>Milestones</div>
+                <div style={{ fontSize: '0.85rem', fontWeight: 800, color: '#8B5CF6' }}>{add.upcomingMilestones}</div>
               </div>
               <div style={{ background: '#FFFFFF', padding: '0.3rem', borderRadius: '6px', border: '1px solid #E2E8F0', textAlign: 'center' }}>
-                <div style={{ fontSize: '0.54rem', color: '#80142B', fontWeight: 600 }}>Overdue</div>
-                <div style={{ fontSize: '0.85rem', fontWeight: 800, color: '#80142B' }}>{add.overdueActivities}</div>
+                <div style={{ fontSize: '0.54rem', color: '#DC2626', fontWeight: 600 }}>Overdue</div>
+                <div style={{ fontSize: '0.85rem', fontWeight: 800, color: '#DC2626' }}>{add.overdueActivities}</div>
               </div>
               <div style={{ background: '#FFFFFF', padding: '0.3rem', borderRadius: '6px', border: '1px solid #E2E8F0', textAlign: 'center' }}>
-                <div style={{ fontSize: '0.54rem', color: '#EA580C', fontWeight: 600 }}>Reports</div>
-                <div style={{ fontSize: '0.85rem', fontWeight: 800, color: '#EA580C' }}>{add.pendingProgressReports}</div>
+                <div style={{ fontSize: '0.54rem', color: '#D97706', fontWeight: 600 }}>Reports</div>
+                <div style={{ fontSize: '0.85rem', fontWeight: 800, color: '#D97706' }}>{add.pendingProgressReports}</div>
               </div>
               <div style={{ background: '#FFFFFF', padding: '0.3rem', borderRadius: '6px', border: '1px solid #E2E8F0', textAlign: 'center' }}>
-                <div style={{ fontSize: '0.54rem', color: '#78350F', fontWeight: 600 }}>Awaiting Verif.</div>
-                <div style={{ fontSize: '0.85rem', fontWeight: 800, color: '#78350F' }}>{add.activitiesAwaitingVerification}</div>
+                <div style={{ fontSize: '0.54rem', color: '#0284C7', fontWeight: 600 }}>Awaiting Verif.</div>
+                <div style={{ fontSize: '0.85rem', fontWeight: 800, color: '#0284C7' }}>{add.activitiesAwaitingVerification}</div>
               </div>
               <div style={{ background: '#FFFFFF', padding: '0.3rem', borderRadius: '6px', border: '1px solid #E2E8F0', textAlign: 'center' }}>
-                <div style={{ fontSize: '0.54rem', color: '#15803D', fontWeight: 600 }}>Actions</div>
-                <div style={{ fontSize: '0.85rem', fontWeight: 800, color: '#16A34A' }}>{add.outstandingAdministrativeActions}</div>
+                <div style={{ fontSize: '0.54rem', color: '#0F766E', fontWeight: 600 }}>Actions</div>
+                <div style={{ fontSize: '0.85rem', fontWeight: 800, color: '#0F766E' }}>{add.outstandingAdministrativeActions}</div>
               </div>
             </div>
           </div>

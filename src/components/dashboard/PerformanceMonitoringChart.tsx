@@ -237,9 +237,9 @@ function PerformanceMonitoringChart({ branchName = 'MOE ICT Branch', monthlyData
                 fontWeight: 700,
                 border: 'none',
                 cursor: 'pointer',
-                background: activeFilter === 'financial' ? '#EA580C' : 'transparent',
+                background: activeFilter === 'financial' ? '#80142B' : 'transparent',
                 color: activeFilter === 'financial' ? '#FFFFFF' : '#64748B',
-                boxShadow: activeFilter === 'financial' ? '0 1px 3px rgba(234, 88, 12, 0.25)' : 'none',
+                boxShadow: activeFilter === 'financial' ? '0 1px 3px rgba(128, 20, 43, 0.2)' : 'none',
                 transition: 'all 0.15s ease',
               }}
             >
@@ -261,7 +261,7 @@ function PerformanceMonitoringChart({ branchName = 'MOE ICT Branch', monthlyData
           <span style={{ color: '#0F172A' }}>Physical</span>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-          <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#EA580C', display: 'inline-block' }} />
+          <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#E07A2B', display: 'inline-block' }} />
           <span style={{ color: '#0F172A' }}>Financial</span>
         </div>
       </div>
@@ -276,10 +276,10 @@ function PerformanceMonitoringChart({ branchName = 'MOE ICT Branch', monthlyData
               <stop offset="100%" stopColor="#80142B" stopOpacity="0.0" />
             </linearGradient>
 
-            {/* Amber/Orange Gradient for Financial Progress Area */}
+            {/* Amber Gradient for Financial Progress Area */}
             <linearGradient id="chartAmberGrad" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stopColor="#EA580C" stopOpacity="0.18" />
-              <stop offset="100%" stopColor="#EA580C" stopOpacity="0.0" />
+              <stop offset="0%" stopColor="#E07A2B" stopOpacity="0.16" />
+              <stop offset="100%" stopColor="#E07A2B" stopOpacity="0.0" />
             </linearGradient>
           </defs>
 
@@ -320,12 +320,12 @@ function PerformanceMonitoringChart({ branchName = 'MOE ICT Branch', monthlyData
             <path d={finAreaPath} fill="url(#chartAmberGrad)" />
           )}
 
-          {/* Financial Progress Line (Orange) */}
+          {/* Financial Progress Line (Amber) */}
           {(activeFilter === 'both' || activeFilter === 'financial') && (
             <path
               d={finLinePath}
               fill="none"
-              stroke="#EA580C"
+              stroke="#E07A2B"
               strokeWidth="2.8"
               strokeLinecap="round"
               strokeLinejoin="round"
@@ -367,14 +367,14 @@ function PerformanceMonitoringChart({ branchName = 'MOE ICT Branch', monthlyData
                   fill="transparent"
                 />
 
-                {/* Financial Point (Orange) */}
+                {/* Financial Point (Amber) */}
                 {(activeFilter === 'both' || activeFilter === 'financial') && (
                   <circle
                     cx={pX}
                     cy={pYFin}
                     r={isHover ? 5.5 : 3.5}
                     fill="#FFFFFF"
-                    stroke="#EA580C"
+                    stroke="#E07A2B"
                     strokeWidth="2.5"
                     style={{ transition: 'all 0.15s ease' }}
                   />

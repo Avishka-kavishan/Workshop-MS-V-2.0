@@ -94,10 +94,10 @@ export default function AutoImplementationTimeline({
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'Completed': return { bg: '#DCFCE7', text: '#15803D', bar: '#16A34A', border: '#86EFAC' }; // Green
-      case 'In Progress': return { bg: '#FFEDD5', text: '#C2410C', bar: '#EA580C', border: '#FDBA74' }; // Orange
-      case 'Delayed': return { bg: '#FCE7E1', text: '#80142B', bar: '#80142B', border: '#F5B8AB' }; // Maroon
-      case 'Upcoming': return { bg: '#FEF3C7', text: '#78350F', bar: '#854D0E', border: '#FDE68A' }; // Brown / Gold
+      case 'Completed': return { bg: '#D1FAE5', text: '#065F46', bar: '#10B981', border: '#A7F3D0' };
+      case 'In Progress': return { bg: '#E0F2FE', text: '#0369A1', bar: '#0284C7', border: '#BAE6FD' };
+      case 'Delayed': return { bg: '#FEE2E2', text: '#991B1B', bar: '#EF4444', border: '#FECACA' };
+      case 'Upcoming': return { bg: '#F1F5F9', text: '#475569', bar: '#94A3B8', border: '#E2E8F0' };
       default: return { bg: '#F1F5F9', text: '#475569', bar: '#64748B', border: '#E2E8F0' };
     }
   };
@@ -254,11 +254,11 @@ export default function AutoImplementationTimeline({
       {/* Filter Tabs */}
       <div style={{ display: 'flex', alignItems: 'center', gap: '0.25rem', marginBottom: '0.55rem', flexWrap: 'wrap' }}>
         {[
-          { id: 'all', label: `All (${counts.all || 35})`, color: '#80142B' },
-          { id: 'Ongoing', label: `Ongoing (${counts.ongo || 20})`, color: '#EA580C' },
-          { id: 'Delayed', label: `Delayed (${counts.delay || 2})`, color: '#80142B' },
-          { id: 'Completed', label: `Completed (${counts.comp || 3})`, color: '#16A34A' },
-          { id: 'Upcoming', label: `Upcoming (${counts.upcom || 4})`, color: '#78350F' },
+          { id: 'all', label: `All (${counts.all || 35})` },
+          { id: 'Ongoing', label: `Ongoing (${counts.ongo || 20})` },
+          { id: 'Delayed', label: `Delayed (${counts.delay || 2})` },
+          { id: 'Completed', label: `Completed (${counts.comp || 3})` },
+          { id: 'Upcoming', label: `Upcoming (${counts.upcom || 4})` },
         ].map((tab) => {
           const isSelected = selectedStatus === tab.id;
           return (
@@ -267,15 +267,15 @@ export default function AutoImplementationTimeline({
               type="button"
               onClick={() => setSelectedStatus(tab.id)}
               style={{
-                border: isSelected ? 'none' : '1px solid #F1E5E2',
-                background: isSelected ? tab.color : '#FDF9F7',
+                border: 'none',
+                background: isSelected ? '#80142B' : '#F8FAFC',
                 color: isSelected ? '#FFFFFF' : '#475569',
                 borderRadius: '6px',
                 padding: '0.18rem 0.5rem',
                 fontSize: '0.65rem',
                 fontWeight: isSelected ? 800 : 600,
                 cursor: 'pointer',
-                boxShadow: isSelected ? `0 1px 4px ${tab.color}33` : 'none',
+                boxShadow: isSelected ? '0 1px 3px rgba(128, 20, 43, 0.2)' : 'none',
                 transition: 'all 0.15s ease',
               }}
             >
