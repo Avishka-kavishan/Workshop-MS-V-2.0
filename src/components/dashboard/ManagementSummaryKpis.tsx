@@ -166,6 +166,8 @@ export default function ManagementSummaryKpis({ kpis }: ManagementSummaryKpisPro
         flexDirection: 'column',
         height: '100%',
         minHeight: '430px',
+        position: 'relative',
+        overflow: 'visible',
       }}
     >
       {/* Header */}
@@ -202,7 +204,19 @@ export default function ManagementSummaryKpis({ kpis }: ManagementSummaryKpisPro
               }}
               title="Click to switch dashboard tiles or filter KPI categories"
             >
-              <span>Tile 03</span>
+              <span>
+                {activeSection === 'all'
+                  ? 'Tile 03'
+                  : activeSection === 'workshops'
+                  ? 'Workshops'
+                  : activeSection === 'aip'
+                  ? 'AIP Plan'
+                  : activeSection === 'budget'
+                  ? 'Budget'
+                  : activeSection === 'amendments'
+                  ? 'Amendments'
+                  : 'Actions'}
+              </span>
               <span
                 style={{
                   fontSize: '0.6rem',
@@ -344,6 +358,7 @@ export default function ManagementSummaryKpis({ kpis }: ManagementSummaryKpisPro
                   { id: 'aip', label: 'AIP Activities' },
                   { id: 'budget', label: 'Budget Utilization' },
                   { id: 'amendments', label: 'Plan Amendments' },
+                  { id: 'additional', label: 'Operational Actions' },
                 ].map((cat) => {
                   const isCatActive = activeSection === cat.id;
                   return (
