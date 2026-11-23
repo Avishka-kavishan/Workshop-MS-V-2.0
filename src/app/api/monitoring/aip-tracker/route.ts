@@ -158,7 +158,7 @@ export async function GET(req: NextRequest) {
       } else if (selectedYear === '2026' || fyRecord?.isCurrent) {
         currentStage = 7;
       } else if (selectedYear === '2027') {
-        currentStage = 5; // Default: AIP Preparation by Branches
+        currentStage = 1; // Default starting point: Budget Planning & Formulation
       } else {
         currentStage = 1;
       }

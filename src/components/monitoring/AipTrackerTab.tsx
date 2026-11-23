@@ -58,7 +58,7 @@ export default function AipTrackerTab({ selectedYear, onSelectYear }: AipTracker
       if (res.ok) {
         const json = await res.json();
         setTrackerData(json);
-        setSelectedStageNum(json.currentStageNumber || 5);
+        setSelectedStageNum(json.currentStageNumber || 1);
       }
     } catch (err: any) {
       console.error('Failed to load AIP tracker data:', err);
@@ -102,7 +102,7 @@ export default function AipTrackerTab({ selectedYear, onSelectYear }: AipTracker
     }
   };
 
-  const currentStageNumber = trackerData?.currentStageNumber || 5;
+  const currentStageNumber = trackerData?.currentStageNumber || 1;
   const stages = trackerData?.stages || [];
   const selectedStage = stages.find((s) => s.stageNumber === selectedStageNum) || stages[0];
 
@@ -161,7 +161,7 @@ export default function AipTrackerTab({ selectedYear, onSelectYear }: AipTracker
               Financial Year:
             </span>
             {(trackerData?.availableYears || [
-              { year: '2027', status: 'Planning', isCurrent: false, currentStage: 5 },
+              { year: '2027', status: 'Planning', isCurrent: false, currentStage: 1 },
               { year: '2026', status: 'Active', isCurrent: true, currentStage: 7 },
               { year: '2025', status: 'Closed', isCurrent: false, currentStage: 7 },
               { year: '2028', status: 'Planning', isCurrent: false, currentStage: 1 },

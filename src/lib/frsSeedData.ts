@@ -600,7 +600,7 @@ export const DEFAULT_FINANCIAL_YEARS: FinancialYear[] = [
     endDate: '2027-12-31',
     status: 'Planning',
     isCurrent: false,
-    currentAipStage: 5, // AIP Prep by branch
+    currentAipStage: 1, // Budget Planning (Starting point)
     description: 'Upcoming Financial Year for AIP Preparation, Budget Forecasting & Objective Mapping',
     createdAt: '2026-09-01T00:00:00.000Z',
     createdBy: 'user-superadmin',
