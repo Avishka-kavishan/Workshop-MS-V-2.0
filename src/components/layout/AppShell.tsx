@@ -6,7 +6,6 @@ import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useSession, signOut } from 'next-auth/react';
 import {
-  DashboardIcon,
   BudgetPlanningIcon,
   AnnualPlanIcon,
   MonitoringIcon,
@@ -204,12 +203,12 @@ export default function AppShell({ children }: AppShellProps) {
   // Check if user is an Administrator at any level (Levels 0-5)
   const userAdminLevel = (user as any)?.adminLevel !== undefined && (user as any)?.adminLevel !== null ? Number((user as any)?.adminLevel) : (
     user?.username === 'superadmin' ? 0 :
-    (user?.username === 'moe' || user?.username === 'moe.admin') ? 1 :
-    (user?.username === 'nie.admin' || user?.username === 'nie') ? 2 :
-    (user?.username === 'ped.sp' || user?.username === 'provincial.admin' || user?.username === 'sp.admin') ? 3 :
-    (user?.username === 'zeo.galle' || user?.username === 'zonal.admin' || user?.username === 'galle.admin') ? 4 :
-    (user?.username === 'deo.galle' || user?.username === 'divisional.admin') ? 5 :
-    (user?.username === 'admin' ? 1 : null)
+      (user?.username === 'moe' || user?.username === 'moe.admin') ? 1 :
+        (user?.username === 'nie.admin' || user?.username === 'nie') ? 2 :
+          (user?.username === 'ped.sp' || user?.username === 'provincial.admin' || user?.username === 'sp.admin') ? 3 :
+            (user?.username === 'zeo.galle' || user?.username === 'zonal.admin' || user?.username === 'galle.admin') ? 4 :
+              (user?.username === 'deo.galle' || user?.username === 'divisional.admin') ? 5 :
+                (user?.username === 'admin' ? 1 : null)
   );
 
   const isAdminUser = Boolean(
@@ -241,7 +240,6 @@ export default function AppShell({ children }: AppShellProps) {
 
   // Primary System Pillars (Matching the Architecture Flow - Reports restricted to Admins/Governance)
   const primaryNavItems = [
-    { href: '/dashboard', label: 'Dashboard', icon: DashboardIcon },
     { href: '/budget-forecasting', label: 'Budget Planning', icon: BudgetPlanningIcon },
     { href: '/annual-plan', label: 'Annual Plan (AIP)', icon: AnnualPlanIcon },
     { href: '/monitoring', label: 'Monitoring & Verification', icon: MonitoringIcon },
@@ -278,7 +276,6 @@ export default function AppShell({ children }: AppShellProps) {
 
   // Get active breadcrumb icon
   const getActivePageDetails = () => {
-    if (pathname === '/dashboard') return { title: 'Dashboard', href: '/dashboard', parent: null };
     if (pathname === '/vote-management') return { title: 'Vote Management', href: '/vote-management', parent: { title: 'Planning Division', href: '/annual-plan' } };
     if (pathname === '/budget-forecasting') return { title: 'Budget Forecasting & Formulation', href: '/budget-forecasting', parent: null };
     if (pathname === '/annual-plan') return { title: 'Annual Implementation Plan (AIP)', href: '/annual-plan', parent: null };
@@ -295,8 +292,8 @@ export default function AppShell({ children }: AppShellProps) {
       const adminTitle = !isAdminUser
         ? 'Administrative Console'
         : userAdminLevel === 0
-        ? 'Super Administrator Console'
-        : `Level ${userAdminLevel} Administrator Console`;
+          ? 'Super Administrator Console'
+          : `Level ${userAdminLevel} Administrator Console`;
       return { title: adminTitle, href: '/admin', parent: null };
     }
     if (pathname.startsWith('/admin/audit-logs') || pathname === '/audit-logs') return { title: 'System Audit Logs & Forensics Registry', href: '/admin/audit-logs', parent: { title: 'Admin Console', href: '/admin' } };
@@ -305,7 +302,6 @@ export default function AppShell({ children }: AppShellProps) {
 
   const getActiveBreadcrumbIcon = () => {
     if (pathname.startsWith('/admin/audit-logs') || pathname === '/audit-logs') return <AuditVaultIcon size={16} color="var(--primary)" />;
-    if (pathname === '/dashboard') return <DashboardIcon size={16} color="var(--primary)" />;
     if (pathname === '/vote-management') return <VoteManagementIcon size={16} color="var(--primary)" />;
     if (pathname === '/budget-forecasting') return <BudgetPlanningIcon size={16} color="var(--primary)" />;
     if (pathname.startsWith('/annual-plan')) return <AnnualPlanIcon size={16} color="var(--primary)" />;
@@ -409,7 +405,7 @@ export default function AppShell({ children }: AppShellProps) {
           className="nav-rail-scroll-container"
           style={{ flex: 1, display: 'flex', flexDirection: 'column', overflowY: 'auto', overflowX: 'hidden', padding: '0.45rem 0' }}
         >
-          
+
           {/* Primary System Pillars */}
           <nav style={{ display: 'flex', flexDirection: 'column' }}>
             {primaryNavItems.map((item) => {
@@ -620,10 +616,10 @@ export default function AppShell({ children }: AppShellProps) {
           {/* Left: Clickable Navigation Pane & Breadcrumb */}
           <div ref={navPaneRef} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', minWidth: 0, position: 'relative' }}>
             <div className="header-breadcrumb" style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', fontSize: '0.85rem', color: 'var(--text-tertiary)', overflow: 'hidden', whiteSpace: 'nowrap', textOverflow: 'ellipsis' }}>
-              
-              {/* Root Institutional & System Link (Clickable Navigation to Dashboard) */}
+
+              {/* Root Institutional & System Link (Clickable Navigation to Home) */}
               <Link
-                href="/dashboard"
+                href="/budget-forecasting"
                 className="header-breadcrumb-root header-breadcrumb-link"
                 style={{
                   fontWeight: 600,
@@ -637,7 +633,7 @@ export default function AppShell({ children }: AppShellProps) {
                   transition: 'all 0.15s ease',
                   cursor: 'pointer',
                 }}
-                title="Return to IPMIS Dashboard Home"
+                title="IPMIS Home"
               >
                 <img
                   src="/logo-emblem.png"
@@ -1202,258 +1198,258 @@ export default function AppShell({ children }: AppShellProps) {
       {/* ── Centralized Multi-Role Switcher Modal Dialog (createPortal) ── */}
       {showRoleModal && typeof document !== 'undefined'
         ? createPortal(
+          <div
+            style={{
+              position: 'fixed',
+              inset: 0,
+              background: 'rgba(15, 23, 42, 0.72)',
+              backdropFilter: 'blur(4px)',
+              zIndex: 999999,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              padding: '1.25rem',
+            }}
+            onClick={(e) => {
+              if (e.target === e.currentTarget) setShowRoleModal(false);
+            }}
+          >
             <div
+              role="dialog"
+              aria-modal="true"
+              aria-label="Switch Working Role"
               style={{
-                position: 'fixed',
-                inset: 0,
-                background: 'rgba(15, 23, 42, 0.72)',
-                backdropFilter: 'blur(4px)',
-                zIndex: 999999,
+                background: '#FFFFFF',
+                borderRadius: '16px',
+                width: '96%',
+                maxWidth: '720px',
+                maxHeight: '85vh',
                 display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                padding: '1.25rem',
-              }}
-              onClick={(e) => {
-                if (e.target === e.currentTarget) setShowRoleModal(false);
+                flexDirection: 'column',
+                boxShadow: '0 25px 60px -12px rgba(0, 0, 0, 0.45)',
+                border: '1px solid #CBD5E1',
+                overflow: 'hidden',
               }}
             >
+              {/* Modal Header */}
               <div
-                role="dialog"
-                aria-modal="true"
-                aria-label="Switch Working Role"
                 style={{
-                  background: '#FFFFFF',
-                  borderRadius: '16px',
-                  width: '96%',
-                  maxWidth: '720px',
-                  maxHeight: '85vh',
+                  padding: '1.15rem 1.5rem',
+                  borderBottom: '1px solid #E2E8F0',
+                  background: 'linear-gradient(180deg, #F8FAFC 0%, #F1F5F9 100%)',
                   display: 'flex',
-                  flexDirection: 'column',
-                  boxShadow: '0 25px 60px -12px rgba(0, 0, 0, 0.45)',
-                  border: '1px solid #CBD5E1',
-                  overflow: 'hidden',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
                 }}
               >
-                {/* Modal Header */}
-                <div
+                <div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.2rem' }}>
+                    <span
+                      style={{
+                        background: '#E6FFFA',
+                        border: '1px solid #0F766E',
+                        color: '#0F766E',
+                        borderRadius: '6px',
+                        padding: '2px 8px',
+                        fontSize: '0.65rem',
+                        fontWeight: 800,
+                        letterSpacing: '0.04em',
+                        textTransform: 'uppercase',
+                      }}
+                    >
+                      Single Login • Multi-Role
+                    </span>
+                    <span style={{ fontSize: '0.72rem', color: '#64748B', fontWeight: 600 }}>
+                      AUTH-07 Active Switch
+                    </span>
+                  </div>
+                  <h3 style={{ margin: 0, fontSize: '1.2rem', fontWeight: 800, color: '#0F172A' }}>
+                    Switch Working Role
+                  </h3>
+                  <div style={{ fontSize: '0.78rem', color: '#475569', marginTop: '2px' }}>
+                    Officer: <strong>{user?.name || user?.fullName}</strong> ({user?.username}) • Current Role: <span style={{ color: '#0F766E', fontWeight: 700 }}>{user?.roleName}</span>
+                  </div>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={() => setShowRoleModal(false)}
                   style={{
-                    padding: '1.15rem 1.5rem',
-                    borderBottom: '1px solid #E2E8F0',
-                    background: 'linear-gradient(180deg, #F8FAFC 0%, #F1F5F9 100%)',
-                    display: 'flex',
+                    background: '#FFFFFF',
+                    border: '1px solid #CBD5E1',
+                    borderRadius: '6px',
+                    width: '32px',
+                    height: '32px',
+                    display: 'inline-flex',
                     alignItems: 'center',
-                    justifyContent: 'space-between',
+                    justifyContent: 'center',
+                    cursor: 'pointer',
+                    color: '#475569',
                   }}
+                  title="Close role switcher"
                 >
-                  <div>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.2rem' }}>
-                      <span
+                  ✕
+                </button>
+              </div>
+
+              {/* Modal Body: Available Assigned Roles */}
+              <div style={{ padding: '1.25rem 1.5rem', overflowY: 'auto', flex: 1 }}>
+                <div style={{ fontSize: '0.75rem', fontWeight: 700, color: '#64748B', textTransform: 'uppercase', letterSpacing: '0.04em', marginBottom: '0.75rem' }}>
+                  Authorized Working Roles Assigned to You:
+                </div>
+
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.85rem' }}>
+                  {(roleProfile?.assignedRoles || user?.assignedRoles || []).map((assignment: any) => {
+                    const isCurrent =
+                      assignment.id === roleProfile?.activeRoleAssignmentId ||
+                      assignment.roleName === user?.roleName;
+
+                    return (
+                      <div
+                        key={assignment.id}
                         style={{
-                          background: '#E6FFFA',
-                          border: '1px solid #0F766E',
-                          color: '#0F766E',
-                          borderRadius: '6px',
-                          padding: '2px 8px',
-                          fontSize: '0.65rem',
-                          fontWeight: 800,
-                          letterSpacing: '0.04em',
-                          textTransform: 'uppercase',
+                          border: isCurrent ? '2px solid #0F766E' : '1px solid #E2E8F0',
+                          borderRadius: '10px',
+                          padding: '1rem 1.15rem',
+                          background: isCurrent ? '#F0FDFA' : '#FFFFFF',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'space-between',
+                          gap: '1rem',
+                          transition: 'all 0.15s ease',
                         }}
                       >
-                        Single Login • Multi-Role
-                      </span>
-                      <span style={{ fontSize: '0.72rem', color: '#64748B', fontWeight: 600 }}>
-                        AUTH-07 Active Switch
-                      </span>
-                    </div>
-                    <h3 style={{ margin: 0, fontSize: '1.2rem', fontWeight: 800, color: '#0F172A' }}>
-                      Switch Working Role
-                    </h3>
-                    <div style={{ fontSize: '0.78rem', color: '#475569', marginTop: '2px' }}>
-                      Officer: <strong>{user?.name || user?.fullName}</strong> ({user?.username}) • Current Role: <span style={{ color: '#0F766E', fontWeight: 700 }}>{user?.roleName}</span>
-                    </div>
-                  </div>
+                        <div>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.25rem' }}>
+                            <h4 style={{ margin: 0, fontSize: '0.98rem', fontWeight: 800, color: '#0F172A' }}>
+                              {assignment.roleName}
+                            </h4>
+                            {isCurrent && (
+                              <span
+                                style={{
+                                  background: '#0F766E',
+                                  color: '#FFFFFF',
+                                  fontSize: '0.62rem',
+                                  fontWeight: 800,
+                                  padding: '2px 6px',
+                                  borderRadius: '4px',
+                                }}
+                              >
+                                CURRENTLY ACTIVE
+                              </span>
+                            )}
+                            <span
+                              style={{
+                                background: '#F1F5F9',
+                                color: '#475569',
+                                fontSize: '0.65rem',
+                                fontWeight: 700,
+                                padding: '2px 6px',
+                                borderRadius: '4px',
+                                textTransform: 'uppercase',
+                              }}
+                            >
+                              {assignment.functionalCategory || 'Normal'} Scope
+                            </span>
+                          </div>
+                          <div style={{ fontSize: '0.8rem', color: '#0F766E', fontWeight: 600 }}>
+                            🏢 {assignment.organizationName}
+                          </div>
+                          <div style={{ fontSize: '0.75rem', color: '#64748B', marginTop: '2px' }}>
+                            {assignment.description || 'Assigned institutional duties and authorized workflows.'}
+                          </div>
+                        </div>
 
+                        <button
+                          type="button"
+                          disabled={isCurrent || switchingRole}
+                          onClick={() => handleSwitchRole(assignment.id)}
+                          style={{
+                            background: isCurrent ? '#E2E8F0' : '#0F766E',
+                            color: isCurrent ? '#94A3B8' : '#FFFFFF',
+                            border: 'none',
+                            borderRadius: '6px',
+                            padding: '0.5rem 1.15rem',
+                            fontSize: '0.78rem',
+                            fontWeight: 800,
+                            cursor: (isCurrent || switchingRole) ? 'default' : 'pointer',
+                            whiteSpace: 'nowrap',
+                            flexShrink: 0,
+                            transition: 'all 0.15s ease',
+                          }}
+                        >
+                          {isCurrent ? 'Active Context' : (switchingRole ? 'Switching...' : 'Switch to this Role →')}
+                        </button>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* Modal Footer with Remember Option */}
+              <div
+                style={{
+                  padding: '0.85rem 1.5rem',
+                  borderTop: '1px solid #E2E8F0',
+                  background: '#F8FAFC',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                }}
+              >
+                <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer', userSelect: 'none' }}>
+                  <input
+                    type="checkbox"
+                    checked={rememberRolePref}
+                    onChange={(e) => setRememberRolePref(e.target.checked)}
+                    style={{ accentColor: '#0F766E' }}
+                  />
+                  <span style={{ fontSize: '0.76rem', color: '#334155', fontWeight: 600 }}>
+                    Remember selected role for subsequent logins
+                  </span>
+                </label>
+
+                <div style={{ display: 'flex', gap: '0.5rem' }}>
+                  <Link
+                    href="/select-role"
+                    onClick={() => setShowRoleModal(false)}
+                    style={{
+                      padding: '0.45rem 0.85rem',
+                      borderRadius: '6px',
+                      border: '1px solid #CBD5E1',
+                      background: '#FFFFFF',
+                      color: '#0F766E',
+                      fontSize: '0.75rem',
+                      fontWeight: 700,
+                      textDecoration: 'none',
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                    }}
+                  >
+                    Full Role Selection Portal
+                  </Link>
                   <button
                     type="button"
                     onClick={() => setShowRoleModal(false)}
                     style={{
-                      background: '#FFFFFF',
-                      border: '1px solid #CBD5E1',
+                      padding: '0.45rem 1rem',
                       borderRadius: '6px',
-                      width: '32px',
-                      height: '32px',
-                      display: 'inline-flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
+                      border: 'none',
+                      background: '#334155',
+                      color: '#FFFFFF',
+                      fontSize: '0.75rem',
+                      fontWeight: 700,
                       cursor: 'pointer',
-                      color: '#475569',
                     }}
-                    title="Close role switcher"
                   >
-                    ✕
+                    Close
                   </button>
                 </div>
-
-                {/* Modal Body: Available Assigned Roles */}
-                <div style={{ padding: '1.25rem 1.5rem', overflowY: 'auto', flex: 1 }}>
-                  <div style={{ fontSize: '0.75rem', fontWeight: 700, color: '#64748B', textTransform: 'uppercase', letterSpacing: '0.04em', marginBottom: '0.75rem' }}>
-                    Authorized Working Roles Assigned to You:
-                  </div>
-
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '0.85rem' }}>
-                    {(roleProfile?.assignedRoles || user?.assignedRoles || []).map((assignment: any) => {
-                      const isCurrent =
-                        assignment.id === roleProfile?.activeRoleAssignmentId ||
-                        assignment.roleName === user?.roleName;
-
-                      return (
-                        <div
-                          key={assignment.id}
-                          style={{
-                            border: isCurrent ? '2px solid #0F766E' : '1px solid #E2E8F0',
-                            borderRadius: '10px',
-                            padding: '1rem 1.15rem',
-                            background: isCurrent ? '#F0FDFA' : '#FFFFFF',
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'space-between',
-                            gap: '1rem',
-                            transition: 'all 0.15s ease',
-                          }}
-                        >
-                          <div>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.25rem' }}>
-                              <h4 style={{ margin: 0, fontSize: '0.98rem', fontWeight: 800, color: '#0F172A' }}>
-                                {assignment.roleName}
-                              </h4>
-                              {isCurrent && (
-                                <span
-                                  style={{
-                                    background: '#0F766E',
-                                    color: '#FFFFFF',
-                                    fontSize: '0.62rem',
-                                    fontWeight: 800,
-                                    padding: '2px 6px',
-                                    borderRadius: '4px',
-                                  }}
-                                >
-                                  CURRENTLY ACTIVE
-                                </span>
-                              )}
-                              <span
-                                style={{
-                                  background: '#F1F5F9',
-                                  color: '#475569',
-                                  fontSize: '0.65rem',
-                                  fontWeight: 700,
-                                  padding: '2px 6px',
-                                  borderRadius: '4px',
-                                  textTransform: 'uppercase',
-                                }}
-                              >
-                                {assignment.functionalCategory || 'Normal'} Scope
-                              </span>
-                            </div>
-                            <div style={{ fontSize: '0.8rem', color: '#0F766E', fontWeight: 600 }}>
-                              🏢 {assignment.organizationName}
-                            </div>
-                            <div style={{ fontSize: '0.75rem', color: '#64748B', marginTop: '2px' }}>
-                              {assignment.description || 'Assigned institutional duties and authorized workflows.'}
-                            </div>
-                          </div>
-
-                          <button
-                            type="button"
-                            disabled={isCurrent || switchingRole}
-                            onClick={() => handleSwitchRole(assignment.id)}
-                            style={{
-                              background: isCurrent ? '#E2E8F0' : '#0F766E',
-                              color: isCurrent ? '#94A3B8' : '#FFFFFF',
-                              border: 'none',
-                              borderRadius: '6px',
-                              padding: '0.5rem 1.15rem',
-                              fontSize: '0.78rem',
-                              fontWeight: 800,
-                              cursor: (isCurrent || switchingRole) ? 'default' : 'pointer',
-                              whiteSpace: 'nowrap',
-                              flexShrink: 0,
-                              transition: 'all 0.15s ease',
-                            }}
-                          >
-                            {isCurrent ? 'Active Context' : (switchingRole ? 'Switching...' : 'Switch to this Role →')}
-                          </button>
-                        </div>
-                      );
-                    })}
-                  </div>
-                </div>
-
-                {/* Modal Footer with Remember Option */}
-                <div
-                  style={{
-                    padding: '0.85rem 1.5rem',
-                    borderTop: '1px solid #E2E8F0',
-                    background: '#F8FAFC',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'space-between',
-                  }}
-                >
-                  <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer', userSelect: 'none' }}>
-                    <input
-                      type="checkbox"
-                      checked={rememberRolePref}
-                      onChange={(e) => setRememberRolePref(e.target.checked)}
-                      style={{ accentColor: '#0F766E' }}
-                    />
-                    <span style={{ fontSize: '0.76rem', color: '#334155', fontWeight: 600 }}>
-                      Remember selected role for subsequent logins
-                    </span>
-                  </label>
-
-                  <div style={{ display: 'flex', gap: '0.5rem' }}>
-                    <Link
-                      href="/select-role"
-                      onClick={() => setShowRoleModal(false)}
-                      style={{
-                        padding: '0.45rem 0.85rem',
-                        borderRadius: '6px',
-                        border: '1px solid #CBD5E1',
-                        background: '#FFFFFF',
-                        color: '#0F766E',
-                        fontSize: '0.75rem',
-                        fontWeight: 700,
-                        textDecoration: 'none',
-                        display: 'inline-flex',
-                        alignItems: 'center',
-                      }}
-                    >
-                      Full Role Selection Portal
-                    </Link>
-                    <button
-                      type="button"
-                      onClick={() => setShowRoleModal(false)}
-                      style={{
-                        padding: '0.45rem 1rem',
-                        borderRadius: '6px',
-                        border: 'none',
-                        background: '#334155',
-                        color: '#FFFFFF',
-                        fontSize: '0.75rem',
-                        fontWeight: 700,
-                        cursor: 'pointer',
-                      }}
-                    >
-                      Close
-                    </button>
-                  </div>
-                </div>
               </div>
-            </div>,
-            document.body
-          )
+            </div>
+          </div>,
+          document.body
+        )
         : null}
 
       {/* Global Type-to-Search Combobox for all Dropdowns */}

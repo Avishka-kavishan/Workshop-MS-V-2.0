@@ -9,7 +9,7 @@ function SelectRoleContent() {
   const { data: session, status, update } = useSession();
   const router = useRouter();
   const searchParams = useSearchParams();
-  const returnUrl = searchParams.get('returnUrl') || '/dashboard';
+  const returnUrl = searchParams.get('returnUrl') || '/budget-forecasting';
 
   const [loading, setLoading] = useState(true);
   const [switching, setSwitching] = useState(false);
@@ -86,9 +86,9 @@ function SelectRoleContent() {
       // Route to destination
       const selected = profileData?.assignedRoles?.find((r: any) => r.id === targetId);
       if (selected?.functionalCategory === 'Planning') {
-        router.push(returnUrl !== '/dashboard' ? returnUrl : '/annual-plan');
+        router.push(returnUrl !== '/budget-forecasting' ? returnUrl : '/annual-plan');
       } else if (selected?.functionalCategory === 'Monitoring') {
-        router.push(returnUrl !== '/dashboard' ? returnUrl : '/monitoring');
+        router.push(returnUrl !== '/budget-forecasting' ? returnUrl : '/monitoring');
       } else {
         router.push(returnUrl);
       }

@@ -593,8 +593,8 @@ export default function RegisterResourcePersonPage() {
             <Link href="/resource-persons" className="btn btn-secondary btn-sm" style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
               <span>👥</span> View All Resource Persons
             </Link>
-            <Link href="/dashboard" className="btn btn-ghost btn-sm">
-              Back to Dashboard
+            <Link href="/budget-forecasting" className="btn btn-ghost btn-sm">
+              Back to Main Menu
             </Link>
           </div>
         </div>
@@ -655,8 +655,8 @@ export default function RegisterResourcePersonPage() {
                   <Link href="/resource-persons" className="btn btn-secondary btn-sm" style={{ fontWeight: 600 }}>
                     👥 Open Resource Persons Directory
                   </Link>
-                  <Link href="/dashboard" className="btn btn-ghost btn-sm">
-                    Return to Dashboard
+                  <Link href="/budget-forecasting" className="btn btn-ghost btn-sm">
+                    Return to Main Menu
                   </Link>
                 </div>
               </div>

@@ -39,7 +39,7 @@ export default function LoginPage() {
       } catch (e) {
         // fallback
       }
-      router.push('/dashboard');
+      router.push('/budget-forecasting');
     }
   };
 

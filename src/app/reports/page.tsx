@@ -453,8 +453,8 @@ export default function ReportsPage() {
               Your account <strong>({user?.username || 'User'})</strong> is a standard operational user and is restricted to operational workshop and plan modules.
             </p>
             <div style={{ display: 'flex', gap: '0.75rem', justifyContent: 'center' }}>
-              <Link href="/dashboard" className="btn btn-primary" style={{ padding: '0.65rem 1.5rem', fontWeight: 700 }}>
-                Return to Dashboard
+              <Link href="/budget-forecasting" className="btn btn-primary" style={{ padding: '0.65rem 1.5rem', fontWeight: 700 }}>
+                Return to Main Menu
               </Link>
             </div>
           </div>

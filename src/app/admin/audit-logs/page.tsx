@@ -328,8 +328,8 @@ export default function SuperAdminAuditLogsPage() {
             </div>
 
             <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center' }}>
-              <Link href="/dashboard" className="btn btn-primary" style={{ padding: '0.75rem 1.75rem', fontWeight: 700 }}>
-                Return to Dashboard
+              <Link href="/budget-forecasting" className="btn btn-primary" style={{ padding: '0.75rem 1.75rem', fontWeight: 700 }}>
+                Return to Main Menu
               </Link>
               <Link href="/reports" className="btn btn-secondary" style={{ padding: '0.75rem 1.5rem', fontWeight: 600 }}>
                 View Operational Reports
