@@ -721,12 +721,12 @@ export default function AppShell({ children }: AppShellProps) {
                         display: 'inline-flex',
                         alignItems: 'center',
                         gap: '0.4rem',
-                        background: showNavMenu ? 'rgba(15, 118, 110, 0.08)' : 'transparent',
+                        background: showNavMenu ? 'rgba(128, 20, 43, 0.08)' : 'transparent',
                         border: '1px solid',
-                        borderColor: showNavMenu ? '#0F766E' : 'transparent',
+                        borderColor: showNavMenu ? '#80142B' : 'transparent',
                         borderRadius: '6px',
                         padding: '0.2rem 0.5rem',
-                        color: 'var(--primary)',
+                        color: showNavMenu ? '#80142B' : 'var(--text-primary)',
                         fontWeight: 700,
                         cursor: 'pointer',
                         fontSize: '0.84rem',
@@ -749,7 +749,7 @@ export default function AppShell({ children }: AppShellProps) {
                         style={{
                           transition: 'transform 0.15s ease',
                           transform: showNavMenu ? 'rotate(180deg)' : 'rotate(0deg)',
-                          color: 'var(--primary)',
+                          color: '#80142B',
                         }}
                       >
                         <polyline points="6 9 12 15 18 9" />
@@ -769,9 +769,9 @@ export default function AppShell({ children }: AppShellProps) {
                   left: 0,
                   top: 'calc(100% + 8px)',
                   background: '#FFFFFF',
-                  border: '1px solid var(--border-medium)',
-                  borderRadius: '12px',
-                  boxShadow: '0 10px 30px rgba(0, 0, 0, 0.12), 0 2px 8px rgba(0, 0, 0, 0.06)',
+                  border: '1px solid #EADBDE',
+                  borderRadius: '14px',
+                  boxShadow: '0 12px 36px rgba(128, 20, 43, 0.14), 0 4px 12px rgba(0, 0, 0, 0.06)',
                   width: '380px',
                   zIndex: 1000,
                   overflow: 'hidden',
@@ -781,31 +781,41 @@ export default function AppShell({ children }: AppShellProps) {
                 {/* Drawer Header */}
                 <div
                   style={{
-                    padding: '0.65rem 0.95rem',
-                    background: 'linear-gradient(135deg, #0A2540 0%, #0F3B66 100%)',
+                    padding: '0.75rem 1rem',
+                    background: 'linear-gradient(135deg, #7A1228 0%, #8D153A 100%)',
                     color: '#FFFFFF',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'space-between',
                   }}
                 >
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.45rem' }}>
-                    <span style={{ fontSize: '1rem' }}>🧭</span>
-                    <span style={{ fontWeight: 800, fontSize: '0.82rem', letterSpacing: '0.02em' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                    <span style={{ fontSize: '1.05rem' }}>🧭</span>
+                    <span style={{ fontWeight: 800, fontSize: '0.84rem', letterSpacing: '0.02em', color: '#FFFFFF' }}>
                       IPMIS Navigation Pane
                     </span>
                   </div>
-                  <span style={{ fontSize: '0.68rem', color: '#93C5FD', fontWeight: 600 }}>
+                  <span
+                    style={{
+                      fontSize: '0.66rem',
+                      color: '#FFFFFF',
+                      fontWeight: 700,
+                      background: 'rgba(255, 255, 255, 0.18)',
+                      padding: '2px 8px',
+                      borderRadius: '12px',
+                      letterSpacing: '0.02em',
+                    }}
+                  >
                     Jump to Module
                   </span>
                 </div>
 
                 {/* Content */}
-                <div style={{ padding: '0.65rem', maxHeight: '420px', overflowY: 'auto' }}>
-                  <div style={{ fontSize: '0.66rem', fontWeight: 800, color: '#64748B', textTransform: 'uppercase', letterSpacing: '0.04em', padding: '0.2rem 0.5rem 0.4rem' }}>
+                <div style={{ padding: '0.75rem', maxHeight: '440px', overflowY: 'auto' }}>
+                  <div style={{ fontSize: '0.66rem', fontWeight: 800, color: '#80142B', textTransform: 'uppercase', letterSpacing: '0.05em', padding: '0.2rem 0.5rem 0.45rem' }}>
                     Core Planning & Monitoring Pillars
                   </div>
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '2px', marginBottom: '0.65rem' }}>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '3px', marginBottom: '0.75rem' }}>
                     {primaryNavItems.map((item) => {
                       const active = isActive(item.href);
                       const IconComp = item.icon;
@@ -819,34 +829,49 @@ export default function AppShell({ children }: AppShellProps) {
                             alignItems: 'center',
                             justifyContent: 'space-between',
                             padding: '0.45rem 0.65rem',
-                            borderRadius: '8px',
+                            borderRadius: '10px',
                             textDecoration: 'none',
-                            color: active ? '#0F766E' : '#1E293B',
-                            background: active ? 'rgba(15, 118, 110, 0.08)' : 'transparent',
-                            fontWeight: active ? 700 : 500,
+                            color: active ? '#80142B' : '#1E293B',
+                            background: active ? '#FFF0EC' : 'transparent',
+                            border: active ? '1px solid #F5D0C5' : '1px solid transparent',
+                            fontWeight: active ? 800 : 500,
                             fontSize: '0.82rem',
                             transition: 'all 0.12s ease',
                           }}
                           className="nav-pane-item"
                         >
-                          <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem' }}>
                             <div
                               style={{
-                                width: '28px',
-                                height: '28px',
-                                borderRadius: '6px',
-                                background: active ? '#0F766E' : '#F1F5F9',
+                                width: '30px',
+                                height: '30px',
+                                borderRadius: '8px',
+                                background: active ? '#80142B' : '#F8EFEA',
                                 display: 'flex',
                                 alignItems: 'center',
                                 justifyContent: 'center',
+                                boxShadow: active ? '0 2px 6px rgba(128, 20, 43, 0.25)' : 'none',
                               }}
                             >
-                              <IconComp size={16} color={active ? '#FFFFFF' : '#475569'} />
+                              <IconComp size={16} color={active ? '#FFFFFF' : '#80142B'} />
                             </div>
-                            <span>{item.label}</span>
+                            <span style={{ fontWeight: active ? 800 : 600 }}>{item.label}</span>
                           </div>
                           {active && (
-                            <span style={{ fontSize: '0.72rem', color: '#0F766E', fontWeight: 800 }}>
+                            <span
+                              style={{
+                                fontSize: '0.68rem',
+                                color: '#80142B',
+                                fontWeight: 800,
+                                background: '#FFFFFF',
+                                border: '1px solid #F2DDD5',
+                                padding: '2px 7px',
+                                borderRadius: '10px',
+                                display: 'inline-flex',
+                                alignItems: 'center',
+                                gap: '3px',
+                              }}
+                            >
                               Active ✓
                             </span>
                           )}
@@ -855,10 +880,10 @@ export default function AppShell({ children }: AppShellProps) {
                     })}
                   </div>
 
-                  <div style={{ fontSize: '0.66rem', fontWeight: 800, color: '#64748B', textTransform: 'uppercase', letterSpacing: '0.04em', padding: '0.2rem 0.5rem 0.4rem', borderTop: '1px solid #E2E8F0', paddingTop: '0.5rem' }}>
+                  <div style={{ fontSize: '0.66rem', fontWeight: 800, color: '#80142B', textTransform: 'uppercase', letterSpacing: '0.05em', padding: '0.35rem 0.5rem 0.45rem', borderTop: '1px solid #F1E5E2', paddingTop: '0.6rem' }}>
                     Operations & Directory
                   </div>
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '3px' }}>
                     {operationalNavItems.map((item) => {
                       if ((item as any).superAdminOnly && !isSuperAdmin) return null;
                       if ((item as any).adminOnly && !isAdminUser) return null;
@@ -874,51 +899,69 @@ export default function AppShell({ children }: AppShellProps) {
                             alignItems: 'center',
                             justifyContent: 'space-between',
                             padding: '0.45rem 0.65rem',
-                            borderRadius: '8px',
+                            borderRadius: '10px',
                             textDecoration: 'none',
-                            color: active ? '#0F766E' : '#1E293B',
-                            background: active ? 'rgba(15, 118, 110, 0.08)' : 'transparent',
-                            fontWeight: active ? 700 : 500,
+                            color: active ? '#80142B' : '#1E293B',
+                            background: active ? '#FFF0EC' : 'transparent',
+                            border: active ? '1px solid #F5D0C5' : '1px solid transparent',
+                            fontWeight: active ? 800 : 500,
                             fontSize: '0.82rem',
                             transition: 'all 0.12s ease',
                           }}
                           className="nav-pane-item"
                         >
-                          <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem' }}>
                             <div
                               style={{
-                                width: '28px',
-                                height: '28px',
-                                borderRadius: '6px',
-                                background: active ? '#0F766E' : '#F1F5F9',
+                                width: '30px',
+                                height: '30px',
+                                borderRadius: '8px',
+                                background: active ? '#80142B' : '#F8EFEA',
                                 display: 'flex',
                                 alignItems: 'center',
                                 justifyContent: 'center',
+                                boxShadow: active ? '0 2px 6px rgba(128, 20, 43, 0.25)' : 'none',
                               }}
                             >
-                              <IconComp size={16} color={active ? '#FFFFFF' : '#475569'} />
+                              <IconComp size={16} color={active ? '#FFFFFF' : '#80142B'} />
                             </div>
-                            <span>{item.label}</span>
+                            <span style={{ fontWeight: active ? 800 : 600 }}>{item.label}</span>
                           </div>
-                          {item.badge && (
-                            <span
-                              style={{
-                                background: '#FFBE29',
-                                color: '#5c0f28',
-                                fontSize: '0.62rem',
-                                fontWeight: 800,
-                                padding: '0.1rem 0.35rem',
-                                borderRadius: '4px',
-                              }}
-                            >
-                              {item.badge}
-                            </span>
-                          )}
-                          {active && (
-                            <span style={{ fontSize: '0.72rem', color: '#0F766E', fontWeight: 800 }}>
-                              Active ✓
-                            </span>
-                          )}
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '0.45rem' }}>
+                            {item.badge && (
+                              <span
+                                style={{
+                                  background: '#80142B',
+                                  color: '#FFFFFF',
+                                  fontSize: '0.62rem',
+                                  fontWeight: 800,
+                                  padding: '0.12rem 0.45rem',
+                                  borderRadius: '6px',
+                                  letterSpacing: '0.02em',
+                                }}
+                              >
+                                {item.badge}
+                              </span>
+                            )}
+                            {active && (
+                              <span
+                                style={{
+                                  fontSize: '0.68rem',
+                                  color: '#80142B',
+                                  fontWeight: 800,
+                                  background: '#FFFFFF',
+                                  border: '1px solid #F2DDD5',
+                                  padding: '2px 7px',
+                                  borderRadius: '10px',
+                                  display: 'inline-flex',
+                                  alignItems: 'center',
+                                  gap: '3px',
+                                }}
+                              >
+                                Active ✓
+                              </span>
+                            )}
+                          </div>
                         </Link>
                       );
                     })}

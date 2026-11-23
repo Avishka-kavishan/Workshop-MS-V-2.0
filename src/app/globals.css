@@ -2159,7 +2159,8 @@ textarea:focus {
 }
 
 .header-nav-pane-btn:hover {
-  background: rgba(15, 118, 110, 0.08) !important;
+  background: rgba(128, 20, 43, 0.08) !important;
+  color: #80142B !important;
 }
 
 .nav-pane-item {
@@ -2167,8 +2168,8 @@ textarea:focus {
 }
 
 .nav-pane-item:hover {
-  background: #F8FAFC !important;
-  color: #0F766E !important;
+  background: #FFF5F2 !important;
+  color: #80142B !important;
 }
 
 /* Eye-Catching Active Notification Bell Animations */
