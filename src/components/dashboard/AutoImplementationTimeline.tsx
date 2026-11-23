@@ -393,8 +393,8 @@ export default function AutoImplementationTimeline({
         )}
       </div>
 
-      {/* Bottom Footer: View All Activities Button & Autumn Leaves Decoration */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginTop: '0.65rem', paddingTop: '0.45rem', borderTop: '1px solid #F1E5E2' }}>
+      {/* Bottom Footer: View All Activities Button */}
+      <div style={{ display: 'flex', justifyContent: 'flex-start', alignItems: 'center', marginTop: '0.65rem', paddingTop: '0.45rem', borderTop: '1px solid #F1E5E2' }}>
         <Link
           href="/annual-plan"
           style={{
@@ -413,12 +413,6 @@ export default function AutoImplementationTimeline({
         >
           View All Activities →
         </Link>
-
-        {/* Autumn Leaves Decoration Graphic */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '2px', opacity: 0.85, fontSize: '1.25rem', userSelect: 'none' }} title="Seasonal Indicator">
-          <span>🍂</span>
-          <span>🍁</span>
-        </div>
       </div>
 
       {/* Activity Details Modal */}
