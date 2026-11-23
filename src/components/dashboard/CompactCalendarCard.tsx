@@ -289,8 +289,8 @@ export default function CompactCalendarCard({
           >
             ‹
           </button>
-          <span style={{ fontSize: '0.78rem', fontWeight: 800, color: '#0F172A', minWidth: '85px', textAlign: 'center' }}>
-            {MONTH_NAMES[currentMonthIdx].slice(0, 3)} {currentYear} ⌵
+          <span style={{ fontSize: '0.78rem', fontWeight: 800, color: '#0F172A', minWidth: '70px', textAlign: 'center' }}>
+            {MONTH_NAMES[currentMonthIdx].slice(0, 3)} {currentYear}
           </span>
           <button
             type="button"
