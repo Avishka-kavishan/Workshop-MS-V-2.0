@@ -72,11 +72,11 @@ function PerformanceMonitoringChart({ branchName = 'MOE ICT Branch', monthlyData
     }
   }, [monthlyData, metrics]);
 
-  // SVG dimensions for the line chart (expanded height to fill and balance card)
-  const width = 540;
-  const height = 345;
-  const paddingX = 42;
-  const paddingY = 24;
+  // SVG dimensions for the line chart (expanded aspect ratio to fill and balance the card)
+  const width = 480;
+  const height = 460;
+  const paddingX = 38;
+  const paddingY = 20;
 
   // Active dataset
   const activeDataset = data.length > 0 ? data : DEFAULT_MONTHLY_PROGRESS;
@@ -267,7 +267,7 @@ function PerformanceMonitoringChart({ branchName = 'MOE ICT Branch', monthlyData
       </div>
 
       {/* ──── SVG Dual Line / Area Chart Container (Flex-1 to expand and balance card) ──── */}
-      <div style={{ position: 'relative', width: '100%', flex: 1, minHeight: '290px', display: 'flex', flexDirection: 'column', justifyContent: 'center', overflow: 'hidden' }}>
+      <div style={{ position: 'relative', width: '100%', flex: 1, minHeight: '340px', display: 'flex', flexDirection: 'column', justifyContent: 'flex-end', overflow: 'hidden' }}>
         <svg viewBox={`0 0 ${width} ${height}`} style={{ width: '100%', height: '100%', maxHeight: '100%', display: 'block' }}>
           <defs>
             {/* Maroon Gradient for Physical Progress Area */}
