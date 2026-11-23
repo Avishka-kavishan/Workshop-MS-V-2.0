@@ -745,10 +745,10 @@ export default function MonitoringWorkspacePage() {
                 Verified Activities
               </div>
               <div style={{ fontSize: '1.6rem', fontWeight: 800, color: '#00534E', marginTop: '0.25rem' }}>
-                {metrics.verifiedActivitiesCount} / {metrics.totalActivities}
+                {metrics.totalActivities > 0 ? `${metrics.verifiedActivitiesCount} / ${metrics.totalActivities}` : '0 / 0'}
               </div>
               <div style={{ fontSize: '0.75rem', color: '#888', marginTop: '0.2rem' }}>
-                {Math.round((metrics.verifiedActivitiesCount / metrics.totalActivities) * 100)}% verified
+                {metrics.totalActivities > 0 ? Math.round((metrics.verifiedActivitiesCount / metrics.totalActivities) * 100) : 0}% verified
               </div>
             </div>
 

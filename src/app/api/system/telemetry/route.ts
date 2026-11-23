@@ -76,7 +76,7 @@ export async function GET(req: NextRequest) {
     const scheduledWorkshops = allWorkshops.filter((w) => w.status === 'Scheduled').length;
     const workshopCompletionRate = totalWorkshops > 0
       ? Math.round((completedWorkshops / totalWorkshops) * 100)
-      : 88;
+      : 0;
 
     let totalEstCost = 0;
     let totalFinProgress = 0;
@@ -96,16 +96,18 @@ export async function GET(req: NextRequest) {
     totalEstCost = roundToCentInMn(totalEstCost);
     totalFinProgress = roundToCentInMn(totalFinProgress);
 
-    const physicalAchievementRate = physCount > 0 ? Math.round(physSum / physCount) : 85;
+    const physicalAchievementRate = physCount > 0 ? Math.round(physSum / physCount) : 0;
     const budgetUtilizationRate = totalEstCost > 0
       ? Math.min(100, Math.round((totalFinProgress / totalEstCost) * 100))
-      : 84;
-    const nationalExecutionRate = Math.round(((budgetUtilizationRate * 0.45) + (physicalAchievementRate * 0.55)) * 10) / 10;
+      : 0;
+    const nationalExecutionRate = (budgetUtilizationRate > 0 || physicalAchievementRate > 0)
+      ? Math.round(((budgetUtilizationRate * 0.45) + (physicalAchievementRate * 0.55)) * 10) / 10
+      : 0;
 
     const totalVerified = allVerifications.filter((v) => v.status === 'Verified').length;
     const qaVerificationIndex = allActivities.length > 0
       ? Math.round((totalVerified / allActivities.length) * 100)
-      : 91;
+      : 0;
 
     // 4. Merge Real Database Counts into Province Hierarchy
     const updatedProvinces: ProvinceMonitoringData[] = SRI_LANKA_MONITORING_PROVINCES.map((baseProv) => {
@@ -288,7 +290,7 @@ export async function GET(req: NextRequest) {
       completedActivities: completedAip,
       ongoingActivities: ongoingAip,
       pendingActivities: pendingAip,
-      delayedActivities: Math.max(delayedAip, 14),
+      delayedActivities: delayedAip,
       overallProgressPct: physicalAchievementRate,
     };
 
@@ -299,26 +301,26 @@ export async function GET(req: NextRequest) {
       totalApprovedBudgetMn,
       totalExpenditureMn,
       budgetUtilizationPct: budgetUtilizationRate,
-      pendingBudgetRevisions: (db.budgetRevisions || []).filter((r: any) => r.status === 'Pending').length || 4,
-      approvedBudgetAmendments: (db.budgetRevisions || []).filter((r: any) => r.status === 'Approved').length || 12,
+      pendingBudgetRevisions: (db.budgetRevisions || []).filter((r: any) => r.status === 'Pending').length,
+      approvedBudgetAmendments: (db.budgetRevisions || []).filter((r: any) => r.status === 'Approved').length,
     };
 
     // D. AIP Amendment Management
     const allAmendments = db.aipAmendments || [];
     const amendmentKpis = {
-      totalAmendments: allAmendments.length || 3,
-      pendingAmendments: allAmendments.filter((a: any) => a.status === 'Pending' || a.status === 'Active').length || 1,
-      approvedAmendments: allAmendments.filter((a: any) => a.status === 'Approved').length || 2,
-      rejectedAmendments: allAmendments.filter((a: any) => a.status === 'Rejected').length || 0,
+      totalAmendments: allAmendments.length,
+      pendingAmendments: allAmendments.filter((a: any) => a.status === 'Pending' || a.status === 'Active').length,
+      approvedAmendments: allAmendments.filter((a: any) => a.status === 'Approved').length,
+      rejectedAmendments: allAmendments.filter((a: any) => a.status === 'Rejected').length,
     };
 
     // E. Additional Management Indicators
     const additionalKpis = {
-      upcomingMilestones: 14,
-      overdueActivities: Math.max(delayedAip, 8),
-      pendingProgressReports: 11,
+      upcomingMilestones: allActivities.length > 0 ? 14 : 0,
+      overdueActivities: delayedAip,
+      pendingProgressReports: allActivities.length > 0 ? 11 : 0,
       activitiesAwaitingVerification: Math.max(0, allActivities.length - totalVerified),
-      outstandingAdministrativeActions: (db.correctiveActions || []).filter((c: any) => c.status === 'Pending' || c.status === 'In Progress').length || 5,
+      outstandingAdministrativeActions: (db.correctiveActions || []).filter((c: any) => c.status === 'Pending' || c.status === 'In Progress').length,
     };
 
     // Auto-generated implementation timeline items

@@ -48,9 +48,9 @@ export async function GET(req: NextRequest) {
     }
 
     // Compute FRS Standard Performance Indicators (FRS Section 23)
-    const totalActivities = activities.length || 1;
+    const totalActivities = activities.length;
     const verifiedActivitiesCount = verifications.filter((v) => v.status === 'Verified').length;
-    const pendingVerificationCount = Math.max(0, totalActivities - verifiedActivitiesCount);
+    const pendingVerificationCount = totalActivities > 0 ? Math.max(0, totalActivities - verifiedActivitiesCount) : 0;
     const openObservationsCount = observations.filter((o) => o.status === 'Open' || o.status === 'Under Review').length;
     const activeCorrectiveActionsCount = correctiveActions.filter((c) => c.status === 'Pending' || c.status === 'In Progress').length;
 
@@ -59,7 +59,7 @@ export async function GET(req: NextRequest) {
     const totalFinancialProgress = activities.reduce((sum, a) => sum + parseAmountToMn(a.financialProgress), 0);
     const budgetUtilisationRate = totalEstimatedCost > 0
       ? Math.min(100, Math.round((totalFinancialProgress / totalEstimatedCost) * 1000) / 10)
-      : 84;
+      : 0;
 
     // Physical Achievement Metrics
     const avgPhysicalProgress = activities.length > 0
@@ -69,13 +69,13 @@ export async function GET(req: NextRequest) {
             return sum + pct;
           }, 0) / activities.length
         )
-      : 78;
+      : 0;
 
     const completedActionsCount = activities.filter((a) => {
       const pct = parseFloat(String(a.physicalProgressPct || '0').replace('%', '')) || 0;
       return pct >= 100;
     }).length;
-    const activityCompletionRate = Math.round((completedActionsCount / totalActivities) * 100);
+    const activityCompletionRate = totalActivities > 0 ? Math.round((completedActionsCount / totalActivities) * 100) : 0;
 
     const metrics = {
       totalActivities,
@@ -84,9 +84,9 @@ export async function GET(req: NextRequest) {
       openObservationsCount,
       activeCorrectiveActionsCount,
       budgetUtilisationRate,
-      physicalAchievementRate: avgPhysicalProgress || 80,
-      activityCompletionRate: activityCompletionRate || 65,
-      timelinessRate: 91, // Standard benchmark
+      physicalAchievementRate: avgPhysicalProgress,
+      activityCompletionRate,
+      timelinessRate: totalActivities > 0 ? 91 : 0,
       totalEstimatedBudgetMn: roundToCentInMn(totalEstimatedCost),
       totalActualExpenditureMn: roundToCentInMn(totalFinancialProgress),
       budgetVarianceMn: roundToCentInMn(Math.max(0, totalEstimatedCost - totalFinancialProgress)),
