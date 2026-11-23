@@ -157,7 +157,7 @@ function PerformanceMonitoringChart({ branchName = 'MOE ICT Branch', monthlyData
       }}
     >
       {/* ──── Header ──── */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.35rem', flexWrap: 'wrap', gap: '0.5rem' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '0.65rem', flexWrap: 'wrap', gap: '0.85rem' }}>
         <div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.45rem', flexWrap: 'wrap' }}>
             <span style={{ fontSize: '1.05rem' }}>🏆</span>
@@ -165,31 +165,31 @@ function PerformanceMonitoringChart({ branchName = 'MOE ICT Branch', monthlyData
               Physical & Financial Achievement Curves
             </h3>
           </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.45rem', marginTop: '3px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.45rem', marginTop: '6px' }}>
             <span
               style={{
-                fontSize: '0.64rem',
+                fontSize: '0.66rem',
                 fontWeight: 700,
-                padding: '1px 8px',
+                padding: '2px 9px',
                 borderRadius: '12px',
                 background: '#FFF5F2',
                 color: '#80142B',
                 border: '1px solid #F2DDD5',
                 display: 'inline-flex',
                 alignItems: 'center',
-                gap: '3px',
+                gap: '4px',
               }}
             >
               <span>📍</span> MOE Data Management Branch
             </span>
           </div>
-          <p style={{ margin: '3px 0 0', fontSize: '0.7rem', color: '#64748B' }}>
+          <p style={{ margin: '7px 0 0', fontSize: '0.72rem', color: '#64748B', lineHeight: 1.35 }}>
             Physical Implementation vs Financial Disbursement Trajectory
           </p>
         </div>
 
         {/* Right side up corner: View Mode Segmented Control & Tile Actions */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginTop: '4px' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '3px', background: '#F8FAFC', padding: '3px', borderRadius: '8px', border: '1px solid #F1E5E2' }}>
             <button
               type="button"
@@ -255,12 +255,12 @@ function PerformanceMonitoringChart({ branchName = 'MOE ICT Branch', monthlyData
       </div>
 
       {/* Legend directly under header controls */}
-      <div style={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', gap: '0.85rem', marginTop: '0.2rem', marginBottom: '0.45rem', fontSize: '0.72rem', fontWeight: 700 }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
+      <div style={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', gap: '1rem', marginTop: '0.65rem', marginBottom: '0.75rem', fontSize: '0.74rem', fontWeight: 700 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
           <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#80142B', display: 'inline-block' }} />
           <span style={{ color: '#0F172A' }}>Physical</span>
         </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
           <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#E07A2B', display: 'inline-block' }} />
           <span style={{ color: '#0F172A' }}>Financial</span>
         </div>
