@@ -1070,7 +1070,7 @@ function readJsonFile(): DbSchema {
       financialYears: [...DEFAULT_FINANCIAL_YEARS],
       deadlines: [...DEFAULT_DEADLINES],
       announcements: [...DEFAULT_ANNOUNCEMENTS],
-      budgetProposalActivities: [...DEFAULT_BUDGET_PROPOSALS],
+      budgetProposalActivities: [],
       votes: [...DEFAULT_GOVERNMENT_VOTES],
       aipTemplates: [...DEFAULT_AIP_TEMPLATES],
     };
@@ -1104,26 +1104,26 @@ function readJsonFile(): DbSchema {
     if (!parsed.fundingSources || parsed.fundingSources.length === 0) {
       parsed.fundingSources = [...DEFAULT_FUNDING_SOURCES];
     }
-    if (!parsed.budgetCeilings || parsed.budgetCeilings.length === 0) {
-      parsed.budgetCeilings = [...DEFAULT_BUDGET_CEILINGS];
+    if (!parsed.budgetCeilings) {
+      parsed.budgetCeilings = [];
     }
-    if (!parsed.budgetAllocations || parsed.budgetAllocations.length === 0) {
-      parsed.budgetAllocations = [...DEFAULT_BUDGET_ALLOCATIONS];
+    if (!parsed.budgetAllocations) {
+      parsed.budgetAllocations = [];
     }
-    if (!parsed.budgetRevisions || parsed.budgetRevisions.length === 0) {
-      parsed.budgetRevisions = [...DEFAULT_BUDGET_REVISIONS];
+    if (!parsed.budgetRevisions) {
+      parsed.budgetRevisions = [];
     }
-    if (!parsed.monitoringObservations || parsed.monitoringObservations.length === 0) {
-      parsed.monitoringObservations = [...DEFAULT_MONITORING_OBSERVATIONS];
+    if (!parsed.monitoringObservations) {
+      parsed.monitoringObservations = [];
     }
-    if (!parsed.verificationRecords || parsed.verificationRecords.length === 0) {
-      parsed.verificationRecords = [...DEFAULT_VERIFICATION_RECORDS];
+    if (!parsed.verificationRecords) {
+      parsed.verificationRecords = [];
     }
-    if (!parsed.correctiveActions || parsed.correctiveActions.length === 0) {
-      parsed.correctiveActions = [...DEFAULT_CORRECTIVE_ACTIONS];
+    if (!parsed.correctiveActions) {
+      parsed.correctiveActions = [];
     }
-    if (!parsed.evidenceFiles || parsed.evidenceFiles.length === 0) {
-      parsed.evidenceFiles = [...DEFAULT_EVIDENCE_FILES];
+    if (!parsed.evidenceFiles) {
+      parsed.evidenceFiles = [];
     }
     if (!parsed.financialYears || parsed.financialYears.length === 0) {
       parsed.financialYears = [...DEFAULT_FINANCIAL_YEARS];
@@ -1134,8 +1134,8 @@ function readJsonFile(): DbSchema {
     if (!parsed.announcements || parsed.announcements.length === 0) {
       parsed.announcements = [...DEFAULT_ANNOUNCEMENTS];
     }
-    if (!parsed.budgetProposalActivities || parsed.budgetProposalActivities.length === 0) {
-      parsed.budgetProposalActivities = [...DEFAULT_BUDGET_PROPOSALS];
+    if (!parsed.budgetProposalActivities) {
+      parsed.budgetProposalActivities = [];
     }
     if (!parsed.votes || parsed.votes.length === 0) {
       parsed.votes = [...DEFAULT_GOVERNMENT_VOTES];

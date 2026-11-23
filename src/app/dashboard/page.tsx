@@ -318,7 +318,7 @@ export default function DashboardPage() {
 
   // 4. Executive Metrics Matching the Reference Screenshot Exactly - Memoized
   const activePlansCount = useMemo(() => {
-    return (budgetData?.proposals?.length || 0) + (monitoringData?.activities?.length || 0) + workshops.length || 128;
+    return (budgetData?.proposals?.length || 0) + (monitoringData?.activities?.length || 0) + workshops.length;
   }, [budgetData, monitoringData, workshops.length]);
 
   const monitoringAlertsCount = monitoringData?.openObservationsCount || 7;
@@ -508,7 +508,7 @@ export default function DashboardPage() {
               </div>
               <div>
                 <div style={{ fontSize: '0.92rem', fontWeight: 800, color: '#1E1B18' }}>
-                  {telemetryData?.metrics?.totalActivities || 241} Activities
+                  {telemetryData?.metrics?.totalActivities ?? 0} Activities
                 </div>
                 <div style={{ fontSize: '0.66rem', fontWeight: 700, color: '#16A34A', marginTop: '1px' }}>
                   ↑ 74% vs last period
@@ -805,7 +805,7 @@ export default function DashboardPage() {
                 transition: 'all 0.15s ease',
               }}
             >
-              Workshops Directory ({workshops.length || 277})
+              Workshops Directory ({workshops.length})
             </button>
           </div>
         </div>
