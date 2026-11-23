@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useRef, useEffect } from 'react';
 import Link from 'next/link';
 import TileActionMenu, { TileExportData } from '@/components/dashboard/TileActionMenu';
 
@@ -43,10 +43,45 @@ export default function ProgressMonitoringCurve({
 }: ProgressMonitoringCurveProps) {
   const [curveMode, setCurveMode] = useState<'both' | 'physical' | 'financial'>('both');
   const [hoveredIdx, setHoveredIdx] = useState<number | null>(null);
+  const [timeframe, setTimeframe] = useState<'12m' | 'h1' | 'h2'>('12m');
+  const [showTimeframeDropdown, setShowTimeframeDropdown] = useState(false);
+  const timeframeDropdownRef = useRef<HTMLDivElement>(null);
 
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (timeframeDropdownRef.current && !timeframeDropdownRef.current.contains(e.target as Node)) {
+        setShowTimeframeDropdown(false);
+      }
+    };
+    if (showTimeframeDropdown) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [showTimeframeDropdown]);
+
+  const handleJumpToTile = (tileId: string) => {
+    setShowTimeframeDropdown(false);
+    if (typeof document !== 'undefined') {
+      const el = document.getElementById(tileId);
+      if (el) {
+        el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        el.style.transition = 'box-shadow 0.3s ease';
+        el.style.boxShadow = '0 0 0 3px #80142B, 0 8px 24px rgba(128, 20, 43, 0.2)';
+        setTimeout(() => {
+          el.style.boxShadow = '';
+        }, 1500);
+      }
+    }
+  };
+
+  const rawData = monthlyData && monthlyData.length > 0 ? monthlyData : DEFAULT_MONTHLY_DATA;
   const data = useMemo(() => {
-    return monthlyData && monthlyData.length > 0 ? monthlyData : DEFAULT_MONTHLY_DATA;
-  }, [monthlyData]);
+    if (timeframe === 'h1') return rawData.slice(0, 6);
+    if (timeframe === 'h2') return rawData.slice(6, 12);
+    return rawData;
+  }, [rawData, timeframe]);
 
   // Baseline Planned Trajectory (Standard approved MoE MTEF S-Curve)
   const plannedTrajectory = [8, 20, 32, 44, 55, 65, 75, 84, 90, 94, 97, 100];
@@ -174,20 +209,215 @@ export default function ProgressMonitoringCurve({
             Live data
           </span>
 
-          <span
-            style={{
-              fontSize: '0.66rem',
-              fontWeight: 700,
-              padding: '2px 8px',
-              borderRadius: '8px',
-              background: '#FFF5F2',
-              color: '#80142B',
-              border: '1px solid #F2DDD5',
-              cursor: 'pointer',
-            }}
-          >
-            Last 12 Months ⌵
-          </span>
+          {/* Tile 02 Interactive Dropdown */}
+          <div ref={timeframeDropdownRef} style={{ position: 'relative' }}>
+            <button
+              type="button"
+              onClick={() => setShowTimeframeDropdown((prev) => !prev)}
+              style={{
+                fontSize: '0.66rem',
+                fontWeight: 700,
+                padding: '2px 8px',
+                borderRadius: '8px',
+                background: showTimeframeDropdown ? '#80142B' : '#FFF5F2',
+                color: showTimeframeDropdown ? '#FFFFFF' : '#80142B',
+                border: '1px solid',
+                borderColor: showTimeframeDropdown ? '#80142B' : '#F2DDD5',
+                cursor: 'pointer',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '4px',
+                transition: 'all 0.15s ease',
+                boxShadow: showTimeframeDropdown ? '0 2px 6px rgba(128, 20, 43, 0.25)' : 'none',
+              }}
+              title="Click to switch dashboard tiles or filter curve timeframe"
+            >
+              <span>
+                {timeframe === '12m' ? 'Tile 02 (12M)' : timeframe === 'h1' ? 'Tile 02 (H1)' : 'Tile 02 (H2)'}
+              </span>
+              <span
+                style={{
+                  fontSize: '0.6rem',
+                  transition: 'transform 0.15s ease',
+                  transform: showTimeframeDropdown ? 'rotate(180deg)' : 'rotate(0deg)',
+                }}
+              >
+                ⌵
+              </span>
+            </button>
+
+            {/* Dropdown Menu */}
+            {showTimeframeDropdown && (
+              <div
+                style={{
+                  position: 'absolute',
+                  top: 'calc(100% + 6px)',
+                  right: 0,
+                  width: '235px',
+                  background: '#FFFFFF',
+                  border: '1px solid #EADBDE',
+                  borderRadius: '12px',
+                  boxShadow: '0 12px 32px rgba(128, 20, 43, 0.16), 0 2px 8px rgba(0, 0, 0, 0.06)',
+                  padding: '6px',
+                  zIndex: 1000,
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: '2px',
+                }}
+              >
+                {/* Section 1: Dashboard Tile Navigation */}
+                <div style={{ padding: '4px 8px 2px', fontSize: '0.6rem', fontWeight: 800, color: '#80142B', letterSpacing: '0.04em', textTransform: 'uppercase' }}>
+                  Management Row Tiles
+                </div>
+
+                {/* Tile 01 */}
+                <button
+                  type="button"
+                  onClick={() => handleJumpToTile('dashboard-tile-01')}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    padding: '6px 8px',
+                    borderRadius: '8px',
+                    background: 'transparent',
+                    border: 'none',
+                    color: '#1E293B',
+                    fontSize: '0.74rem',
+                    fontWeight: 600,
+                    cursor: 'pointer',
+                    textAlign: 'left',
+                    transition: 'all 0.12s ease',
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.background = '#FFF5F2';
+                    e.currentTarget.style.color = '#80142B';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.background = 'transparent';
+                    e.currentTarget.style.color = '#1E293B';
+                  }}
+                >
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                    <span>📶</span>
+                    <span>Tile 01: Implementation Timeline</span>
+                  </div>
+                  <span style={{ fontSize: '0.7rem', color: '#94A3B8' }}>↗</span>
+                </button>
+
+                {/* Tile 02 */}
+                <div
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    padding: '6px 8px',
+                    borderRadius: '8px',
+                    background: '#FFF5F2',
+                    color: '#80142B',
+                    fontSize: '0.74rem',
+                    fontWeight: 700,
+                  }}
+                >
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                    <span>📈</span>
+                    <span>Tile 02: Performance Curve</span>
+                  </div>
+                  <span style={{ fontSize: '0.65rem', background: '#80142B', color: '#FFFFFF', padding: '1px 5px', borderRadius: '4px', fontWeight: 800 }}>
+                    Active ✓
+                  </span>
+                </div>
+
+                {/* Tile 03 */}
+                <button
+                  type="button"
+                  onClick={() => handleJumpToTile('dashboard-tile-03')}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    padding: '6px 8px',
+                    borderRadius: '8px',
+                    background: 'transparent',
+                    border: 'none',
+                    color: '#1E293B',
+                    fontSize: '0.74rem',
+                    fontWeight: 600,
+                    cursor: 'pointer',
+                    textAlign: 'left',
+                    transition: 'all 0.12s ease',
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.background = '#FFF5F2';
+                    e.currentTarget.style.color = '#80142B';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.background = 'transparent';
+                    e.currentTarget.style.color = '#1E293B';
+                  }}
+                >
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                    <span>📊</span>
+                    <span>Tile 03: Summary & KPIs</span>
+                  </div>
+                  <span style={{ fontSize: '0.7rem', color: '#94A3B8' }}>↗</span>
+                </button>
+
+                <div style={{ height: '1px', background: '#F1E5E2', margin: '4px 0' }} />
+
+                {/* Section 2: Timeframe Filter */}
+                <div style={{ padding: '2px 8px', fontSize: '0.6rem', fontWeight: 800, color: '#80142B', letterSpacing: '0.04em', textTransform: 'uppercase' }}>
+                  Filter Timeframe
+                </div>
+
+                {[
+                  { id: '12m', label: 'Last 12 Months (Full FY)' },
+                  { id: 'h1', label: 'First Half (H1: Jan – Jun)' },
+                  { id: 'h2', label: 'Second Half (H2: Jul – Dec)' },
+                ].map((tf) => {
+                  const isTfActive = timeframe === tf.id;
+                  return (
+                    <button
+                      key={tf.id}
+                      type="button"
+                      onClick={() => {
+                        setTimeframe(tf.id as any);
+                        setShowTimeframeDropdown(false);
+                      }}
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                        padding: '5px 8px',
+                        borderRadius: '6px',
+                        background: isTfActive ? 'rgba(128, 20, 43, 0.08)' : 'transparent',
+                        border: 'none',
+                        color: isTfActive ? '#80142B' : '#334155',
+                        fontSize: '0.72rem',
+                        fontWeight: isTfActive ? 800 : 500,
+                        cursor: 'pointer',
+                        textAlign: 'left',
+                        transition: 'all 0.12s ease',
+                      }}
+                      onMouseEnter={(e) => {
+                        if (!isTfActive) {
+                          e.currentTarget.style.background = '#F8FAFC';
+                        }
+                      }}
+                      onMouseLeave={(e) => {
+                        if (!isTfActive) {
+                          e.currentTarget.style.background = 'transparent';
+                        }
+                      }}
+                    >
+                      <span>{tf.label}</span>
+                      {isTfActive && <span style={{ color: '#80142B', fontWeight: 800 }}>✓</span>}
+                    </button>
+                  );
+                })}
+              </div>
+            )}
+          </div>
 
           <TileActionMenu
             tileTitle="02. Progress Monitoring"

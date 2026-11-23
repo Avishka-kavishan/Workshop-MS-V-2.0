@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
 import TileActionMenu, { TileExportData } from '@/components/dashboard/TileActionMenu';
 import { formatMillion } from '@/lib/financialFormat';
@@ -49,6 +49,37 @@ interface ManagementSummaryKpisProps {
 
 export default function ManagementSummaryKpis({ kpis }: ManagementSummaryKpisProps) {
   const [activeSection, setActiveSection] = useState<'all' | 'workshops' | 'aip' | 'budget' | 'amendments' | 'additional'>('all');
+  const [showTileDropdown, setShowTileDropdown] = useState(false);
+  const tileDropdownRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (tileDropdownRef.current && !tileDropdownRef.current.contains(e.target as Node)) {
+        setShowTileDropdown(false);
+      }
+    };
+    if (showTileDropdown) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [showTileDropdown]);
+
+  const handleJumpToTile = (tileId: string) => {
+    setShowTileDropdown(false);
+    if (typeof document !== 'undefined') {
+      const el = document.getElementById(tileId);
+      if (el) {
+        el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        el.style.transition = 'box-shadow 0.3s ease';
+        el.style.boxShadow = '0 0 0 3px #80142B, 0 8px 24px rgba(128, 20, 43, 0.2)';
+        setTimeout(() => {
+          el.style.boxShadow = '';
+        }, 1500);
+      }
+    }
+  };
 
   const ws = kpis?.workshops || {
     totalWorkshops: 277,
@@ -148,19 +179,216 @@ export default function ManagementSummaryKpis({ kpis }: ManagementSummaryKpisPro
 
         {/* Right side up corner: Tile Actions */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
-          <span
-            style={{
-              fontSize: '0.66rem',
-              fontWeight: 700,
-              padding: '2px 8px',
-              borderRadius: '8px',
-              background: '#FFF5F2',
-              color: '#80142B',
-              border: '1px solid #F2DDD5',
-            }}
-          >
-            Tile 03 ⌵
-          </span>
+          {/* Tile 03 Interactive Dropdown */}
+          <div ref={tileDropdownRef} style={{ position: 'relative' }}>
+            <button
+              type="button"
+              onClick={() => setShowTileDropdown((prev) => !prev)}
+              style={{
+                fontSize: '0.66rem',
+                fontWeight: 700,
+                padding: '2px 8px',
+                borderRadius: '8px',
+                background: showTileDropdown ? '#80142B' : '#FFF5F2',
+                color: showTileDropdown ? '#FFFFFF' : '#80142B',
+                border: '1px solid',
+                borderColor: showTileDropdown ? '#80142B' : '#F2DDD5',
+                cursor: 'pointer',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '4px',
+                transition: 'all 0.15s ease',
+                boxShadow: showTileDropdown ? '0 2px 6px rgba(128, 20, 43, 0.25)' : 'none',
+              }}
+              title="Click to switch dashboard tiles or filter KPI categories"
+            >
+              <span>Tile 03</span>
+              <span
+                style={{
+                  fontSize: '0.6rem',
+                  transition: 'transform 0.15s ease',
+                  transform: showTileDropdown ? 'rotate(180deg)' : 'rotate(0deg)',
+                }}
+              >
+                ⌵
+              </span>
+            </button>
+
+            {/* Dropdown Menu */}
+            {showTileDropdown && (
+              <div
+                style={{
+                  position: 'absolute',
+                  top: 'calc(100% + 6px)',
+                  right: 0,
+                  width: '235px',
+                  background: '#FFFFFF',
+                  border: '1px solid #EADBDE',
+                  borderRadius: '12px',
+                  boxShadow: '0 12px 32px rgba(128, 20, 43, 0.16), 0 2px 8px rgba(0, 0, 0, 0.06)',
+                  padding: '6px',
+                  zIndex: 1000,
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: '2px',
+                }}
+              >
+                {/* Section 1: Dashboard Tile Navigation */}
+                <div style={{ padding: '4px 8px 2px', fontSize: '0.6rem', fontWeight: 800, color: '#80142B', letterSpacing: '0.04em', textTransform: 'uppercase' }}>
+                  Management Row Tiles
+                </div>
+
+                {/* Tile 01 */}
+                <button
+                  type="button"
+                  onClick={() => handleJumpToTile('dashboard-tile-01')}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    padding: '6px 8px',
+                    borderRadius: '8px',
+                    background: 'transparent',
+                    border: 'none',
+                    color: '#1E293B',
+                    fontSize: '0.74rem',
+                    fontWeight: 600,
+                    cursor: 'pointer',
+                    textAlign: 'left',
+                    transition: 'all 0.12s ease',
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.background = '#FFF5F2';
+                    e.currentTarget.style.color = '#80142B';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.background = 'transparent';
+                    e.currentTarget.style.color = '#1E293B';
+                  }}
+                >
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                    <span>📶</span>
+                    <span>Tile 01: Implementation Timeline</span>
+                  </div>
+                  <span style={{ fontSize: '0.7rem', color: '#94A3B8' }}>↗</span>
+                </button>
+
+                {/* Tile 02 */}
+                <button
+                  type="button"
+                  onClick={() => handleJumpToTile('dashboard-tile-02')}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    padding: '6px 8px',
+                    borderRadius: '8px',
+                    background: 'transparent',
+                    border: 'none',
+                    color: '#1E293B',
+                    fontSize: '0.74rem',
+                    fontWeight: 600,
+                    cursor: 'pointer',
+                    textAlign: 'left',
+                    transition: 'all 0.12s ease',
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.background = '#FFF5F2';
+                    e.currentTarget.style.color = '#80142B';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.background = 'transparent';
+                    e.currentTarget.style.color = '#1E293B';
+                  }}
+                >
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                    <span>📈</span>
+                    <span>Tile 02: Performance Curve</span>
+                  </div>
+                  <span style={{ fontSize: '0.7rem', color: '#94A3B8' }}>↗</span>
+                </button>
+
+                {/* Tile 03 */}
+                <div
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    padding: '6px 8px',
+                    borderRadius: '8px',
+                    background: '#FFF5F2',
+                    color: '#80142B',
+                    fontSize: '0.74rem',
+                    fontWeight: 700,
+                  }}
+                >
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                    <span>📊</span>
+                    <span>Tile 03: Summary & KPIs</span>
+                  </div>
+                  <span style={{ fontSize: '0.65rem', background: '#80142B', color: '#FFFFFF', padding: '1px 5px', borderRadius: '4px', fontWeight: 800 }}>
+                    Active ✓
+                  </span>
+                </div>
+
+                <div style={{ height: '1px', background: '#F1E5E2', margin: '4px 0' }} />
+
+                {/* Section 2: Quick KPI Category Switcher */}
+                <div style={{ padding: '2px 8px', fontSize: '0.6rem', fontWeight: 800, color: '#80142B', letterSpacing: '0.04em', textTransform: 'uppercase' }}>
+                  Filter KPI Category
+                </div>
+
+                {[
+                  { id: 'all', label: 'All KPI Groups' },
+                  { id: 'workshops', label: 'Workshops & Training' },
+                  { id: 'aip', label: 'AIP Activities' },
+                  { id: 'budget', label: 'Budget Utilization' },
+                  { id: 'amendments', label: 'Plan Amendments' },
+                ].map((cat) => {
+                  const isCatActive = activeSection === cat.id;
+                  return (
+                    <button
+                      key={cat.id}
+                      type="button"
+                      onClick={() => {
+                        setActiveSection(cat.id as any);
+                        setShowTileDropdown(false);
+                      }}
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                        padding: '5px 8px',
+                        borderRadius: '6px',
+                        background: isCatActive ? 'rgba(128, 20, 43, 0.08)' : 'transparent',
+                        border: 'none',
+                        color: isCatActive ? '#80142B' : '#334155',
+                        fontSize: '0.72rem',
+                        fontWeight: isCatActive ? 800 : 500,
+                        cursor: 'pointer',
+                        textAlign: 'left',
+                        transition: 'all 0.12s ease',
+                      }}
+                      onMouseEnter={(e) => {
+                        if (!isCatActive) {
+                          e.currentTarget.style.background = '#F8FAFC';
+                        }
+                      }}
+                      onMouseLeave={(e) => {
+                        if (!isCatActive) {
+                          e.currentTarget.style.background = 'transparent';
+                        }
+                      }}
+                    >
+                      <span>{cat.label}</span>
+                      {isCatActive && <span style={{ color: '#80142B', fontWeight: 800 }}>✓</span>}
+                    </button>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+
           <TileActionMenu
             tileTitle="Management Summary & KPIs"
             exportData={tileExportData}

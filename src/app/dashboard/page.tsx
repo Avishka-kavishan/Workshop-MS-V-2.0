@@ -879,25 +879,31 @@ export default function DashboardPage() {
               }}
             >
               {/* Tile 01 – Auto-Generated Implementation Timeline (Left) */}
-              <AutoImplementationTimeline
-                activities={telemetryData?.timelineActivities}
-                fiscalYear={selectedYear}
-                filterDivision={selectedBranch}
-                filterStatus="all"
-              />
+              <div id="dashboard-tile-01" style={{ height: '100%', borderRadius: '16px' }}>
+                <AutoImplementationTimeline
+                  activities={telemetryData?.timelineActivities}
+                  fiscalYear={selectedYear}
+                  filterDivision={selectedBranch}
+                  filterStatus="all"
+                />
+              </div>
 
               {/* Tile 02 – Progress Monitoring and Performance Curve (Middle) */}
-              <ProgressMonitoringCurve
-                monthlyData={telemetryData?.monthlyProgress}
-                physicalAchievementRate={telemetryData?.metrics?.physicalAchievementRate}
-                budgetUtilizationRate={telemetryData?.metrics?.budgetUtilizationRate}
-                nationalExecutionRate={telemetryData?.metrics?.nationalExecutionRate}
-              />
+              <div id="dashboard-tile-02" style={{ height: '100%', borderRadius: '16px' }}>
+                <ProgressMonitoringCurve
+                  monthlyData={telemetryData?.monthlyProgress}
+                  physicalAchievementRate={telemetryData?.metrics?.physicalAchievementRate}
+                  budgetUtilizationRate={telemetryData?.metrics?.budgetUtilizationRate}
+                  nationalExecutionRate={telemetryData?.metrics?.nationalExecutionRate}
+                />
+              </div>
 
               {/* Tile 03 – Management Summary and Key Performance Indicators (Right) */}
-              <ManagementSummaryKpis
-                kpis={telemetryData?.kpiGroups}
-              />
+              <div id="dashboard-tile-03" style={{ height: '100%', borderRadius: '16px' }}>
+                <ManagementSummaryKpis
+                  kpis={telemetryData?.kpiGroups}
+                />
+              </div>
             </div>
           </>
         )}
