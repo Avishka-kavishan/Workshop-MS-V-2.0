@@ -353,55 +353,6 @@ export default function ProgressMonitoringCurve({
         </div>
       </div>
 
-      {/* 4 Stat Boxes (All Crews, Planned, Actual, Delay) */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '0.45rem', marginBottom: '0.55rem' }}>
-        {/* Stat 1: All Crews */}
-        <div style={{ background: '#FFF5F2', border: '1px solid #F2DDD5', borderRadius: '10px', padding: '0.45rem 0.55rem', display: 'flex', alignItems: 'center', gap: '0.45rem' }}>
-          <div style={{ width: '24px', height: '24px', borderRadius: '50%', background: '#FCE7E1', color: '#80142B', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.75rem', fontWeight: 800 }}>
-            ✓
-          </div>
-          <div>
-            <div style={{ fontSize: '0.6rem', color: '#64748B', fontWeight: 700 }}>All Crews</div>
-            <div style={{ fontSize: '0.96rem', fontWeight: 900, color: '#0F172A', lineHeight: 1.1 }}>{totalActivities}</div>
-          </div>
-        </div>
-
-        {/* Stat 2: Planned */}
-        <div style={{ background: '#F0FDF4', border: '1px solid #BBF7D0', borderRadius: '10px', padding: '0.45rem 0.55rem', display: 'flex', alignItems: 'center', gap: '0.45rem' }}>
-          <div style={{ width: '24px', height: '24px', borderRadius: '50%', background: '#DCFCE7', color: '#16A34A', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.75rem', fontWeight: 800 }}>
-            📊
-          </div>
-          <div>
-            <div style={{ fontSize: '0.6rem', color: '#64748B', fontWeight: 700 }}>Planned</div>
-            <div style={{ fontSize: '0.96rem', fontWeight: 900, color: '#0F172A', lineHeight: 1.1 }}>{plannedActivities}</div>
-          </div>
-        </div>
-
-        {/* Stat 3: Actual */}
-        <div style={{ background: '#F0F9FF', border: '1px solid #BAE6FD', borderRadius: '10px', padding: '0.45rem 0.55rem', display: 'flex', alignItems: 'center', gap: '0.45rem' }}>
-          <div style={{ width: '24px', height: '24px', borderRadius: '50%', background: '#E0F2FE', color: '#0284C7', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.75rem', fontWeight: 800 }}>
-            🎯
-          </div>
-          <div>
-            <div style={{ fontSize: '0.6rem', color: '#64748B', fontWeight: 700 }}>Actual</div>
-            <div style={{ fontSize: '0.96rem', fontWeight: 900, color: '#0284C7', lineHeight: 1.1 }}>
-              {actualAchievementPct !== undefined ? actualAchievementPct : Math.round(physicalAchievementRate || 0)}%
-            </div>
-          </div>
-        </div>
-
-        {/* Stat 4: Delay */}
-        <div style={{ background: '#FFFBEB', border: '1px solid #FDE68A', borderRadius: '10px', padding: '0.45rem 0.55rem', display: 'flex', alignItems: 'center', gap: '0.45rem' }}>
-          <div style={{ width: '24px', height: '24px', borderRadius: '50%', background: '#FEF3C7', color: '#D97706', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.75rem', fontWeight: 800 }}>
-            ⏰
-          </div>
-          <div>
-            <div style={{ fontSize: '0.6rem', color: '#64748B', fontWeight: 700 }}>Delay</div>
-            <div style={{ fontSize: '0.96rem', fontWeight: 900, color: '#D97706', lineHeight: 1.1 }}>{delayedActivities}</div>
-          </div>
-        </div>
-      </div>
-
       {/* Legend Indicators Matching Mockup: Planned = Maroon (#80142B), Actual = Green (#10B981) */}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: '0.85rem', marginBottom: '0.35rem', fontSize: '0.7rem', fontWeight: 700 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
