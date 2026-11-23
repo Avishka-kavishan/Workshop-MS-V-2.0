@@ -43,9 +43,27 @@ export default function ProgressMonitoringCurve({
 }: ProgressMonitoringCurveProps) {
   const [curveMode, setCurveMode] = useState<'both' | 'physical' | 'financial'>('both');
   const [hoveredIdx, setHoveredIdx] = useState<number | null>(null);
-  const [timeframe, setTimeframe] = useState<'12m' | 'h1' | 'h2'>('12m');
+  type TimeframeOption = '12m' | '6m' | '3m' | 'h1' | 'h2' | 'q1' | 'q2' | 'q3' | 'q4';
+  const [timeframe, setTimeframe] = useState<TimeframeOption>('12m');
   const [showTimeframeDropdown, setShowTimeframeDropdown] = useState(false);
   const timeframeDropdownRef = useRef<HTMLDivElement>(null);
+
+  const PLANNED_BY_MONTH: Record<string, number> = {
+    Jan: 8, Feb: 20, Mar: 32, Apr: 44, May: 55, Jun: 65,
+    Jul: 75, Aug: 84, Sep: 90, Oct: 94, Nov: 97, Dec: 100,
+  };
+
+  const timeframeLabels: Record<TimeframeOption, string> = {
+    '12m': 'Last 12 Months',
+    '6m': 'Last 6 Months',
+    '3m': 'Last 3 Months',
+    'h1': 'First Half (H1)',
+    'h2': 'Second Half (H2)',
+    'q1': 'Q1 (Jan – Mar)',
+    'q2': 'Q2 (Apr – Jun)',
+    'q3': 'Q3 (Jul – Sep)',
+    'q4': 'Q4 (Oct – Dec)',
+  };
 
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
@@ -80,6 +98,12 @@ export default function ProgressMonitoringCurve({
   const data = useMemo(() => {
     if (timeframe === 'h1') return rawData.slice(0, 6);
     if (timeframe === 'h2') return rawData.slice(6, 12);
+    if (timeframe === '6m') return rawData.slice(Math.max(0, rawData.length - 6));
+    if (timeframe === '3m') return rawData.slice(Math.max(0, rawData.length - 3));
+    if (timeframe === 'q1') return rawData.slice(0, 3);
+    if (timeframe === 'q2') return rawData.slice(3, 6);
+    if (timeframe === 'q3') return rawData.slice(6, 9);
+    if (timeframe === 'q4') return rawData.slice(9, 12);
     return rawData;
   }, [rawData, timeframe]);
 
@@ -105,16 +129,18 @@ export default function ProgressMonitoringCurve({
   const chartHeight = svgHeight - padTop - padBottom;
 
   const getCoordinates = (index: number, valuePct: number) => {
-    const x = padLeft + (index / (data.length - 1)) * chartWidth;
+    const divisor = Math.max(1, data.length - 1);
+    const x = padLeft + (index / divisor) * chartWidth;
     const y = padTop + chartHeight - (Math.min(100, Math.max(0, valuePct)) / 100) * chartHeight;
     return { x, y };
   };
 
   // Build SVG Path strings
   const plannedPath = useMemo(() => {
-    return plannedTrajectory
-      .map((val, i) => {
-        const { x, y } = getCoordinates(i, val);
+    return data
+      .map((pt, i) => {
+        const plannedVal = PLANNED_BY_MONTH[pt.month] ?? 50;
+        const { x, y } = getCoordinates(i, plannedVal);
         return `${i === 0 ? 'M' : 'L'} ${x.toFixed(1)} ${y.toFixed(1)}`;
       })
       .join(' ');
@@ -145,8 +171,8 @@ export default function ProgressMonitoringCurve({
     reportTitle: '02. Progress Monitoring - Cumulative Trajectory',
     subtitle: 'Illustrative planned vs actual cumulative progress trajectory (S-Curve)',
     headers: ['Month', 'Planned Cumulative Progress (%)', 'Actual Physical Progress (%)', 'Financial Disbursement (%)', 'Variance Gap (%)', 'Cumulative Workshops Held'],
-    rows: data.map((pt, i) => {
-      const planned = plannedTrajectory[i] || 0;
+    rows: data.map((pt) => {
+      const planned = PLANNED_BY_MONTH[pt.month] ?? 0;
       const gap = pt.physical - planned;
       return [
         pt.month,
@@ -178,6 +204,8 @@ export default function ProgressMonitoringCurve({
         flexDirection: 'column',
         height: '100%',
         minHeight: '430px',
+        position: 'relative',
+        overflow: 'visible',
       }}
     >
       {/* Header matching User Mockup: 02. Progress Monitoring */}
@@ -230,11 +258,9 @@ export default function ProgressMonitoringCurve({
                 transition: 'all 0.15s ease',
                 boxShadow: showTimeframeDropdown ? '0 2px 6px rgba(128, 20, 43, 0.25)' : 'none',
               }}
-              title="Click to switch dashboard tiles or filter curve timeframe"
+              title="Click to filter curve timeframe or jump to other dashboard tiles"
             >
-              <span>
-                {timeframe === '12m' ? 'Tile 02 (12M)' : timeframe === 'h1' ? 'Tile 02 (H1)' : 'Tile 02 (H2)'}
-              </span>
+              <span>{timeframeLabels[timeframe] || 'Last 12 Months'}</span>
               <span
                 style={{
                   fontSize: '0.6rem',
@@ -372,8 +398,14 @@ export default function ProgressMonitoringCurve({
 
                 {[
                   { id: '12m', label: 'Last 12 Months (Full FY)' },
+                  { id: '6m', label: 'Last 6 Months' },
+                  { id: '3m', label: 'Last 3 Months' },
                   { id: 'h1', label: 'First Half (H1: Jan – Jun)' },
                   { id: 'h2', label: 'Second Half (H2: Jul – Dec)' },
+                  { id: 'q1', label: 'Quarter 1 (Q1: Jan – Mar)' },
+                  { id: 'q2', label: 'Quarter 2 (Q2: Apr – Jun)' },
+                  { id: 'q3', label: 'Quarter 3 (Q3: Jul – Sep)' },
+                  { id: 'q4', label: 'Quarter 4 (Q4: Oct – Dec)' },
                 ].map((tf) => {
                   const isTfActive = timeframe === tf.id;
                   return (
@@ -541,9 +573,9 @@ export default function ProgressMonitoringCurve({
                 x={x}
                 y={svgHeight - 8}
                 textAnchor="middle"
-                fill={i === currentMonthIdx ? '#80142B' : '#64748B'}
+                fill={pt.month === 'Nov' ? '#80142B' : '#64748B'}
                 fontSize="8.5"
-                fontWeight={i === currentMonthIdx ? '800' : '600'}
+                fontWeight={pt.month === 'Nov' ? '800' : '600'}
               >
                 {pt.month}
               </text>
