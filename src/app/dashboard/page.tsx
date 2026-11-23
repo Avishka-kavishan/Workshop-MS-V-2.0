@@ -428,8 +428,8 @@ export default function DashboardPage() {
           style={{
             display: 'grid',
             gridTemplateColumns: '1.15fr 1fr 1fr 0.85fr',
-            gap: '0.75rem',
-            marginBottom: '0.75rem',
+            gap: '0.55rem',
+            marginBottom: '0.35rem',
           }}
         >
           {/* Card 1: Last Updated (Solid Maroon Capsule) */}
@@ -438,23 +438,23 @@ export default function DashboardPage() {
               background: 'linear-gradient(135deg, #7A1228 0%, #8D153A 100%)',
               color: '#FFFFFF',
               borderRadius: '14px',
-              padding: '0.75rem 1rem',
+              padding: '0.55rem 0.85rem',
               display: 'flex',
               alignItems: 'center',
-              gap: '0.75rem',
+              gap: '0.65rem',
               boxShadow: '0 4px 14px rgba(122, 18, 40, 0.22)',
             }}
           >
             <div
               style={{
-                width: '36px',
-                height: '36px',
-                borderRadius: '10px',
+                width: '32px',
+                height: '32px',
+                borderRadius: '8px',
                 background: 'rgba(255, 255, 255, 0.16)',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                fontSize: '1.1rem',
+                fontSize: '1rem',
               }}
             >
               📅
@@ -462,7 +462,7 @@ export default function DashboardPage() {
             <div>
               <div
                 style={{
-                  fontSize: '0.68rem',
+                  fontSize: '0.65rem',
                   fontWeight: 600,
                   color: '#FBCFE8',
                   textTransform: 'uppercase',
@@ -471,7 +471,7 @@ export default function DashboardPage() {
               >
                 Last Updated
               </div>
-              <div style={{ fontSize: '0.88rem', fontWeight: 800, marginTop: '2px' }}>
+              <div style={{ fontSize: '0.84rem', fontWeight: 800, marginTop: '1px' }}>
                 {lastUpdatedTime || '20 Nov 2026, 09:13 AM SLST'}
               </div>
             </div>
@@ -482,7 +482,7 @@ export default function DashboardPage() {
             style={{
               background: '#FFFFFF',
               borderRadius: '14px',
-              padding: '0.75rem 1rem',
+              padding: '0.55rem 0.85rem',
               border: '1px solid #F1E5E2',
               display: 'flex',
               alignItems: 'center',
@@ -490,35 +490,35 @@ export default function DashboardPage() {
               boxShadow: '0 2px 8px rgba(122, 18, 40, 0.03)',
             }}
           >
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.55rem' }}>
               <div
                 style={{
-                  width: '36px',
-                  height: '36px',
-                  borderRadius: '10px',
+                  width: '32px',
+                  height: '32px',
+                  borderRadius: '8px',
                   background: '#FDF2F4',
                   color: '#8D153A',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  fontSize: '1.1rem',
+                  fontSize: '1rem',
                 }}
               >
                 📄
               </div>
               <div>
-                <div style={{ fontSize: '0.96rem', fontWeight: 800, color: '#1E1B18' }}>
+                <div style={{ fontSize: '0.92rem', fontWeight: 800, color: '#1E1B18' }}>
                   {telemetryData?.metrics?.totalActivities || 241} Activities
                 </div>
-                <div style={{ fontSize: '0.68rem', fontWeight: 700, color: '#16A34A', marginTop: '2px' }}>
+                <div style={{ fontSize: '0.66rem', fontWeight: 700, color: '#16A34A', marginTop: '1px' }}>
                   ↑ 74% vs last period
                 </div>
               </div>
             </div>
             {/* Sparkline curve */}
-            <svg width="60" height="26" viewBox="0 0 60 26" fill="none">
+            <svg width="60" height="24" viewBox="0 0 60 24" fill="none">
               <path
-                d="M 2 20 Q 15 18, 25 10 T 45 6 T 58 14"
+                d="M 2 18 Q 15 16, 25 9 T 45 5 T 58 12"
                 stroke="#8D153A"
                 strokeWidth="2"
                 fill="none"
@@ -532,7 +532,7 @@ export default function DashboardPage() {
             style={{
               background: '#FFFFFF',
               borderRadius: '14px',
-              padding: '0.75rem 1rem',
+              padding: '0.55rem 0.85rem',
               border: '1px solid #F1E5E2',
               display: 'flex',
               alignItems: 'center',
@@ -540,35 +540,35 @@ export default function DashboardPage() {
               boxShadow: '0 2px 8px rgba(122, 18, 40, 0.03)',
             }}
           >
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.55rem' }}>
               <div
                 style={{
-                  width: '36px',
-                  height: '36px',
-                  borderRadius: '10px',
+                  width: '32px',
+                  height: '32px',
+                  borderRadius: '8px',
                   background: '#ECFDF5',
                   color: '#16A34A',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  fontSize: '1.1rem',
+                  fontSize: '1rem',
                 }}
               >
                 👥
               </div>
               <div>
-                <div style={{ fontSize: '0.96rem', fontWeight: 800, color: '#1E1B18' }}>
+                <div style={{ fontSize: '0.92rem', fontWeight: 800, color: '#1E1B18' }}>
                   28% Plan Progress
                 </div>
-                <div style={{ fontSize: '0.68rem', fontWeight: 700, color: '#16A34A', marginTop: '2px' }}>
+                <div style={{ fontSize: '0.66rem', fontWeight: 700, color: '#16A34A', marginTop: '1px' }}>
                   ↑ 8% vs last month
                 </div>
               </div>
             </div>
             {/* Sparkline curve */}
-            <svg width="60" height="26" viewBox="0 0 60 26" fill="none">
+            <svg width="60" height="24" viewBox="0 0 60 24" fill="none">
               <path
-                d="M 2 22 Q 18 20, 32 14 T 48 8 T 58 4"
+                d="M 2 20 Q 18 18, 32 12 T 48 7 T 58 3"
                 stroke="#16A34A"
                 strokeWidth="2"
                 fill="none"
@@ -582,7 +582,7 @@ export default function DashboardPage() {
             style={{
               background: '#FFFFFF',
               borderRadius: '14px',
-              padding: '0.75rem 1rem',
+              padding: '0.55rem 0.85rem',
               border: '1px solid #F1E5E2',
               display: 'flex',
               alignItems: 'center',
@@ -590,15 +590,15 @@ export default function DashboardPage() {
               boxShadow: '0 2px 8px rgba(122, 18, 40, 0.03)',
             }}
           >
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.55rem' }}>
-              <span style={{ fontSize: '1.1rem' }}>📅</span>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+              <span style={{ fontSize: '1rem' }}>📅</span>
               <select
                 value={selectedYear}
                 onChange={(e) => setSelectedYear(e.target.value)}
                 style={{
                   border: 'none',
                   background: 'transparent',
-                  fontSize: '0.86rem',
+                  fontSize: '0.84rem',
                   fontWeight: 800,
                   color: '#1E1B18',
                   cursor: 'pointer',
@@ -624,13 +624,13 @@ export default function DashboardPage() {
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',
-            marginBottom: '0.85rem',
+            marginBottom: '0.55rem',
             flexWrap: 'wrap',
-            gap: '0.65rem',
+            gap: '0.5rem',
           }}
         >
           {/* Left: Filter Pills */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', flexWrap: 'wrap' }}>
             <select
               value={selectedLevel}
               onChange={(e) => setSelectedLevel(e.target.value)}
@@ -638,7 +638,7 @@ export default function DashboardPage() {
                 background: '#FFFFFF',
                 border: '1px solid #EADBDE',
                 borderRadius: '20px',
-                padding: '0.35rem 0.85rem',
+                padding: '0.28rem 0.75rem',
                 fontSize: '0.74rem',
                 fontWeight: 700,
                 color: '#332E2C',
@@ -660,7 +660,7 @@ export default function DashboardPage() {
                 background: '#FFFFFF',
                 border: '1px solid #EADBDE',
                 borderRadius: '20px',
-                padding: '0.35rem 0.85rem',
+                padding: '0.28rem 0.75rem',
                 fontSize: '0.74rem',
                 fontWeight: 700,
                 color: '#332E2C',
@@ -687,7 +687,7 @@ export default function DashboardPage() {
                 background: '#FFFFFF',
                 border: '1px solid #EADBDE',
                 borderRadius: '20px',
-                padding: '0.35rem 0.85rem',
+                padding: '0.28rem 0.75rem',
                 fontSize: '0.74rem',
                 fontWeight: 700,
                 color: '#332E2C',
