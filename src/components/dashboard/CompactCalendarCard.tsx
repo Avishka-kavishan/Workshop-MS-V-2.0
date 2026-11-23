@@ -322,8 +322,8 @@ export default function CompactCalendarCard({
         style={{
           display: 'flex',
           alignItems: 'center',
-          gap: '0.3rem',
-          marginBottom: '0.45rem',
+          gap: '0.35rem',
+          marginBottom: '0.65rem',
           flexWrap: 'wrap',
         }}
       >
@@ -344,8 +344,8 @@ export default function CompactCalendarCard({
                 background: isSelected ? '#80142B' : '#F8FAFC',
                 color: isSelected ? '#FFFFFF' : '#475569',
                 borderRadius: '12px',
-                padding: '0.2rem 0.6rem',
-                fontSize: '0.68rem',
+                padding: '0.24rem 0.65rem',
+                fontSize: '0.72rem',
                 fontWeight: isSelected ? 800 : 600,
                 cursor: 'pointer',
                 boxShadow: isSelected ? '0 1px 3px rgba(128, 20, 43, 0.2)' : 'none',
@@ -363,16 +363,16 @@ export default function CompactCalendarCard({
         style={{
           display: 'grid',
           gridTemplateColumns: 'repeat(7, 1fr)',
-          gap: '2px',
+          gap: '4px',
           textAlign: 'center',
-          fontSize: '0.66rem',
+          fontSize: '0.72rem',
           fontWeight: 700,
-          color: '#64748B',
-          marginBottom: '3px',
+          color: '#475569',
+          marginBottom: '6px',
         }}
       >
         {WEEKDAYS.map((w) => (
-          <div key={w} style={{ padding: '2px 0' }}>{w}</div>
+          <div key={w} style={{ padding: '3px 0' }}>{w}</div>
         ))}
       </div>
 
@@ -381,8 +381,9 @@ export default function CompactCalendarCard({
         style={{
           display: 'grid',
           gridTemplateColumns: 'repeat(7, 1fr)',
-          gap: '2px',
-          marginBottom: '0.5rem',
+          rowGap: '6px',
+          columnGap: '4px',
+          marginBottom: '0.75rem',
         }}
       >
         {calendarDays.map((cell) => {
@@ -404,22 +405,22 @@ export default function CompactCalendarCard({
                   : cell.isCurrentMonth
                   ? '#1E293B'
                   : '#CBD5E1',
-                borderRadius: isSelected ? '50%' : '6px',
-                padding: '3px 2px',
-                width: isSelected ? '26px' : 'auto',
-                height: isSelected ? '26px' : '24px',
+                borderRadius: isSelected ? '50%' : '8px',
+                padding: '2px',
+                width: isSelected ? '34px' : 'auto',
+                height: '34px',
                 margin: isSelected ? '0 auto' : '0',
                 display: 'flex',
                 flexDirection: 'column',
                 alignItems: 'center',
                 justifyContent: 'center',
                 cursor: 'pointer',
-                boxShadow: isSelected ? '0 2px 6px rgba(128, 20, 43, 0.35)' : 'none',
-                transition: 'all 0.1s ease',
+                boxShadow: isSelected ? '0 3px 8px rgba(128, 20, 43, 0.35)' : 'none',
+                transition: 'all 0.12s ease',
               }}
               title={`${cell.dateKey}: ${eventsOnDay.length} event(s)`}
             >
-              <span style={{ fontSize: '0.68rem', fontWeight: isSelected ? 800 : 600 }}>
+              <span style={{ fontSize: '0.82rem', fontWeight: isSelected ? 800 : cell.isCurrentMonth ? 700 : 500 }}>
                 {cell.dayNum}
               </span>
             </div>
