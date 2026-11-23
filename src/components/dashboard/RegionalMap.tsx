@@ -374,18 +374,19 @@ function RegionalMap({ workshops = [], provincesData, onSelectProvince }: Region
               alignItems: 'center',
               minHeight: 0,
               minWidth: 0,
+              overflow: 'hidden',
               padding: '0.2rem 0.4rem',
             }}
           >
             <svg
-              viewBox="8 -4 224 372"
+              viewBox="0 -8 238 384"
               preserveAspectRatio="xMidYMid meet"
               style={{
-                width: '100%',
                 height: '100%',
                 maxHeight: '100%',
-                display: 'block',
-                filter: 'drop-shadow(0 3px 10px rgba(128, 20, 43, 0.12))',
+                width: '100%',
+                maxWidth: '100%',
+                filter: 'drop-shadow(0 4px 14px rgba(128, 20, 43, 0.12))',
               }}
             >
               {/* Official geoBoundaries ADM0 Coastline Backdrop */}
