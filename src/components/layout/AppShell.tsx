@@ -39,6 +39,20 @@ export default function AppShell({ children }: AppShellProps) {
   const [switchingRole, setSwitchingRole] = useState(false);
   const [rememberRolePref, setRememberRolePref] = useState(true);
 
+  // Live Sync & Profile Avatar Menu
+  const [isLiveSyncing, setIsLiveSyncing] = useState(false);
+  const [showProfileMenu, setShowProfileMenu] = useState(false);
+  const profileMenuRef = useRef<HTMLDivElement>(null);
+
+  const handleLiveSync = () => {
+    setIsLiveSyncing(true);
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(new CustomEvent('app:live-sync'));
+    }
+    fetchNotifications();
+    setTimeout(() => setIsLiveSyncing(false), 1200);
+  };
+
   const fetchUserRoles = async () => {
     try {
       const res = await fetch('/api/auth/switch-role');
@@ -115,6 +129,26 @@ export default function AppShell({ children }: AppShellProps) {
   // Close nav pane on navigation
   useEffect(() => {
     setShowNavMenu(false);
+  }, [pathname]);
+
+  // Close profile menu on click outside
+  useEffect(() => {
+    const handleOutsideClick = (e: MouseEvent) => {
+      if (profileMenuRef.current && !profileMenuRef.current.contains(e.target as Node)) {
+        setShowProfileMenu(false);
+      }
+    };
+    if (showProfileMenu) {
+      document.addEventListener('mousedown', handleOutsideClick);
+    }
+    return () => {
+      document.removeEventListener('mousedown', handleOutsideClick);
+    };
+  }, [showProfileMenu]);
+
+  // Close profile menu on navigation
+  useEffect(() => {
+    setShowProfileMenu(false);
   }, [pathname]);
   const [notifications, setNotifications] = useState<any[]>([]);
   const [unreadCount, setUnreadCount] = useState(0);
@@ -897,90 +931,70 @@ export default function AppShell({ children }: AppShellProps) {
           {/* Right: User Profile & Notifications */}
           <div className="app-header-right" style={{ display: 'flex', alignItems: 'center', gap: '0.65rem' }}>
 
-            {/* Current Working Role & Switch Role Capsule (Requirement B) */}
-            <div
+            {/* Current Role Capsule (First Image Mockup Design) */}
+            <button
+              type="button"
               className="header-switch-role-capsule"
+              onClick={() => {
+                fetchUserRoles();
+                setShowRoleModal(true);
+              }}
               style={{
                 display: 'inline-flex',
                 alignItems: 'center',
-                gap: '0.45rem',
-                background: '#FFFFFF',
-                border: '1.5px solid #0F766E',
+                gap: '0.4rem',
+                background: '#F8EFEA',
+                border: '1px solid #EADBDE',
                 borderRadius: '20px',
-                padding: '3px 10px 3px 12px',
-                boxShadow: '0 1px 4px rgba(15, 118, 110, 0.12)',
+                padding: '0.28rem 0.85rem',
+                fontSize: '0.74rem',
+                color: '#332E2C',
+                fontWeight: 700,
+                cursor: 'pointer',
+                transition: 'all 0.15s ease',
+                boxShadow: '0 1px 3px rgba(128, 20, 43, 0.06)',
               }}
+              title="Click to switch working role"
             >
-              <span style={{ fontSize: '0.72rem', color: '#64748B', fontWeight: 600 }}>
-                Current Role:
+              <span style={{ color: '#80142B', fontWeight: 600 }}>Current Role:</span>
+              <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.35rem', fontWeight: 800 }}>
+                <span>👥</span> {user?.organizationName || user?.roleName || 'MOE Data Management Branch'}
               </span>
+              <span style={{ color: '#685F5C', fontSize: '0.68rem', marginLeft: '2px' }}>▾</span>
+            </button>
+
+            {/* Live Sync Badge (First Image Mockup Design) */}
+            <button
+              type="button"
+              onClick={handleLiveSync}
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '0.35rem',
+                background: '#E8F8EE',
+                border: '1px solid #A7F3D0',
+                borderRadius: '20px',
+                padding: '0.28rem 0.75rem',
+                fontSize: '0.72rem',
+                fontWeight: 800,
+                color: '#15803D',
+                cursor: 'pointer',
+                transition: 'all 0.15s ease',
+              }}
+              title="Click to refresh telemetry sync"
+            >
               <span
                 style={{
-                  fontSize: '0.76rem',
-                  fontWeight: 800,
-                  color: '#0F766E',
-                  maxWidth: '190px',
-                  overflow: 'hidden',
-                  textOverflow: 'ellipsis',
-                  whiteSpace: 'nowrap',
+                  width: '7px',
+                  height: '7px',
+                  borderRadius: '50%',
+                  background: '#10B981',
+                  boxShadow: '0 0 6px #10B981',
+                  display: 'inline-block',
                 }}
-                title={`Current Role: ${user?.roleName || 'Planning Officer'}`}
-              >
-                {user?.roleName || 'Planning Officer'}
-              </span>
-              <span style={{ color: '#CBD5E1', fontSize: '0.8rem' }}>|</span>
-              <button
-                type="button"
-                onClick={() => {
-                  fetchUserRoles();
-                  setShowRoleModal(true);
-                }}
-                style={{
-                  background: 'transparent',
-                  border: 'none',
-                  color: '#DC2626',
-                  fontWeight: 800,
-                  fontSize: '0.74rem',
-                  cursor: 'pointer',
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: '4px',
-                  padding: '2px 4px',
-                  borderRadius: '4px',
-                  transition: 'all 0.15s ease',
-                }}
-                title="Switch working role without logging out"
-              >
-                <span>⇄</span>
-                <span>Switch Role</span>
-              </button>
-            </div>
-
-            {/* User Profile Capsule (Name first then logo, managing space maximally) */}
-            <div
-              className="header-user-profile-capsule"
-              style={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: '0.45rem',
-                padding: '0.2rem 0.55rem',
-                borderRadius: '18px',
-                background: 'rgba(15, 118, 110, 0.06)',
-                border: '1px solid rgba(15, 118, 110, 0.2)',
-                cursor: 'default',
-                lineHeight: 1,
-              }}
-              title={`Logged in as ${user?.name || 'Authorized Officer'} (${user?.organizationName || 'MOE ICT Branch'})`}
-            >
-              <span style={{ fontSize: '0.74rem', fontWeight: 700, color: 'var(--text-primary)', whiteSpace: 'nowrap' }}>
-                Welcome, {user?.name || user?.organizationName || 'Officer'}
-              </span>
-              <BranchBadge
-                name={user?.organizationName || user?.name || 'MOE ICT Branch'}
-                showName={false}
-                size="xs"
               />
-            </div>
+              <span>{isLiveSyncing ? 'Syncing...' : 'Live Sync'}</span>
+            </button>
 
             {/* Notification Bell */}
             <div style={{ position: 'relative' }}>
@@ -1137,6 +1151,127 @@ export default function AppShell({ children }: AppShellProps) {
                       ))
                     )}
                   </div>
+                </div>
+              )}
+            </div>
+
+            {/* Profile Avatar (First Image Mockup Design) */}
+            <div ref={profileMenuRef} style={{ position: 'relative' }}>
+              <button
+                type="button"
+                onClick={() => setShowProfileMenu((prev) => !prev)}
+                style={{
+                  width: '36px',
+                  height: '36px',
+                  borderRadius: '50%',
+                  overflow: 'hidden',
+                  border: '2px solid #EADBDE',
+                  background: '#F5EBE8',
+                  padding: 0,
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  transition: 'transform 0.15s ease, box-shadow 0.15s ease',
+                  boxShadow: '0 1px 4px rgba(0,0,0,0.08)',
+                }}
+                title={`${user?.name || 'Authorized Officer'} (${user?.organizationName || 'MOE Data Management Branch'})`}
+              >
+                <img
+                  src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&auto=format&fit=crop&q=80"
+                  alt="Profile"
+                  style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                />
+              </button>
+
+              {showProfileMenu && (
+                <div
+                  style={{
+                    position: 'absolute',
+                    right: 0,
+                    top: 'calc(100% + 8px)',
+                    background: '#FFFFFF',
+                    border: '1px solid #EADBDE',
+                    borderRadius: '12px',
+                    boxShadow: '0 10px 30px rgba(0, 0, 0, 0.12), 0 2px 8px rgba(0, 0, 0, 0.06)',
+                    padding: '0.85rem',
+                    minWidth: '220px',
+                    zIndex: 100,
+                  }}
+                >
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', marginBottom: '0.65rem' }}>
+                    <div
+                      style={{
+                        width: '38px',
+                        height: '38px',
+                        borderRadius: '50%',
+                        overflow: 'hidden',
+                        border: '1.5px solid #80142B',
+                        flexShrink: 0,
+                      }}
+                    >
+                      <img
+                        src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&auto=format&fit=crop&q=80"
+                        alt="Profile"
+                        style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                      />
+                    </div>
+                    <div>
+                      <div style={{ fontWeight: 800, fontSize: '0.82rem', color: '#1E1B18', lineHeight: 1.2 }}>
+                        {user?.name || 'Authorized Officer'}
+                      </div>
+                      <div style={{ fontSize: '0.7rem', color: '#685F5C', marginTop: '2px' }}>
+                        {user?.organizationName || 'MOE Data Management Branch'}
+                      </div>
+                    </div>
+                  </div>
+                  <div style={{ height: '1px', background: '#F1E8E6', margin: '6px 0 8px' }} />
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setShowProfileMenu(false);
+                      fetchUserRoles();
+                      setShowRoleModal(true);
+                    }}
+                    style={{
+                      width: '100%',
+                      textAlign: 'left',
+                      background: 'none',
+                      border: 'none',
+                      padding: '6px 8px',
+                      fontSize: '0.76rem',
+                      color: '#80142B',
+                      fontWeight: 700,
+                      cursor: 'pointer',
+                      borderRadius: '6px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '8px',
+                    }}
+                  >
+                    <span>⇄</span> Switch Role
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => signOut({ callbackUrl: '/login' })}
+                    style={{
+                      width: '100%',
+                      textAlign: 'left',
+                      background: 'none',
+                      border: 'none',
+                      padding: '6px 8px',
+                      fontSize: '0.76rem',
+                      color: '#DC2626',
+                      fontWeight: 700,
+                      cursor: 'pointer',
+                      borderRadius: '6px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '8px',
+                    }}
+                  >
+                    <span>🚪</span> Sign Out
+                  </button>
                 </div>
               )}
             </div>

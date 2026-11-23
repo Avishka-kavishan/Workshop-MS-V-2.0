@@ -223,10 +223,17 @@ export default function DashboardPage() {
       loadDashboard(true);
     });
 
+    // 5. Header Live Sync Event Listener
+    const handleLiveSync = () => {
+      loadDashboard(true);
+    };
+    window.addEventListener('app:live-sync', handleLiveSync);
+
     return () => {
       clearInterval(pollTimer);
       window.removeEventListener('focus', handleVisibilityOrFocus);
       document.removeEventListener('visibilitychange', handleVisibilityOrFocus);
+      window.removeEventListener('app:live-sync', handleLiveSync);
       unsubscribe();
     };
   }, [loadDashboard]);
@@ -414,133 +421,7 @@ export default function DashboardPage() {
         }}
       >
         {/* ══════════════════════════════════════════════════════
-            1. TOP EXECUTIVE HEADER
-           ══════════════════════════════════════════════════════ */}
-        <div
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'flex-end',
-            padding: '0.45rem 0 0.65rem',
-            flexWrap: 'wrap',
-            gap: '0.75rem',
-          }}
-        >
-          {/* Right: Current Role Capsule, Live Sync Badge, Bell & Avatar */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem', flexWrap: 'wrap' }}>
-            {/* Current Role Capsule */}
-            <div
-              style={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: '0.4rem',
-                background: '#F8EFEA',
-                border: '1px solid #EADBDE',
-                borderRadius: '20px',
-                padding: '0.28rem 0.85rem',
-                fontSize: '0.74rem',
-                color: '#332E2C',
-                fontWeight: 700,
-              }}
-            >
-              <span style={{ color: '#80142B', fontWeight: 600 }}>Current Role:</span>
-              <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.35rem', fontWeight: 800 }}>
-                <span>👥</span> {user?.organizationName || 'MOE Data Management Branch'}
-              </span>
-              <span style={{ color: '#685F5C', fontSize: '0.68rem', marginLeft: '2px' }}>▾</span>
-            </div>
-
-            {/* Live Sync Badge */}
-            <button
-              type="button"
-              onClick={() => loadDashboard(true)}
-              style={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: '0.35rem',
-                background: '#E8F8EE',
-                border: '1px solid #A7F3D0',
-                borderRadius: '20px',
-                padding: '0.28rem 0.75rem',
-                fontSize: '0.72rem',
-                fontWeight: 800,
-                color: '#15803D',
-                cursor: 'pointer',
-              }}
-              title="Click to refresh telemetry sync"
-            >
-              <span
-                style={{
-                  width: '7px',
-                  height: '7px',
-                  borderRadius: '50%',
-                  background: '#10B981',
-                  boxShadow: '0 0 6px #10B981',
-                  display: 'inline-block',
-                }}
-              />
-              <span>{isSyncing ? 'Syncing...' : 'Live Sync'}</span>
-            </button>
-
-            {/* Notification Bell with Badge 3 */}
-            <div
-              style={{
-                position: 'relative',
-                width: '34px',
-                height: '34px',
-                borderRadius: '50%',
-                background: '#F8EFEA',
-                border: '1px solid #EADBDE',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                cursor: 'pointer',
-              }}
-            >
-              <span style={{ fontSize: '1rem' }}>🔔</span>
-              <span
-                style={{
-                  position: 'absolute',
-                  top: '-3px',
-                  right: '-3px',
-                  background: '#EF4444',
-                  color: '#FFFFFF',
-                  fontSize: '0.62rem',
-                  fontWeight: 900,
-                  width: '16px',
-                  height: '16px',
-                  borderRadius: '50%',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                }}
-              >
-                3
-              </span>
-            </div>
-
-            {/* Profile Avatar */}
-            <div
-              style={{
-                width: '36px',
-                height: '36px',
-                borderRadius: '50%',
-                overflow: 'hidden',
-                border: '2px solid #EADBDE',
-                background: '#F5EBE8',
-              }}
-            >
-              <img
-                src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&auto=format&fit=crop&q=80"
-                alt="Profile"
-                style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-              />
-            </div>
-          </div>
-        </div>
-
-        {/* ══════════════════════════════════════════════════════
-            2. TOP KPI & STATUS ROW (4 CARDS)
+            1. TOP KPI & STATUS ROW (4 CARDS)
             Matching Reference Design Exactly
            ══════════════════════════════════════════════════════ */}
         <div
