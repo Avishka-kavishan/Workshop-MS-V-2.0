@@ -21,7 +21,6 @@ import {
   AuditVaultIcon,
   VoteManagementIcon,
 } from '@/components/icons/NavIcons';
-import BranchBadge from '@/components/common/BranchBadge';
 import GlobalSearchableSelect from '@/components/common/GlobalSearchableSelect';
 
 interface AppShellProps {
@@ -543,68 +542,30 @@ export default function AppShell({ children }: AppShellProps) {
           </button>
         )}
 
-        {/* Bottom User Profile & Logout */}
+        {/* Bottom Logout Area */}
         <div
           style={{
-            padding: '0.85rem 0.75rem',
+            padding: isExpanded ? '0.75rem 0.85rem' : '0.65rem 0',
             borderTop: '1px solid rgba(255,255,255,0.15)',
             background: 'rgba(0,0,0,0.18)',
             display: 'flex',
-            flexDirection: 'column',
-            gap: '0.65rem',
+            alignItems: 'center',
+            justifyContent: isExpanded ? 'flex-start' : 'center',
           }}
         >
-          {/* User profile capsule */}
-          <div
-            style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}
-            title={`${user?.name || 'Authorized Officer'} (${user?.organizationName || 'Branch'})`}
-          >
-            <BranchBadge
-              name={user?.organizationName || 'Ministry of Education'}
-              showName={false}
-              size="md"
-              style={{ flexShrink: 0 }}
-            />
-            <div className="sidebar-user-details" style={{ overflow: 'hidden' }}>
-              <div
-                style={{
-                  fontWeight: 700,
-                  fontSize: '0.84rem',
-                  color: '#fff',
-                  overflow: 'hidden',
-                  textOverflow: 'ellipsis',
-                  whiteSpace: 'nowrap',
-                }}
-              >
-                {user?.name || 'Authorized Officer'}
-              </div>
-              <div
-                style={{
-                  fontSize: '0.68rem',
-                  color: '#FFBE29',
-                  overflow: 'hidden',
-                  textOverflow: 'ellipsis',
-                  whiteSpace: 'nowrap',
-                  fontWeight: 600,
-                }}
-              >
-                {user?.organizationName || 'Ministry of Education'}
-              </div>
-            </div>
-          </div>
-
           {/* Logout button */}
           <button
             type="button"
             onClick={() => signOut({ callbackUrl: '/login' })}
             style={{
-              width: '100%',
+              width: isExpanded ? '100%' : '44px',
+              height: '44px',
               display: 'flex',
               alignItems: 'center',
-              justifyContent: isExpanded ? 'center' : 'center',
+              justifyContent: 'center',
               gap: '0.5rem',
-              padding: '0.55rem',
-              borderRadius: '6px',
+              padding: isExpanded ? '0.55rem' : '0',
+              borderRadius: isExpanded ? '8px' : '11px',
               color: 'rgba(255,255,255,0.85)',
               background: 'rgba(255,255,255,0.08)',
               border: '1px solid rgba(255,255,255,0.15)',
@@ -612,6 +573,7 @@ export default function AppShell({ children }: AppShellProps) {
               fontSize: '0.82rem',
               cursor: 'pointer',
               transition: 'all 150ms ease',
+              margin: isExpanded ? '0' : '0 auto',
             }}
             title="Sign out of system"
             onMouseEnter={(e) => {
@@ -626,8 +588,8 @@ export default function AppShell({ children }: AppShellProps) {
             }}
           >
             <svg
-              width="16"
-              height="16"
+              width="18"
+              height="18"
               viewBox="0 0 24 24"
               fill="none"
               stroke="currentColor"
