@@ -307,8 +307,8 @@ export default function MonitoringWorkspacePage() {
 
     const baseline = VOTE_BASELINE_RECORDS[vn] || (vn.startsWith('126') ? VOTE_BASELINE_RECORDS['126'] : { budget: 25.0, spent: 18.5, fundedActivitiesCount: 3 });
 
-    const totalAllocation = actTotalBudget > 0 ? actTotalBudget : baseline.budget;
-    const totalSpent = actTotalSpent > 0 ? actTotalSpent : baseline.spent;
+    const totalAllocation = actTotalBudget > 0 ? actTotalBudget : (activities.length > 0 ? baseline.budget : 0);
+    const totalSpent = actTotalSpent > 0 ? actTotalSpent : (activities.length > 0 ? baseline.spent : 0);
     const remainingBalance = Math.max(0, Math.round((totalAllocation - totalSpent) * 100) / 100);
     const utilizationRate = totalAllocation > 0 ? Math.round((totalSpent / totalAllocation) * 1000) / 10 : 0;
 
@@ -319,8 +319,8 @@ export default function MonitoringWorkspacePage() {
       remainingBalance,
       utilizationRate,
       matchingActivities: filteredMatching,
-      totalMatchingCount: matching.length > 0 ? matching.length : baseline.fundedActivitiesCount,
-      status: utilizationRate >= 75 ? 'On Track' : utilizationRate >= 50 ? 'Moderate Progress' : 'Under-Utilized',
+      totalMatchingCount: matching.length > 0 ? matching.length : (activities.length > 0 ? baseline.fundedActivitiesCount : 0),
+      status: totalAllocation === 0 ? 'No Data' : (utilizationRate >= 75 ? 'On Track' : utilizationRate >= 50 ? 'Moderate Progress' : 'Under-Utilized'),
     };
   }, [selectedVoteNumber, activities, voteBranchFilter]);
 
@@ -1138,6 +1138,15 @@ export default function MonitoringWorkspacePage() {
             </div>
 
             {/* Strategic Goal Cards Cascade */}
+            {activities.length === 0 ? (
+              <div style={{ textAlign: 'center', padding: '3.5rem 1rem', background: '#FAFAF9', borderRadius: '12px', border: '1px dashed #CBD5E1', color: '#64748B' }}>
+                <div style={{ fontSize: '2.5rem', marginBottom: '0.75rem' }}>🎯</div>
+                <div style={{ fontWeight: 800, fontSize: '1.05rem', color: '#1E293B' }}>No Strategic Results Framework Data for FY {selectedYear}</div>
+                <p style={{ fontSize: '0.84rem', color: '#64748B', maxWidth: '540px', margin: '0.4rem auto 0', lineHeight: 1.5 }}>
+                  Strategic outcome KPIs, indicator tracking, and target baselines will populate dynamically as operational branches register and link AIP activities to National Strategic Goals (NSG-1, NSG-2, NSG-3).
+                </p>
+              </div>
+            ) : (
             <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
               {/* GOAL 1 */}
               {(selectedGoalFilter === 'all' || selectedGoalFilter === 'goal-1') && (
@@ -1466,6 +1475,7 @@ export default function MonitoringWorkspacePage() {
                 </div>
               )}
             </div>
+            )}
           </div>
         )}
 
@@ -1499,6 +1509,16 @@ export default function MonitoringWorkspacePage() {
             </div>
 
             {/* Quarterly Phasing S-Curve & Cumulative Expenditure Trajectory */}
+            {activities.length === 0 ? (
+              <div style={{ textAlign: 'center', padding: '3.5rem 1rem', background: '#FAFAF9', borderRadius: '12px', border: '1px dashed #CBD5E1', color: '#64748B' }}>
+                <div style={{ fontSize: '2.5rem', marginBottom: '0.75rem' }}>📈</div>
+                <div style={{ fontWeight: 800, fontSize: '1.05rem', color: '#1E293B' }}>No Sector Performance Records for FY {selectedYear}</div>
+                <p style={{ fontSize: '0.84rem', color: '#64748B', maxWidth: '540px', margin: '0.4rem auto 0', lineHeight: 1.5 }}>
+                  Phasing trajectories, quarterly S-curve expenditure milestones, and operational branch league table rankings will activate once activities are scheduled and monthly progress returns are submitted.
+                </p>
+              </div>
+            ) : (
+              <>
             <h4 style={{ margin: '0 0 0.5rem 0', fontSize: '0.92rem', color: '#1E293B' }}>
               Cumulative Expenditure Phasing Trajectory (Planned vs Actual S-Curve)
             </h4>
@@ -1606,6 +1626,8 @@ export default function MonitoringWorkspacePage() {
                 </tbody>
               </table>
             </div>
+              </>
+            )}
           </div>
         )}
 
@@ -1648,6 +1670,16 @@ export default function MonitoringWorkspacePage() {
               )}
             </div>
 
+            {activities.length === 0 ? (
+              <div style={{ textAlign: 'center', padding: '3.5rem 1rem', background: '#FAFAF9', borderRadius: '12px', border: '1px dashed #CBD5E1', color: '#64748B' }}>
+                <div style={{ fontSize: '2.5rem', marginBottom: '0.75rem' }}>🔍</div>
+                <div style={{ fontWeight: 800, fontSize: '1.05rem', color: '#1E293B' }}>No Data Quality Audit Records for FY {selectedYear}</div>
+                <p style={{ fontSize: '0.84rem', color: '#64748B', maxWidth: '540px', margin: '0.4rem auto 0', lineHeight: 1.5 }}>
+                  Data Quality Index (DQI), completeness scores, consistency audits, and automated anomaly detection will activate as operational branches submit their monthly returns and field verifications.
+                </p>
+              </div>
+            ) : (
+              <>
             {/* DQI Scorecard Cards */}
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '0.85rem', marginBottom: '1.25rem' }}>
               <div style={{ background: '#F0FDF4', border: '1.5px solid #86EFAC', borderRadius: '8px', padding: '1rem' }}>
@@ -1761,6 +1793,8 @@ export default function MonitoringWorkspacePage() {
                 <div style={{ fontSize: '0.72rem', color: '#64748B', marginTop: '4px' }}>Reminders dispatched automatically to Teacher Admin & Infrastructure branches.</div>
               </div>
             </div>
+              </>
+            )}
           </div>
         )}
 
@@ -1802,6 +1836,15 @@ export default function MonitoringWorkspacePage() {
             </div>
 
             {/* Evaluation Studies Cards */}
+            {activities.length === 0 ? (
+              <div style={{ textAlign: 'center', padding: '3.5rem 1rem', background: '#FAFAF9', borderRadius: '12px', border: '1px dashed #CBD5E1', color: '#64748B' }}>
+                <div style={{ fontSize: '2.5rem', marginBottom: '0.75rem' }}>📑</div>
+                <div style={{ fontWeight: 800, fontSize: '1.05rem', color: '#1E293B' }}>No Strategic Evaluations Recorded for FY {selectedYear}</div>
+                <p style={{ fontSize: '0.84rem', color: '#64748B', maxWidth: '540px', margin: '0.4rem auto 0', lineHeight: 1.5 }}>
+                  Evidence-based evaluation studies, mid-term sector reviews, impact assessments, and branch management responses will appear here when registered.
+                </p>
+              </div>
+            ) : (
             <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
               {[
                 {
@@ -1897,6 +1940,7 @@ export default function MonitoringWorkspacePage() {
                 </div>
               ))}
             </div>
+            )}
           </div>
         )}
 
@@ -1942,6 +1986,16 @@ export default function MonitoringWorkspacePage() {
             </div>
 
             {/* Provincial Comparative Table across all 9 Provinces */}
+            {activities.length === 0 ? (
+              <div style={{ textAlign: 'center', padding: '3.5rem 1rem', background: '#FAFAF9', borderRadius: '12px', border: '1px dashed #CBD5E1', color: '#64748B' }}>
+                <div style={{ fontSize: '2.5rem', marginBottom: '0.75rem' }}>🗺️</div>
+                <div style={{ fontWeight: 800, fontSize: '1.05rem', color: '#1E293B' }}>No Geographical Distribution Records for FY {selectedYear}</div>
+                <p style={{ fontSize: '0.84rem', color: '#64748B', maxWidth: '540px', margin: '0.4rem auto 0', lineHeight: 1.5 }}>
+                  Provincial and zonal comparative tables, school reach statistics, and regional educational equity disparity analysis will populate as branch AIP activities are allocated across Sri Lankan provinces.
+                </p>
+              </div>
+            ) : (
+              <>
             <div style={{ overflowX: 'auto', border: '1px solid #E2E8F0', borderRadius: '6px', marginBottom: '1.25rem' }}>
               <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.82rem', textAlign: 'left' }}>
                 <thead>
@@ -2019,6 +2073,8 @@ export default function MonitoringWorkspacePage() {
                 While Western and Southern Provinces demonstrate high physical milestone delivery (&gt;86%), Eastern and Uva Provinces have flagged resource allocation bottlenecks in digital smart lab rollouts. M&E recommends accelerated vote disbursement for remote zonal clusters.
               </div>
             </div>
+              </>
+            )}
           </div>
         )}
 
@@ -2864,19 +2920,25 @@ export default function MonitoringWorkspacePage() {
                       fontSize: '0.75rem',
                       fontWeight: 700,
                       background:
-                        voteExpenditureData.utilizationRate >= 75
+                        voteExpenditureData.totalAllocation === 0
+                          ? '#F1F5F9'
+                          : voteExpenditureData.utilizationRate >= 75
                           ? '#ECFDF5'
                           : voteExpenditureData.utilizationRate >= 50
                           ? '#FFFBEB'
                           : '#FEF2F2',
                       color:
-                        voteExpenditureData.utilizationRate >= 75
+                        voteExpenditureData.totalAllocation === 0
+                          ? '#475569'
+                          : voteExpenditureData.utilizationRate >= 75
                           ? '#065F46'
                           : voteExpenditureData.utilizationRate >= 50
                           ? '#92400E'
                           : '#991B1B',
                       border: `1px solid ${
-                        voteExpenditureData.utilizationRate >= 75
+                        voteExpenditureData.totalAllocation === 0
+                          ? '#CBD5E1'
+                          : voteExpenditureData.utilizationRate >= 75
                           ? '#A7F3D0'
                           : voteExpenditureData.utilizationRate >= 50
                           ? '#FDE68A'
@@ -2884,7 +2946,7 @@ export default function MonitoringWorkspacePage() {
                       }`,
                     }}
                   >
-                    {voteExpenditureData.status === 'On Track' ? '✅ On Track' : voteExpenditureData.status === 'Moderate Progress' ? '⚠️ Moderate Burn' : '🚨 Under-Utilized'} ({voteExpenditureData.utilizationRate}%)
+                    {voteExpenditureData.totalAllocation === 0 ? '⚪ No Records' : voteExpenditureData.status === 'On Track' ? '✅ On Track' : voteExpenditureData.status === 'Moderate Progress' ? '⚠️ Moderate Burn' : '🚨 Under-Utilized'} ({voteExpenditureData.utilizationRate}%)
                   </span>
 
                   <span
@@ -3116,10 +3178,14 @@ export default function MonitoringWorkspacePage() {
                           <td colSpan={7} style={{ padding: '2.5rem 1rem', textAlign: 'center', color: '#64748B' }}>
                             <div style={{ fontSize: '1.6rem', marginBottom: '0.4rem' }}>🏛️</div>
                             <div style={{ fontWeight: 700, fontSize: '0.9rem', color: '#334155' }}>
-                              Vote {voteExpenditureData.voteNumber} — Baseline Treasury Allocation Active
+                              {voteExpenditureData.totalAllocation === 0
+                                ? `Vote ${voteExpenditureData.voteNumber} — No Expenditure Records in FY ${selectedYear}`
+                                : `Vote ${voteExpenditureData.voteNumber} — Baseline Treasury Allocation Active`}
                             </div>
                             <div style={{ fontSize: '0.8rem', color: '#64748B', maxWidth: '580px', margin: '0.25rem auto 0' }}>
-                              This vote is provisioned with <strong>Rs. {formatMillion(voteExpenditureData.totalAllocation)} Mn</strong> allocation. Individual activity expenditure vouchers will appear in this breakdown table as operational divisions submit their monthly AIP returns.
+                              {voteExpenditureData.totalAllocation === 0
+                                ? 'No budget commitments or expenditure vouchers have been recorded for this vote in the current financial year.'
+                                : <>This vote is provisioned with <strong>Rs. {formatMillion(voteExpenditureData.totalAllocation)} Mn</strong> allocation. Individual activity expenditure vouchers will appear in this breakdown table as operational divisions submit their monthly AIP returns.</>}
                             </div>
                           </td>
                         </tr>

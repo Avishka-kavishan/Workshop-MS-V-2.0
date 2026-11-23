@@ -3,6 +3,8 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { getDb, updateDb, FinancialYear } from '@/lib/db';
 
+export const dynamic = 'force-dynamic';
+
 function isSuperAdminUser(user: any): boolean {
   if (!user) return false;
   return (
