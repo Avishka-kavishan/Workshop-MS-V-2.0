@@ -3298,6 +3298,27 @@ export default function AnnualPlanPage() {
                   )}
                   <button
                     type="button"
+                    onClick={handleOpenAddModal}
+                    style={{
+                      background: '#7a1c2d',
+                      color: '#ffffff',
+                      border: 'none',
+                      padding: '4px 12px',
+                      borderRadius: '8px',
+                      fontWeight: 700,
+                      fontSize: '0.78rem',
+                      cursor: 'pointer',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '0.35rem',
+                      boxShadow: '0 2px 4px rgba(122, 28, 45, 0.25)',
+                      transition: 'all 0.2s ease',
+                    }}
+                  >
+                    <span style={{ fontWeight: 800, fontSize: '0.95rem', lineHeight: 1 }}>+</span> Add Activity
+                  </button>
+                  <button
+                    type="button"
                     onClick={() => setShowResponsibilityCard(!showResponsibilityCard)}
                     style={{
                       background: '#f8fafc',
