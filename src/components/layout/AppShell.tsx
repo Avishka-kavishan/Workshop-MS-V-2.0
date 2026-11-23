@@ -447,7 +447,7 @@ export default function AppShell({ children }: AppShellProps) {
         >
 
           {/* Primary System Pillars */}
-          <nav style={{ display: 'flex', flexDirection: 'column' }}>
+          <nav className="nav-rail-group">
             {primaryNavItems.map((item) => {
               const active = isActive(item.href);
               const IconComp = item.icon;
@@ -477,54 +477,57 @@ export default function AppShell({ children }: AppShellProps) {
           </nav>
 
           {/* Section Divider: Workshop Operations */}
-          <div className="sidebar-section-divider">
+          <div className="sidebar-section-divider" />
+          {isExpanded && (
             <div className="sidebar-section-title">
               Operations & Directory
             </div>
-            <div style={{ display: 'flex', flexDirection: 'column' }}>
-              {operationalNavItems.map((item) => {
-                if ((item as any).superAdminOnly && !isSuperAdmin) return null;
-                if ((item as any).adminOnly && !isAdminUser) return null;
-                const active = isActive(item.href);
-                const IconComp = item.icon;
-                return (
-                  <Link
-                    key={item.href}
-                    href={item.href}
-                    className={`nav-rail-item ${active ? 'active' : ''}`}
-                    title={item.label}
-                  >
-                    <div className="nav-rail-icon-box">
-                      <IconComp
-                        size={22}
-                        color={active ? '#80142B' : '#FFFFFF'}
-                        accentColor={active ? '#80142B' : '#FFBE29'}
-                      />
-                    </div>
-                    <span className="nav-rail-label" style={{ fontWeight: active ? 700 : 500 }}>
-                      {item.label}
+          )}
+
+          {/* Operations & Directory Pillars */}
+          <nav className="nav-rail-group">
+            {operationalNavItems.map((item) => {
+              if ((item as any).superAdminOnly && !isSuperAdmin) return null;
+              if ((item as any).adminOnly && !isAdminUser) return null;
+              const active = isActive(item.href);
+              const IconComp = item.icon;
+              return (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  className={`nav-rail-item ${active ? 'active' : ''}`}
+                  title={item.label}
+                >
+                  <div className="nav-rail-icon-box">
+                    <IconComp
+                      size={22}
+                      color={active ? '#80142B' : '#FFFFFF'}
+                      accentColor={active ? '#80142B' : '#FFBE29'}
+                    />
+                  </div>
+                  <span className="nav-rail-label" style={{ fontWeight: active ? 700 : 500 }}>
+                    {item.label}
+                  </span>
+                  {item.badge && isExpanded && (
+                    <span
+                      style={{
+                        marginLeft: 'auto',
+                        background: '#FFBE29',
+                        color: '#5c0f28',
+                        fontSize: '0.62rem',
+                        fontWeight: 800,
+                        padding: '0.15rem 0.4rem',
+                        borderRadius: '4px',
+                        letterSpacing: '0.04em',
+                      }}
+                    >
+                      {item.badge}
                     </span>
-                    {item.badge && isExpanded && (
-                      <span
-                        style={{
-                          marginLeft: 'auto',
-                          background: '#FFBE29',
-                          color: '#5c0f28',
-                          fontSize: '0.62rem',
-                          fontWeight: 800,
-                          padding: '0.15rem 0.4rem',
-                          borderRadius: '4px',
-                          letterSpacing: '0.04em',
-                        }}
-                      >
-                        {item.badge}
-                      </span>
-                    )}
-                  </Link>
-                );
-              })}
-            </div>
-          </div>
+                  )}
+                </Link>
+              );
+            })}
+          </nav>
         </div>
 
         {/* ── Active Arrow Icon at BOTTOM Edge (Only in collapsed rail view, hidden in expanded view) ── */}
