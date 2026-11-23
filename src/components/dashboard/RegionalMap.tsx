@@ -654,50 +654,71 @@ function RegionalMap({ workshops = [], provincesData, onSelectProvince }: Region
           <div
             style={{
               background: '#FFFFFF',
-              borderRadius: '16px',
-              maxWidth: '880px',
+              borderRadius: '20px',
+              maxWidth: '890px',
               width: '100%',
               maxHeight: '88vh',
               overflowY: 'auto',
-              boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.35)',
-              border: '1px solid #E2E8F0',
+              boxShadow: '0 25px 60px -15px rgba(128, 20, 43, 0.25), 0 10px 30px rgba(0, 0, 0, 0.12)',
+              border: '1px solid #EADBDE',
               display: 'flex',
               flexDirection: 'column',
               animation: 'fadeIn 0.2s ease',
             }}
             onClick={(e) => e.stopPropagation()}
           >
-            {/* Modal Header (Matching Top Government Header) */}
+            {/* Modal Header (Matching MoE Sri Lanka Brand Identity) */}
             <div
               style={{
-                padding: '1.25rem 1.5rem',
-                borderBottom: '1px solid #E2E8F0',
-                background: 'linear-gradient(135deg, #0A192F 0%, #0F2A4A 60%, #173B63 100%)',
+                padding: '1.25rem 1.6rem',
+                borderBottom: '1px solid rgba(255, 255, 255, 0.12)',
+                background: 'linear-gradient(135deg, #7A1228 0%, #8D153A 55%, #5B0E1E 100%)',
                 color: '#FFFFFF',
-                borderTopLeftRadius: '16px',
-                borderTopRightRadius: '16px',
+                borderTopLeftRadius: '20px',
+                borderTopRightRadius: '20px',
+                position: 'relative',
               }}
             >
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.65rem' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem' }}>
-                  <span style={{ fontSize: '1.3rem' }}>🚦</span>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                  <div
+                    style={{
+                      width: '40px',
+                      height: '40px',
+                      borderRadius: '12px',
+                      background: 'rgba(255, 255, 255, 0.15)',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      fontSize: '1.25rem',
+                      border: '1px solid rgba(255, 255, 255, 0.25)',
+                    }}
+                  >
+                    🚦
+                  </div>
                   <div>
-                    <h2 style={{ margin: 0, fontSize: '1.2rem', fontWeight: 800, color: '#FFFFFF', display: 'flex', alignItems: 'center', gap: '0.55rem' }}>
+                    <h2 style={{ margin: 0, fontSize: '1.25rem', fontWeight: 800, color: '#FFFFFF', display: 'flex', alignItems: 'center', gap: '0.6rem', letterSpacing: '-0.01em' }}>
                       <span>{activeDrillProvince.name}</span>
                       <span
                         style={{
-                          fontSize: '0.72rem',
-                          padding: '0.15rem 0.5rem',
-                          borderRadius: '6px',
-                          background: getTrafficLight(activeDrillProvince.progressPct).bg,
+                          fontSize: '0.7rem',
+                          padding: '0.15rem 0.55rem',
+                          borderRadius: '16px',
+                          background: 'rgba(255, 255, 255, 0.2)',
+                          backdropFilter: 'blur(4px)',
+                          border: '1px solid rgba(255, 255, 255, 0.35)',
                           color: '#FFFFFF',
-                          fontWeight: 700,
+                          fontWeight: 800,
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          gap: '5px',
                         }}
                       >
+                        <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: getTrafficLight(activeDrillProvince.progressPct).bg, display: 'inline-block' }} />
                         {activeDrillProvince.progressPct}% • {getTrafficLight(activeDrillProvince.progressPct).label}
                       </span>
                     </h2>
-                    <div style={{ fontSize: '0.75rem', color: '#94A3B8', marginTop: '2px' }}>
+                    <div style={{ fontSize: '0.74rem', color: '#FCE7E1', marginTop: '3px' }}>
                       Provincial Director: <strong>{activeDrillProvince.directorName}</strong> • Capital: {activeDrillProvince.capital}
                     </div>
                   </div>
@@ -707,17 +728,18 @@ function RegionalMap({ workshops = [], provincesData, onSelectProvince }: Region
                   type="button"
                   onClick={closeDrillDown}
                   style={{
-                    background: 'rgba(255, 255, 255, 0.15)',
-                    border: 'none',
+                    background: 'rgba(255, 255, 255, 0.16)',
+                    border: '1px solid rgba(255, 255, 255, 0.25)',
                     borderRadius: '50%',
                     width: '32px',
                     height: '32px',
                     color: '#FFFFFF',
                     cursor: 'pointer',
-                    fontSize: '1rem',
+                    fontSize: '0.9rem',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
+                    transition: 'all 0.15s ease',
                   }}
                   title="Close modal"
                 >
@@ -725,23 +747,38 @@ function RegionalMap({ workshops = [], provincesData, onSelectProvince }: Region
                 </button>
               </div>
 
-              {/* Breadcrumb Navigation */}
-              <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', fontSize: '0.76rem', color: '#94A3B8' }}>
+              {/* Breadcrumb Navigation Bar */}
+              <div
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.45rem',
+                  fontSize: '0.76rem',
+                  background: 'rgba(0, 0, 0, 0.18)',
+                  padding: '0.35rem 0.75rem',
+                  borderRadius: '8px',
+                  marginTop: '0.5rem',
+                }}
+              >
                 <button
                   type="button"
                   onClick={() => setDrillLevel('province')}
                   style={{
                     background: 'transparent',
                     border: 'none',
-                    color: drillLevel === 'province' ? '#38BDF8' : '#94A3B8',
+                    color: drillLevel === 'province' ? '#FCD34D' : '#FCE7E1',
                     cursor: 'pointer',
-                    fontWeight: drillLevel === 'province' ? 800 : 500,
+                    fontWeight: drillLevel === 'province' ? 800 : 600,
                     padding: 0,
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '4px',
                   }}
                 >
-                  🏛️ {activeDrillProvince.name} (Overview)
+                  <span>🏛️</span>
+                  <span>{activeDrillProvince.name} (Overview)</span>
                 </button>
-                <span>›</span>
+                <span style={{ color: 'rgba(255, 255, 255, 0.45)' }}>›</span>
                 {activeDrillZone && (
                   <button
                     type="button"
@@ -749,20 +786,25 @@ function RegionalMap({ workshops = [], provincesData, onSelectProvince }: Region
                     style={{
                       background: 'transparent',
                       border: 'none',
-                      color: drillLevel === 'zone' ? '#38BDF8' : '#94A3B8',
+                      color: drillLevel === 'zone' ? '#FCD34D' : '#FCE7E1',
                       cursor: 'pointer',
-                      fontWeight: drillLevel === 'zone' ? 800 : 500,
+                      fontWeight: drillLevel === 'zone' ? 800 : 600,
                       padding: 0,
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '4px',
                     }}
                   >
-                    📍 {activeDrillZone.name}
+                    <span>📍</span>
+                    <span>{activeDrillZone.name}</span>
                   </button>
                 )}
                 {drillLevel === 'division' && activeDrillDivision && (
                   <>
-                    <span>›</span>
-                    <span style={{ color: '#FCD34D', fontWeight: 800 }}>
-                      🔍 {activeDrillDivision.name} (Issues)
+                    <span style={{ color: 'rgba(255, 255, 255, 0.45)' }}>›</span>
+                    <span style={{ color: '#FCD34D', fontWeight: 800, display: 'flex', alignItems: 'center', gap: '4px' }}>
+                      <span>🔍</span>
+                      <span>{activeDrillDivision.name} (Issues)</span>
                     </span>
                   </>
                 )}
@@ -771,32 +813,35 @@ function RegionalMap({ workshops = [], provincesData, onSelectProvince }: Region
 
             {/* Modal Body: Level 1 (Province) */}
             {drillLevel === 'province' && (
-              <div style={{ padding: '1.35rem 1.5rem' }}>
+              <div style={{ padding: '1.35rem 1.6rem', background: '#FFFFFF' }}>
                 {/* Summary Cards */}
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '0.85rem', marginBottom: '1.25rem' }}>
-                  <div style={{ background: '#F8FAFC', padding: '0.85rem', borderRadius: '10px', border: '1px solid #E2E8F0' }}>
-                    <div style={{ fontSize: '0.72rem', color: '#64748B', fontWeight: 600 }}>OVERALL EXECUTION RATE</div>
-                    <div style={{ fontSize: '1.45rem', fontWeight: 800, color: getTrafficLight(activeDrillProvince.progressPct).bg, marginTop: '2px' }}>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '0.85rem', marginBottom: '1.15rem' }}>
+                  <div style={{ background: '#FFF5F2', padding: '0.85rem 1rem', borderRadius: '12px', border: '1px solid #F2DDD5' }}>
+                    <div style={{ fontSize: '0.68rem', color: '#80142B', fontWeight: 800, letterSpacing: '0.04em' }}>OVERALL EXECUTION RATE</div>
+                    <div style={{ fontSize: '1.5rem', fontWeight: 900, color: getTrafficLight(activeDrillProvince.progressPct).bg, marginTop: '2px' }}>
                       {activeDrillProvince.progressPct}%
+                    </div>
+                    <div style={{ fontSize: '0.68rem', color: '#80142B', fontWeight: 700, marginTop: '2px' }}>
+                      {getTrafficLight(activeDrillProvince.progressPct).label}
                     </div>
                   </div>
 
-                  <div style={{ background: '#F8FAFC', padding: '0.85rem', borderRadius: '10px', border: '1px solid #E2E8F0' }}>
-                    <div style={{ fontSize: '0.72rem', color: '#64748B', fontWeight: 600 }}>BUDGET EXPENDITURE</div>
-                    <div style={{ fontSize: '1.35rem', fontWeight: 800, color: '#0F172A', marginTop: '2px' }}>
+                  <div style={{ background: '#FDF9F7', padding: '0.85rem 1rem', borderRadius: '12px', border: '1px solid #F1E5E2' }}>
+                    <div style={{ fontSize: '0.68rem', color: '#64748B', fontWeight: 800, letterSpacing: '0.04em' }}>BUDGET EXPENDITURE</div>
+                    <div style={{ fontSize: '1.4rem', fontWeight: 900, color: '#0F172A', marginTop: '2px' }}>
                       Rs. {activeDrillProvince.budgetSpentMn}M
                     </div>
-                    <div style={{ fontSize: '0.68rem', color: '#64748B' }}>
+                    <div style={{ fontSize: '0.68rem', color: '#64748B', marginTop: '2px' }}>
                       Allocated: Rs. {activeDrillProvince.budgetAllocatedMn}M
                     </div>
                   </div>
 
-                  <div style={{ background: '#F8FAFC', padding: '0.85rem', borderRadius: '10px', border: '1px solid #E2E8F0' }}>
-                    <div style={{ fontSize: '0.72rem', color: '#64748B', fontWeight: 600 }}>PLANS & WORKSHOPS</div>
-                    <div style={{ fontSize: '1.35rem', fontWeight: 800, color: '#0F766E', marginTop: '2px' }}>
+                  <div style={{ background: '#FDF9F7', padding: '0.85rem 1rem', borderRadius: '12px', border: '1px solid #F1E5E2' }}>
+                    <div style={{ fontSize: '0.68rem', color: '#64748B', fontWeight: 800, letterSpacing: '0.04em' }}>PLANS & WORKSHOPS</div>
+                    <div style={{ fontSize: '1.4rem', fontWeight: 900, color: '#80142B', marginTop: '2px' }}>
                       {activeDrillProvince.activitiesCount} Plans
                     </div>
-                    <div style={{ fontSize: '0.68rem', color: '#64748B' }}>
+                    <div style={{ fontSize: '0.68rem', color: '#64748B', marginTop: '2px' }}>
                       {activeDrillProvince.workshopsCount} Scheduled Workshops
                     </div>
                   </div>
@@ -805,16 +850,17 @@ function RegionalMap({ workshops = [], provincesData, onSelectProvince }: Region
                 {/* Priority Initiative */}
                 <div
                   style={{
-                    background: '#F1F5F9',
+                    background: 'linear-gradient(90deg, #FFF5F2 0%, #FFFFFF 100%)',
                     padding: '0.75rem 1rem',
-                    borderRadius: '8px',
+                    borderRadius: '10px',
                     fontSize: '0.78rem',
                     color: '#1E293B',
                     marginBottom: '1.25rem',
-                    borderLeft: '4px solid #0284C7',
+                    border: '1px solid #F2DDD5',
+                    borderLeft: '4px solid #80142B',
                   }}
                 >
-                  <strong style={{ color: '#0F172A' }}>Provincial Priority Flagship:</strong> {activeDrillProvince.keyInitiative}
+                  <strong style={{ color: '#80142B' }}>🎯 Provincial Priority Flagship:</strong> {activeDrillProvince.keyInitiative}
                 </div>
 
                 {/* Zone Breakdown */}
@@ -822,7 +868,7 @@ function RegionalMap({ workshops = [], provincesData, onSelectProvince }: Region
                   Constituent Educational Zones ({activeDrillProvince.zones.length})
                 </h4>
 
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '0.85rem' }}>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '0.85rem' }}>
                   {activeDrillProvince.zones.map((zone) => {
                     const ztl = getTrafficLight(zone.progressPct);
                     const totalIssues = zone.divisions.reduce((acc, div) => acc + div.issues.length, 0);
@@ -832,28 +878,29 @@ function RegionalMap({ workshops = [], provincesData, onSelectProvince }: Region
                         key={zone.id}
                         style={{
                           background: '#FFFFFF',
-                          border: '1px solid #E2E8F0',
+                          border: '1px solid #F1E5E2',
                           borderLeft: `4px solid ${ztl.bg}`,
-                          borderRadius: '10px',
+                          borderRadius: '12px',
                           padding: '0.95rem',
-                          boxShadow: '0 2px 6px rgba(0,0,0,0.02)',
+                          boxShadow: '0 2px 8px rgba(128, 20, 43, 0.04)',
                           display: 'flex',
                           flexDirection: 'column',
                           justifyContent: 'space-between',
                         }}
                       >
                         <div>
-                          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.4rem' }}>
-                            <span style={{ fontWeight: 800, fontSize: '0.9rem', color: '#0F172A' }}>
+                          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.45rem' }}>
+                            <span style={{ fontWeight: 800, fontSize: '0.92rem', color: '#0F172A' }}>
                               {zone.name}
                             </span>
                             <span
                               style={{
                                 fontSize: '0.7rem',
-                                padding: '0.1rem 0.45rem',
-                                borderRadius: '4px',
-                                background: ztl.bg,
-                                color: '#FFFFFF',
+                                padding: '0.12rem 0.5rem',
+                                borderRadius: '12px',
+                                background: ztl.lightBg,
+                                color: ztl.border,
+                                border: `1px solid ${ztl.border}`,
                                 fontWeight: 800,
                               }}
                             >
@@ -861,13 +908,13 @@ function RegionalMap({ workshops = [], provincesData, onSelectProvince }: Region
                             </span>
                           </div>
 
-                          <div style={{ height: '6px', background: '#E2E8F0', borderRadius: '3px', overflow: 'hidden', marginBottom: '0.5rem' }}>
+                          <div style={{ height: '6px', background: '#F1E5E2', borderRadius: '3px', overflow: 'hidden', marginBottom: '0.55rem' }}>
                             <div style={{ width: `${Math.min(zone.progressPct, 100)}%`, height: '100%', background: ztl.bg, borderRadius: '3px' }} />
                           </div>
 
                           <div style={{ fontSize: '0.72rem', color: '#64748B', display: 'flex', justifyContent: 'space-between', marginBottom: '0.5rem' }}>
                             <span>Budget: Rs. {zone.budgetSpentMn}M / {zone.budgetAllocatedMn}M</span>
-                            <span>{zone.divisionsCount} Divisions</span>
+                            <span style={{ fontWeight: 600 }}>{zone.divisionsCount} Divisions</span>
                           </div>
 
                           {totalIssues > 0 ? (
@@ -875,7 +922,7 @@ function RegionalMap({ workshops = [], provincesData, onSelectProvince }: Region
                               ⚠️ {totalIssues} Grass-roots Bottleneck{totalIssues > 1 ? 's' : ''} Flagged
                             </div>
                           ) : (
-                            <div style={{ fontSize: '0.7rem', color: '#166534', fontWeight: 700 }}>
+                            <div style={{ fontSize: '0.7rem', color: '#16A34A', fontWeight: 700 }}>
                               ✓ On Schedule
                             </div>
                           )}
@@ -889,19 +936,28 @@ function RegionalMap({ workshops = [], provincesData, onSelectProvince }: Region
                             setDrillLevel('zone');
                           }}
                           style={{
-                            background: '#F8FAFC',
-                            border: '1px solid #CBD5E1',
-                            borderRadius: '6px',
-                            padding: '0.35rem 0.5rem',
+                            background: '#FFF5F2',
+                            border: '1px solid #F2DDD5',
+                            borderRadius: '8px',
+                            padding: '0.4rem 0.6rem',
                             fontSize: '0.74rem',
                             fontWeight: 700,
-                            color: '#0F172A',
+                            color: '#80142B',
                             cursor: 'pointer',
                             display: 'flex',
                             alignItems: 'center',
                             justifyContent: 'center',
-                            gap: '0.35rem',
-                            marginTop: '0.75rem',
+                            gap: '0.4rem',
+                            marginTop: '0.85rem',
+                            transition: 'all 0.15s ease',
+                          }}
+                          onMouseEnter={(e) => {
+                            e.currentTarget.style.background = '#80142B';
+                            e.currentTarget.style.color = '#FFFFFF';
+                          }}
+                          onMouseLeave={(e) => {
+                            e.currentTarget.style.background = '#FFF5F2';
+                            e.currentTarget.style.color = '#80142B';
                           }}
                         >
                           <span>Inspect Divisions</span>
@@ -916,25 +972,26 @@ function RegionalMap({ workshops = [], provincesData, onSelectProvince }: Region
 
             {/* Modal Body: Level 2 (Zone ➔ Divisions) */}
             {drillLevel === 'zone' && activeDrillZone && (
-              <div style={{ padding: '1.35rem 1.5rem' }}>
+              <div style={{ padding: '1.35rem 1.6rem', background: '#FFFFFF' }}>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.15rem', flexWrap: 'wrap', gap: '0.5rem' }}>
                   <div>
-                    <h3 style={{ margin: 0, fontSize: '1.1rem', fontWeight: 800, color: '#0F172A', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                    <h3 style={{ margin: 0, fontSize: '1.15rem', fontWeight: 800, color: '#0F172A', display: 'flex', alignItems: 'center', gap: '0.55rem' }}>
                       <span>{activeDrillZone.name}</span>
                       <span
                         style={{
                           fontSize: '0.7rem',
-                          padding: '0.15rem 0.45rem',
-                          borderRadius: '4px',
-                          background: getTrafficLight(activeDrillZone.progressPct).bg,
-                          color: '#FFFFFF',
-                          fontWeight: 700,
+                          padding: '0.12rem 0.5rem',
+                          borderRadius: '12px',
+                          background: getTrafficLight(activeDrillZone.progressPct).lightBg,
+                          color: getTrafficLight(activeDrillZone.progressPct).border,
+                          border: `1px solid ${getTrafficLight(activeDrillZone.progressPct).border}`,
+                          fontWeight: 800,
                         }}
                       >
                         {activeDrillZone.progressPct}%
                       </span>
                     </h3>
-                    <div style={{ fontSize: '0.74rem', color: '#64748B', marginTop: '2px' }}>
+                    <div style={{ fontSize: '0.74rem', color: '#64748B', marginTop: '3px' }}>
                       Zone Code: <strong>{activeDrillZone.code}</strong> • Budget: Rs. {activeDrillZone.budgetSpentMn}M / {activeDrillZone.budgetAllocatedMn}M
                     </div>
                   </div>
@@ -943,14 +1000,15 @@ function RegionalMap({ workshops = [], provincesData, onSelectProvince }: Region
                     type="button"
                     onClick={() => setDrillLevel('province')}
                     style={{
-                      background: '#F1F5F9',
-                      border: '1px solid #CBD5E1',
-                      borderRadius: '6px',
-                      padding: '0.3rem 0.65rem',
+                      background: '#FFF5F2',
+                      border: '1px solid #F2DDD5',
+                      borderRadius: '8px',
+                      padding: '0.35rem 0.75rem',
                       fontSize: '0.74rem',
                       fontWeight: 700,
                       cursor: 'pointer',
-                      color: '#475569',
+                      color: '#80142B',
+                      transition: 'all 0.15s ease',
                     }}
                   >
                     ← Back to All Zones
@@ -966,28 +1024,29 @@ function RegionalMap({ workshops = [], provincesData, onSelectProvince }: Region
                         key={div.id}
                         style={{
                           background: '#FFFFFF',
-                          border: '1px solid #E2E8F0',
+                          border: '1px solid #F1E5E2',
                           borderLeft: `4px solid ${dtl.bg}`,
-                          borderRadius: '10px',
-                          padding: '0.95rem',
+                          borderRadius: '12px',
+                          padding: '0.95rem 1.1rem',
+                          boxShadow: '0 2px 6px rgba(128, 20, 43, 0.03)',
                         }}
                       >
                         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '0.5rem' }}>
                           <div>
                             <div style={{ display: 'flex', alignItems: 'center', gap: '0.45rem' }}>
-                              <span style={{ fontWeight: 800, fontSize: '0.92rem', color: '#0F172A' }}>{div.name}</span>
-                              <span style={{ fontSize: '0.68rem', color: '#64748B', background: '#F1F5F9', padding: '0.08rem 0.35rem', borderRadius: '4px' }}>
+                              <span style={{ fontWeight: 800, fontSize: '0.94rem', color: '#0F172A' }}>{div.name}</span>
+                              <span style={{ fontSize: '0.68rem', color: '#80142B', background: '#FFF5F2', border: '1px solid #F2DDD5', padding: '0.08rem 0.4rem', borderRadius: '4px', fontWeight: 700 }}>
                                 {div.code}
                               </span>
                             </div>
-                            <div style={{ fontSize: '0.72rem', color: '#64748B', marginTop: '2px' }}>
+                            <div style={{ fontSize: '0.72rem', color: '#64748B', marginTop: '3px' }}>
                               Schools: <strong>{div.activeSchoolsCount}</strong> • Budget: Rs. {div.budgetSpentMn}M / {div.budgetAllocatedMn}M
                             </div>
                           </div>
 
-                          <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem' }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
                             <div style={{ textAlign: 'right' }}>
-                              <div style={{ fontSize: '1rem', fontWeight: 800, color: dtl.bg }}>
+                              <div style={{ fontSize: '1.05rem', fontWeight: 900, color: dtl.bg }}>
                                 {div.progressPct}%
                               </div>
                               <div style={{ fontSize: '0.66rem', color: dtl.badgeColor, fontWeight: 700 }}>
@@ -1002,14 +1061,16 @@ function RegionalMap({ workshops = [], provincesData, onSelectProvince }: Region
                                 setDrillLevel('division');
                               }}
                               style={{
-                                background: div.issues.length > 0 ? '#DC2626' : '#0F766E',
+                                background: div.issues.length > 0 ? '#DC2626' : '#80142B',
                                 color: '#FFFFFF',
                                 border: 'none',
-                                borderRadius: '6px',
-                                padding: '0.4rem 0.75rem',
+                                borderRadius: '8px',
+                                padding: '0.4rem 0.85rem',
                                 fontSize: '0.74rem',
                                 fontWeight: 700,
                                 cursor: 'pointer',
+                                boxShadow: '0 2px 6px rgba(128, 20, 43, 0.2)',
+                                transition: 'all 0.15s ease',
                               }}
                             >
                               {div.issues.length > 0 ? `Inspect Issues (${div.issues.length})` : 'Inspect'} ➔
@@ -1025,25 +1086,26 @@ function RegionalMap({ workshops = [], provincesData, onSelectProvince }: Region
 
             {/* Modal Body: Level 3 (Division ➔ Stalled Issues) */}
             {drillLevel === 'division' && activeDrillDivision && (
-              <div style={{ padding: '1.35rem 1.5rem' }}>
+              <div style={{ padding: '1.35rem 1.6rem', background: '#FFFFFF' }}>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.15rem', flexWrap: 'wrap', gap: '0.5rem' }}>
                   <div>
-                    <h3 style={{ margin: 0, fontSize: '1.1rem', fontWeight: 800, color: '#0F172A', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                    <h3 style={{ margin: 0, fontSize: '1.15rem', fontWeight: 800, color: '#0F172A', display: 'flex', alignItems: 'center', gap: '0.55rem' }}>
                       <span>🔍 {activeDrillDivision.name}</span>
                       <span
                         style={{
                           fontSize: '0.7rem',
-                          padding: '0.15rem 0.45rem',
-                          borderRadius: '4px',
-                          background: getTrafficLight(activeDrillDivision.progressPct).bg,
-                          color: '#FFFFFF',
-                          fontWeight: 700,
+                          padding: '0.12rem 0.5rem',
+                          borderRadius: '12px',
+                          background: getTrafficLight(activeDrillDivision.progressPct).lightBg,
+                          color: getTrafficLight(activeDrillDivision.progressPct).border,
+                          border: `1px solid ${getTrafficLight(activeDrillDivision.progressPct).border}`,
+                          fontWeight: 800,
                         }}
                       >
                         {activeDrillDivision.progressPct}%
                       </span>
                     </h3>
-                    <div style={{ fontSize: '0.74rem', color: '#64748B', marginTop: '2px' }}>
+                    <div style={{ fontSize: '0.74rem', color: '#64748B', marginTop: '3px' }}>
                       Code: <strong>{activeDrillDivision.code}</strong> • Schools: <strong>{activeDrillDivision.activeSchoolsCount}</strong>
                     </div>
                   </div>
@@ -1052,14 +1114,15 @@ function RegionalMap({ workshops = [], provincesData, onSelectProvince }: Region
                     type="button"
                     onClick={() => setDrillLevel('zone')}
                     style={{
-                      background: '#F1F5F9',
-                      border: '1px solid #CBD5E1',
-                      borderRadius: '6px',
-                      padding: '0.3rem 0.65rem',
+                      background: '#FFF5F2',
+                      border: '1px solid #F2DDD5',
+                      borderRadius: '8px',
+                      padding: '0.35rem 0.75rem',
                       fontSize: '0.74rem',
                       fontWeight: 700,
                       cursor: 'pointer',
-                      color: '#475569',
+                      color: '#80142B',
+                      transition: 'all 0.15s ease',
                     }}
                   >
                     ← Back to Divisions List
@@ -1067,7 +1130,7 @@ function RegionalMap({ workshops = [], provincesData, onSelectProvince }: Region
                 </div>
 
                 {activeDrillDivision.issues.length === 0 ? (
-                  <div style={{ padding: '2rem', textAlign: 'center', background: '#F0FDF4', border: '1px solid #BBF7D0', borderRadius: '10px', color: '#166534' }}>
+                  <div style={{ padding: '2rem', textAlign: 'center', background: '#F0FDF4', border: '1px solid #BBF7D0', borderRadius: '12px', color: '#166534' }}>
                     <div style={{ fontSize: '1.8rem', marginBottom: '0.4rem' }}>✅</div>
                     <div style={{ fontWeight: 800, fontSize: '0.95rem' }}>No Stalled Activities Found</div>
                     <div style={{ fontSize: '0.76rem', color: '#15803D', marginTop: '3px' }}>
@@ -1081,11 +1144,11 @@ function RegionalMap({ workshops = [], provincesData, onSelectProvince }: Region
                         key={issue.id}
                         style={{
                           background: '#FFFFFF',
-                          border: '1px solid #E2E8F0',
+                          border: '1px solid #F1E5E2',
                           borderLeft: `4px solid ${issue.severity === 'Critical' ? '#DC2626' : issue.severity === 'High' ? '#EA580C' : '#EAB308'}`,
-                          borderRadius: '10px',
+                          borderRadius: '12px',
                           padding: '1rem',
-                          boxShadow: '0 2px 6px rgba(0,0,0,0.03)',
+                          boxShadow: '0 2px 8px rgba(128, 20, 43, 0.04)',
                         }}
                       >
                         <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '0.5rem', marginBottom: '0.55rem' }}>
@@ -1097,8 +1160,8 @@ function RegionalMap({ workshops = [], provincesData, onSelectProvince }: Region
                               <span
                                 style={{
                                   fontSize: '0.64rem',
-                                  padding: '0.1rem 0.4rem',
-                                  borderRadius: '4px',
+                                  padding: '0.1rem 0.45rem',
+                                  borderRadius: '6px',
                                   fontWeight: 800,
                                   background: issue.severity === 'Critical' ? '#DC2626' : issue.severity === 'High' ? '#EA580C' : '#EAB308',
                                   color: '#FFFFFF',
@@ -1114,17 +1177,17 @@ function RegionalMap({ workshops = [], provincesData, onSelectProvince }: Region
                             )}
                           </div>
 
-                          <span style={{ background: '#FEF2F2', color: '#DC2626', border: '1px solid #FCA5A5', borderRadius: '4px', padding: '0.15rem 0.45rem', fontSize: '0.68rem', fontWeight: 800 }}>
+                          <span style={{ background: '#FFF5F2', color: '#80142B', border: '1px solid #F2DDD5', borderRadius: '6px', padding: '0.15rem 0.5rem', fontSize: '0.68rem', fontWeight: 800 }}>
                             ⏳ {issue.daysDelayed}d delayed
                           </span>
                         </div>
 
-                        <div style={{ background: '#FFF7ED', border: '1px solid #FFEDD5', borderRadius: '6px', padding: '0.65rem', marginBottom: '0.5rem', fontSize: '0.74rem' }}>
+                        <div style={{ background: '#FFF7ED', border: '1px solid #FFEDD5', borderRadius: '8px', padding: '0.65rem', marginBottom: '0.5rem', fontSize: '0.74rem' }}>
                           <strong style={{ color: '#9A3412' }}>Root Cause: </strong>
                           <span style={{ color: '#7C2D12' }}>{issue.rootCause}</span>
                         </div>
 
-                        <div style={{ background: '#F0FDF4', border: '1px solid #DCFCE7', borderRadius: '6px', padding: '0.65rem', marginBottom: '0.5rem', fontSize: '0.74rem' }}>
+                        <div style={{ background: '#F0FDF4', border: '1px solid #DCFCE7', borderRadius: '8px', padding: '0.65rem', marginBottom: '0.5rem', fontSize: '0.74rem' }}>
                           <strong style={{ color: '#166534' }}>Corrective Action: </strong>
                           <span style={{ color: '#14532D' }}>{issue.correctiveAction}</span>
                         </div>
@@ -1142,33 +1205,40 @@ function RegionalMap({ workshops = [], provincesData, onSelectProvince }: Region
             {/* Modal Footer */}
             <div
               style={{
-                padding: '0.85rem 1.5rem',
-                borderTop: '1px solid #E2E8F0',
-                background: '#F8FAFC',
+                padding: '0.9rem 1.6rem',
+                borderTop: '1px solid #F1E5E2',
+                background: '#FDF9F7',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'space-between',
-                borderBottomLeftRadius: '16px',
-                borderBottomRightRadius: '16px',
+                borderBottomLeftRadius: '20px',
+                borderBottomRightRadius: '20px',
               }}
             >
-              <div style={{ fontSize: '0.72rem', color: '#64748B' }}>
-                Standards: <strong>MoE Traffic Light System</strong>
+              <div style={{ fontSize: '0.74rem', color: '#64748B' }}>
+                Standards: <strong style={{ color: '#80142B' }}>MoE Traffic Light System</strong>
               </div>
 
-              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.55rem' }}>
                 <button
                   type="button"
                   onClick={closeDrillDown}
                   style={{
                     background: '#FFFFFF',
-                    border: '1px solid #CBD5E1',
-                    borderRadius: '6px',
-                    padding: '0.35rem 0.85rem',
+                    border: '1px solid #EADBDE',
+                    borderRadius: '8px',
+                    padding: '0.4rem 1rem',
                     fontSize: '0.76rem',
                     fontWeight: 700,
                     cursor: 'pointer',
-                    color: '#334155',
+                    color: '#475569',
+                    transition: 'all 0.15s ease',
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.background = '#F8FAFC';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.background = '#FFFFFF';
                   }}
                 >
                   Close
@@ -1178,14 +1248,19 @@ function RegionalMap({ workshops = [], provincesData, onSelectProvince }: Region
                   <Link
                     href={`/workshops?province=${encodeURIComponent(activeDrillProvince.name)}`}
                     style={{
-                      background: '#0F766E',
+                      background: 'linear-gradient(135deg, #7A1228 0%, #8D153A 100%)',
                       color: '#FFFFFF',
                       border: 'none',
-                      borderRadius: '6px',
-                      padding: '0.35rem 0.85rem',
+                      borderRadius: '8px',
+                      padding: '0.4rem 1.1rem',
                       fontSize: '0.76rem',
-                      fontWeight: 700,
+                      fontWeight: 800,
                       textDecoration: 'none',
+                      boxShadow: '0 2px 8px rgba(128, 20, 43, 0.25)',
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '4px',
+                      transition: 'all 0.15s ease',
                     }}
                   >
                     View Workshops →

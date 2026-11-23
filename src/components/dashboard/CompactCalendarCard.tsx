@@ -398,13 +398,13 @@ export default function CompactCalendarCard({
                 background: isSelected
                   ? '#80142B'
                   : cell.isCurrentMonth
-                  ? '#FFFFFF'
-                  : '#FAFAFA',
+                    ? '#FFFFFF'
+                    : '#FAFAFA',
                 color: isSelected
                   ? '#FFFFFF'
                   : cell.isCurrentMonth
-                  ? '#1E293B'
-                  : '#CBD5E1',
+                    ? '#1E293B'
+                    : '#CBD5E1',
                 borderRadius: isSelected ? '50%' : '8px',
                 padding: '2px',
                 width: isSelected ? '34px' : 'auto',
