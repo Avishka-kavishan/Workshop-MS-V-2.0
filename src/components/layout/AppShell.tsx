@@ -646,7 +646,7 @@ export default function AppShell({ children }: AppShellProps) {
                   alt="IPMIS Logo"
                   style={{ width: '18px', height: '18px', objectFit: 'contain' }}
                 />
-                <span style={{ fontWeight: 800, color: '#0F766E' }}>IPMIS</span>
+                <span style={{ fontWeight: 800, color: '#80142B' }}>IPMIS</span>
               </Link>
 
               <span className="header-breadcrumb-separator" style={{ color: 'var(--border-medium)', userSelect: 'none', margin: '0 2px' }}>/</span>
@@ -1331,7 +1331,7 @@ export default function AppShell({ children }: AppShellProps) {
                 display: 'inline-flex',
                 alignItems: 'center',
                 gap: '0.35rem',
-                color: '#0F766E',
+                color: '#80142B',
                 textDecoration: 'none',
                 fontWeight: 600,
                 fontSize: '0.75rem',
@@ -1381,48 +1381,49 @@ export default function AppShell({ children }: AppShellProps) {
                 maxHeight: '85vh',
                 display: 'flex',
                 flexDirection: 'column',
-                boxShadow: '0 25px 60px -12px rgba(0, 0, 0, 0.45)',
-                border: '1px solid #CBD5E1',
+                boxShadow: '0 25px 60px -12px rgba(122, 18, 40, 0.28), 0 10px 30px rgba(0, 0, 0, 0.16)',
+                border: '1px solid #EADBDE',
                 overflow: 'hidden',
               }}
             >
               {/* Modal Header */}
               <div
                 style={{
-                  padding: '1.15rem 1.5rem',
-                  borderBottom: '1px solid #E2E8F0',
-                  background: 'linear-gradient(180deg, #F8FAFC 0%, #F1F5F9 100%)',
+                  padding: '1.25rem 1.6rem',
+                  borderBottom: '1px solid #EADBDE',
+                  background: 'linear-gradient(135deg, #7A1228 0%, #8D153A 55%, #5B0E1E 100%)',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'space-between',
                 }}
               >
                 <div>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.2rem' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.25rem' }}>
                     <span
                       style={{
-                        background: '#E6FFFA',
-                        border: '1px solid #0F766E',
-                        color: '#0F766E',
+                        background: 'rgba(255, 255, 255, 0.18)',
+                        border: '1px solid rgba(255, 255, 255, 0.32)',
+                        color: '#FFFFFF',
                         borderRadius: '6px',
                         padding: '2px 8px',
                         fontSize: '0.65rem',
                         fontWeight: 800,
                         letterSpacing: '0.04em',
                         textTransform: 'uppercase',
+                        backdropFilter: 'blur(4px)',
                       }}
                     >
                       Single Login • Multi-Role
                     </span>
-                    <span style={{ fontSize: '0.72rem', color: '#64748B', fontWeight: 600 }}>
+                    <span style={{ fontSize: '0.72rem', color: '#FCD34D', fontWeight: 700 }}>
                       AUTH-07 Active Switch
                     </span>
                   </div>
-                  <h3 style={{ margin: 0, fontSize: '1.2rem', fontWeight: 800, color: '#0F172A' }}>
+                  <h3 style={{ margin: 0, fontSize: '1.25rem', fontWeight: 800, color: '#FFFFFF', letterSpacing: '-0.01em' }}>
                     Switch Working Role
                   </h3>
-                  <div style={{ fontSize: '0.78rem', color: '#475569', marginTop: '2px' }}>
-                    Officer: <strong>{user?.name || user?.fullName}</strong> ({user?.username}) • Current Role: <span style={{ color: '#0F766E', fontWeight: 700 }}>{user?.roleName}</span>
+                  <div style={{ fontSize: '0.78rem', color: '#FCE7E1', marginTop: '3px' }}>
+                    Officer: <strong style={{ color: '#FFFFFF' }}>{user?.name || user?.fullName}</strong> ({user?.username}) • Current Role: <span style={{ color: '#FCD34D', fontWeight: 800 }}>{user?.roleName}</span>
                   </div>
                 </div>
 
@@ -1430,16 +1431,18 @@ export default function AppShell({ children }: AppShellProps) {
                   type="button"
                   onClick={() => setShowRoleModal(false)}
                   style={{
-                    background: '#FFFFFF',
-                    border: '1px solid #CBD5E1',
-                    borderRadius: '6px',
+                    background: 'rgba(255, 255, 255, 0.16)',
+                    border: '1px solid rgba(255, 255, 255, 0.25)',
+                    borderRadius: '50%',
                     width: '32px',
                     height: '32px',
                     display: 'inline-flex',
                     alignItems: 'center',
                     justifyContent: 'center',
                     cursor: 'pointer',
-                    color: '#475569',
+                    color: '#FFFFFF',
+                    fontSize: '0.9rem',
+                    transition: 'all 0.15s ease',
                   }}
                   title="Close role switcher"
                 >
@@ -1448,8 +1451,8 @@ export default function AppShell({ children }: AppShellProps) {
               </div>
 
               {/* Modal Body: Available Assigned Roles */}
-              <div style={{ padding: '1.25rem 1.5rem', overflowY: 'auto', flex: 1 }}>
-                <div style={{ fontSize: '0.75rem', fontWeight: 700, color: '#64748B', textTransform: 'uppercase', letterSpacing: '0.04em', marginBottom: '0.75rem' }}>
+              <div style={{ padding: '1.25rem 1.6rem', overflowY: 'auto', flex: 1, background: '#FAFAF9' }}>
+                <div style={{ fontSize: '0.72rem', fontWeight: 800, color: '#80142B', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '0.75rem' }}>
                   Authorized Working Roles Assigned to You:
                 </div>
 
@@ -1463,10 +1466,11 @@ export default function AppShell({ children }: AppShellProps) {
                       <div
                         key={assignment.id}
                         style={{
-                          border: isCurrent ? '2px solid #0F766E' : '1px solid #E2E8F0',
-                          borderRadius: '10px',
-                          padding: '1rem 1.15rem',
-                          background: isCurrent ? '#F0FDFA' : '#FFFFFF',
+                          border: isCurrent ? '2px solid #80142B' : '1px solid #EADBDE',
+                          borderRadius: '12px',
+                          padding: '1.05rem 1.25rem',
+                          background: isCurrent ? 'linear-gradient(135deg, #FFF5F2 0%, #FFFFFF 100%)' : '#FFFFFF',
+                          boxShadow: isCurrent ? '0 4px 14px rgba(128, 20, 43, 0.08)' : '0 1px 3px rgba(0, 0, 0, 0.02)',
                           display: 'flex',
                           alignItems: 'center',
                           justifyContent: 'space-between',
@@ -1475,19 +1479,20 @@ export default function AppShell({ children }: AppShellProps) {
                         }}
                       >
                         <div>
-                          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.25rem' }}>
-                            <h4 style={{ margin: 0, fontSize: '0.98rem', fontWeight: 800, color: '#0F172A' }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.3rem', flexWrap: 'wrap' }}>
+                            <h4 style={{ margin: 0, fontSize: '0.98rem', fontWeight: 800, color: isCurrent ? '#80142B' : '#1E293B' }}>
                               {assignment.roleName}
                             </h4>
                             {isCurrent && (
                               <span
                                 style={{
-                                  background: '#0F766E',
+                                  background: '#80142B',
                                   color: '#FFFFFF',
                                   fontSize: '0.62rem',
                                   fontWeight: 800,
-                                  padding: '2px 6px',
-                                  borderRadius: '4px',
+                                  padding: '2px 8px',
+                                  borderRadius: '12px',
+                                  letterSpacing: '0.03em',
                                 }}
                               >
                                 CURRENTLY ACTIVE
@@ -1495,22 +1500,24 @@ export default function AppShell({ children }: AppShellProps) {
                             )}
                             <span
                               style={{
-                                background: '#F1F5F9',
-                                color: '#475569',
+                                background: '#FFF5F2',
+                                color: '#80142B',
+                                border: '1px solid #F1E5E2',
                                 fontSize: '0.65rem',
                                 fontWeight: 700,
-                                padding: '2px 6px',
-                                borderRadius: '4px',
+                                padding: '2px 8px',
+                                borderRadius: '12px',
                                 textTransform: 'uppercase',
                               }}
                             >
                               {assignment.functionalCategory || 'Normal'} Scope
                             </span>
                           </div>
-                          <div style={{ fontSize: '0.8rem', color: '#0F766E', fontWeight: 600 }}>
-                            🏢 {assignment.organizationName}
+                          <div style={{ fontSize: '0.8rem', color: '#80142B', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '4px' }}>
+                            <span>🏛️</span>
+                            <span>{assignment.organizationName}</span>
                           </div>
-                          <div style={{ fontSize: '0.75rem', color: '#64748B', marginTop: '2px' }}>
+                          <div style={{ fontSize: '0.75rem', color: '#64748B', marginTop: '3px' }}>
                             {assignment.description || 'Assigned institutional duties and authorized workflows.'}
                           </div>
                         </div>
@@ -1520,20 +1527,23 @@ export default function AppShell({ children }: AppShellProps) {
                           disabled={isCurrent || switchingRole}
                           onClick={() => handleSwitchRole(assignment.id)}
                           style={{
-                            background: isCurrent ? '#E2E8F0' : '#0F766E',
-                            color: isCurrent ? '#94A3B8' : '#FFFFFF',
-                            border: 'none',
-                            borderRadius: '6px',
-                            padding: '0.5rem 1.15rem',
+                            background: isCurrent
+                              ? '#F1E5E2'
+                              : 'linear-gradient(135deg, #7A1228 0%, #8D153A 100%)',
+                            color: isCurrent ? '#80142B' : '#FFFFFF',
+                            border: isCurrent ? '1px solid #EADBDE' : 'none',
+                            borderRadius: '8px',
+                            padding: '0.55rem 1.25rem',
                             fontSize: '0.78rem',
                             fontWeight: 800,
                             cursor: (isCurrent || switchingRole) ? 'default' : 'pointer',
                             whiteSpace: 'nowrap',
                             flexShrink: 0,
+                            boxShadow: isCurrent ? 'none' : '0 2px 6px rgba(122, 18, 40, 0.25)',
                             transition: 'all 0.15s ease',
                           }}
                         >
-                          {isCurrent ? 'Active Context' : (switchingRole ? 'Switching...' : 'Switch to this Role →')}
+                          {isCurrent ? '✓ Active Context' : (switchingRole ? 'Switching...' : 'Switch to this Role →')}
                         </button>
                       </div>
                     );
@@ -1544,9 +1554,9 @@ export default function AppShell({ children }: AppShellProps) {
               {/* Modal Footer with Remember Option */}
               <div
                 style={{
-                  padding: '0.85rem 1.5rem',
-                  borderTop: '1px solid #E2E8F0',
-                  background: '#F8FAFC',
+                  padding: '0.95rem 1.6rem',
+                  borderTop: '1px solid #EADBDE',
+                  background: '#FDF9F7',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'space-between',
@@ -1557,9 +1567,9 @@ export default function AppShell({ children }: AppShellProps) {
                     type="checkbox"
                     checked={rememberRolePref}
                     onChange={(e) => setRememberRolePref(e.target.checked)}
-                    style={{ accentColor: '#0F766E' }}
+                    style={{ accentColor: '#80142B' }}
                   />
-                  <span style={{ fontSize: '0.76rem', color: '#334155', fontWeight: 600 }}>
+                  <span style={{ fontSize: '0.76rem', color: '#475569', fontWeight: 600 }}>
                     Remember selected role for subsequent logins
                   </span>
                 </label>
@@ -1569,16 +1579,17 @@ export default function AppShell({ children }: AppShellProps) {
                     href="/select-role"
                     onClick={() => setShowRoleModal(false)}
                     style={{
-                      padding: '0.45rem 0.85rem',
-                      borderRadius: '6px',
-                      border: '1px solid #CBD5E1',
-                      background: '#FFFFFF',
-                      color: '#0F766E',
+                      padding: '0.45rem 0.95rem',
+                      borderRadius: '8px',
+                      border: '1px solid #EADBDE',
+                      background: '#FFF5F2',
+                      color: '#80142B',
                       fontSize: '0.75rem',
                       fontWeight: 700,
                       textDecoration: 'none',
                       display: 'inline-flex',
                       alignItems: 'center',
+                      transition: 'all 0.15s ease',
                     }}
                   >
                     Full Role Selection Portal
@@ -1587,14 +1598,15 @@ export default function AppShell({ children }: AppShellProps) {
                     type="button"
                     onClick={() => setShowRoleModal(false)}
                     style={{
-                      padding: '0.45rem 1rem',
-                      borderRadius: '6px',
+                      padding: '0.45rem 1.15rem',
+                      borderRadius: '8px',
                       border: 'none',
-                      background: '#334155',
+                      background: '#332E2C',
                       color: '#FFFFFF',
                       fontSize: '0.75rem',
                       fontWeight: 700,
                       cursor: 'pointer',
+                      transition: 'all 0.15s ease',
                     }}
                   >
                     Close
