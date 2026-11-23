@@ -631,26 +631,6 @@ export default function DashboardPage() {
         >
           {/* Left: Filter Pills */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap' }}>
-            <button
-              type="button"
-              style={{
-                background: '#80142B',
-                color: '#FFFFFF',
-                border: 'none',
-                borderRadius: '20px',
-                padding: '0.35rem 0.9rem',
-                fontSize: '0.74rem',
-                fontWeight: 800,
-                display: 'flex',
-                alignItems: 'center',
-                gap: '0.35rem',
-                cursor: 'pointer',
-                boxShadow: '0 2px 6px rgba(128, 20, 43, 0.25)',
-              }}
-            >
-              <span>⏳</span> Filters
-            </button>
-
             <select
               value={selectedLevel}
               onChange={(e) => setSelectedLevel(e.target.value)}
