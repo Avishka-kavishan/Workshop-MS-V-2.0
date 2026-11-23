@@ -902,28 +902,6 @@ export default function DashboardPage() {
           </>
         )}
 
-        {/* ══════════════════════════════════════════════════════
-            MOCKUP FOOTER
-           ══════════════════════════════════════════════════════ */}
-        <div
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            padding: '1rem 0.25rem 0.25rem',
-            color: '#685F5C',
-            fontSize: '0.74rem',
-            fontWeight: 600,
-            borderTop: '1px solid #F1E5E2',
-            marginTop: '0.5rem',
-          }}
-        >
-          <div>DMISU+ - MoE, © 2026</div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
-            <span>✉</span> Contact: gasithamoe@gmail.com
-          </div>
-        </div>
-
         {/* TAB: TIMELINE & MANAGEMENT KPIS (Direct View) */}
         {activeTab === 'timeline-kpis' && (
           <div className="gov-main-3col" style={{ marginTop: '0.5rem' }}>

@@ -1285,52 +1285,54 @@ export default function AppShell({ children }: AppShellProps) {
         </main>
 
         {/* Global Application Normalized Footer */}
-        <footer
-          className="app-footer"
-          style={{
-            borderTop: '1px solid var(--border-medium, #E2E8F0)',
-            background: 'var(--bg-card, #FFFFFF)',
-            padding: '0.55rem 1.5rem',
-            marginTop: 'auto',
-            flexShrink: 0,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            flexWrap: 'wrap',
-            gap: '0.75rem',
-            fontSize: '0.75rem',
-            color: 'var(--text-secondary, #64748B)',
-          }}
-        >
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-            <span style={{ fontWeight: 600, color: 'var(--text-primary, #0F172A)' }}>
-              DMISDU- MoE, copyrights MoE
-            </span>
-          </div>
+        {pathname !== '/dashboard' && (
+          <footer
+            className="app-footer"
+            style={{
+              borderTop: '1px solid var(--border-medium, #E2E8F0)',
+              background: 'var(--bg-card, #FFFFFF)',
+              padding: '0.55rem 1.5rem',
+              marginTop: 'auto',
+              flexShrink: 0,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              flexWrap: 'wrap',
+              gap: '0.75rem',
+              fontSize: '0.75rem',
+              color: 'var(--text-secondary, #64748B)',
+            }}
+          >
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+              <span style={{ fontWeight: 600, color: 'var(--text-primary, #0F172A)' }}>
+                DMISDU- MoE, copyrights MoE
+              </span>
+            </div>
 
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-            <a
-              href="mailto:gasithamoe@gmail.com"
-              style={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: '0.35rem',
-                color: '#0F766E',
-                textDecoration: 'none',
-                fontWeight: 600,
-                fontSize: '0.75rem',
-                transition: 'color 0.15s ease',
-              }}
-              title="Official MoE Contact & Support"
-            >
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
-                <rect width="20" height="16" x="2" y="4" rx="2" />
-                <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7" />
-              </svg>
-              <span>Contact: gasithamoe@gmail.com</span>
-            </a>
-          </div>
-        </footer>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+              <a
+                href="mailto:gasithamoe@gmail.com"
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '0.35rem',
+                  color: '#0F766E',
+                  textDecoration: 'none',
+                  fontWeight: 600,
+                  fontSize: '0.75rem',
+                  transition: 'color 0.15s ease',
+                }}
+                title="Official MoE Contact & Support"
+              >
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
+                  <rect width="20" height="16" x="2" y="4" rx="2" />
+                  <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7" />
+                </svg>
+                <span>Contact: gasithamoe@gmail.com</span>
+              </a>
+            </div>
+          </footer>
+        )}
 
       </div>
 
