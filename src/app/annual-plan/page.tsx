@@ -5548,63 +5548,7 @@ export default function AnnualPlanPage() {
                   </div>
                 )}
 
-                {/* Custom Template Columns Section */}
-                {customColumns.length > 0 && (
-                  <div style={{ background: '#F8FAFC', border: '1px solid #E2E8F0', borderLeft: '4px solid #00534E', borderRadius: '8px', padding: '0.85rem 1rem', marginBottom: '1.25rem' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.45rem', marginBottom: '0.65rem' }}>
-                      <span style={{ fontSize: '1rem' }}>📑</span>
-                      <h4 style={{ margin: 0, fontSize: '0.84rem', fontWeight: 800, color: '#00534E', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
-                        Template Custom Fields ({aipTemplate?.name || 'AIP Template'})
-                      </h4>
-                    </div>
 
-                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '0.85rem' }}>
-                      {customColumns.map((col: any) => (
-                        <div key={col.id}>
-                          <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 700, color: '#1E293B', marginBottom: '0.25rem' }}>
-                            {col.label} {col.required && <span style={{ color: '#E11D48' }}>*</span>}
-                          </label>
-
-                          {col.dataType === 'dropdown' ? (
-                            <select
-                              disabled={isBaselineLocked}
-                              value={formCustomFields[col.key] || ''}
-                              onChange={(e) => setFormCustomFields({ ...formCustomFields, [col.key]: e.target.value })}
-                              style={{ width: '100%', padding: '0.45rem 0.6rem', border: '1px solid #CBD5E1', borderRadius: '6px', fontSize: '0.82rem', background: '#FFFFFF' }}
-                              required={col.required}
-                            >
-                              <option value="">Select an option...</option>
-                              {(col.options || []).map((opt: string) => (
-                                <option key={opt} value={opt}>{opt}</option>
-                              ))}
-                            </select>
-                          ) : col.dataType === 'textarea' ? (
-                            <textarea
-                              rows={2}
-                              disabled={isBaselineLocked}
-                              value={formCustomFields[col.key] || ''}
-                              onChange={(e) => setFormCustomFields({ ...formCustomFields, [col.key]: e.target.value })}
-                              placeholder={col.description || col.label}
-                              style={{ width: '100%', padding: '0.45rem 0.6rem', border: '1px solid #CBD5E1', borderRadius: '6px', fontSize: '0.82rem' }}
-                              required={col.required}
-                            />
-                          ) : (
-                            <input
-                              type={col.dataType === 'number' || col.dataType === 'currency' ? 'number' : col.dataType === 'date' ? 'date' : 'text'}
-                              step={col.dataType === 'currency' ? 'any' : undefined}
-                              disabled={isBaselineLocked}
-                              value={formCustomFields[col.key] || ''}
-                              onChange={(e) => setFormCustomFields({ ...formCustomFields, [col.key]: e.target.value })}
-                              placeholder={col.description || col.label}
-                              style={{ width: '100%', padding: '0.45rem 0.6rem', border: '1px solid #CBD5E1', borderRadius: '6px', fontSize: '0.82rem' }}
-                              required={col.required}
-                            />
-                          )}
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
 
                 {/* Section 2: Monthly Financial & Physical Targets */}
                 <h4 style={{ margin: '0 0 0.5rem 0', fontSize: '0.9rem', color: '#7a1c2d', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
