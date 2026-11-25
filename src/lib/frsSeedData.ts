@@ -63,6 +63,30 @@ export const MONITORING_USER: User = {
   createdAt: '2026-10-01T08:00:00.000Z',
 };
 
+export const ADDITIONAL_SECRETARY_ROLE: UserRole = {
+  id: 'role-additional-secretary',
+  name: 'Additional Secretary',
+  description: 'Highest executive authority of the branch / division. Approves branch workshops and activities, authorizes internal branch AIP plans and budget proposals, signs off on submissions, and oversees overall branch execution.',
+  functionalScope: 'Normal',
+  delegatedAuthority: 'Approval',
+  canCreateWorkshop: true,
+  canApproveWorkshop: true,
+  canManageUsers: false,
+  canViewReports: true,
+  canManageOrganizations: false,
+  canView: true,
+  canCreate: true,
+  canEdit: true,
+  canDelete: false,
+  canSubmit: true,
+  canReview: true,
+  canRecommend: true,
+  canApprove: true,
+  canVerify: false,
+  canMonitor: true,
+  canExport: true,
+};
+
 export const SUPERADMIN_ROLE: UserRole = {
   id: 'role-superadmin',
   name: 'Super Administrator',

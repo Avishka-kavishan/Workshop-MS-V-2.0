@@ -16,6 +16,7 @@ import {
   MONITORING_ORGANIZATION,
   MONITORING_ROLE,
   MONITORING_USER,
+  ADDITIONAL_SECRETARY_ROLE,
   SUPERADMIN_ROLE,
   SUPERADMIN_USER,
   DEFAULT_STRATEGIC_OBJECTIVES,
@@ -1151,6 +1152,9 @@ function readJsonFile(): DbSchema {
     if (!parsed.userRoles.some((r: any) => r.id === MONITORING_ROLE.id)) {
       parsed.userRoles.push(MONITORING_ROLE);
     }
+    if (!parsed.userRoles.some((r: any) => r.id === ADDITIONAL_SECRETARY_ROLE.id)) {
+      parsed.userRoles.push(ADDITIONAL_SECRETARY_ROLE);
+    }
     if (!parsed.userRoles.some((r: any) => r.id === SUPERADMIN_ROLE.id)) {
       parsed.userRoles.push(SUPERADMIN_ROLE);
     }
@@ -1372,6 +1376,20 @@ function readJsonFile(): DbSchema {
         functionalCategory: 'Normal',
         delegatedAuthority: 'Standard',
         description: 'EMIS cloud workshops, infrastructure proposals, and national statistics bulletins.',
+        isDefault: false,
+        isActive: true,
+        assignedAt: '2026-01-01T00:00:00.000Z',
+      },
+      {
+        id: 'ura-admin-addsec',
+        userId: 'user-admin',
+        roleId: 'role-additional-secretary',
+        roleName: 'Additional Secretary (Branch Executive Head)',
+        organizationId: 'org-moe-data',
+        organizationName: 'MOE Data Management Branch',
+        functionalCategory: 'Normal',
+        delegatedAuthority: 'Approval',
+        description: 'Highest executive authority of the branch. Approves branch workshops, authorizes AIP activities and budget proposals.',
         isDefault: false,
         isActive: true,
         assignedAt: '2026-01-01T00:00:00.000Z',

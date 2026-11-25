@@ -208,6 +208,12 @@ export const authOptions: NextAuthOptions = {
         const isMonitoringDivision = functionalCategory === 'Monitoring' || isSuperAdmin;
         const isMasterAdmin = isSuperAdmin || adminLevel === 1;
         const isPlanningLeader = isPlanningDivision;
+        const isAdditionalSecretary =
+          freshRole?.id === 'role-additional-secretary' ||
+          freshRole?.name === 'Additional Secretary' ||
+          activeAssignment?.roleId === 'role-additional-secretary' ||
+          activeAssignment?.roleName?.includes('Additional Secretary') ||
+          (freshUser as any)?.roleId === 'role-additional-secretary';
 
         session.user.name = freshUser?.fullName || token.name || '';
         (session.user as any).id = freshUser?.id || token.id;
@@ -221,6 +227,7 @@ export const authOptions: NextAuthOptions = {
         (session.user as any).isSuperAdmin = isSuperAdmin;
         (session.user as any).isPlanningDivision = isPlanningDivision;
         (session.user as any).isMonitoringDivision = isMonitoringDivision;
+        (session.user as any).isAdditionalSecretary = isAdditionalSecretary;
 
         (session.user as any).activeRoleAssignmentId = activeAssignment?.id || (token as any).activeRoleAssignmentId;
         (session.user as any).assignedRoles = assignedRoles;
@@ -228,16 +235,16 @@ export const authOptions: NextAuthOptions = {
 
         (session.user as any).roleId = activeAssignment?.roleId || freshUser?.roleId || (token as any).roleId;
         (session.user as any).roleName = activeAssignment?.roleName || freshRole?.name || (token as any).roleName || '';
-        (session.user as any).canCreateWorkshop = isSuperAdmin || (adminLevel !== undefined && adminLevel <= 3) || isPlanningLeader || (freshRole?.canCreateWorkshop ?? (token as any).canCreateWorkshop);
-        (session.user as any).canApproveWorkshop = isMasterAdmin || isPlanningLeader || (freshRole?.canApproveWorkshop ?? (token as any).canApproveWorkshop);
+        (session.user as any).canCreateWorkshop = isSuperAdmin || (adminLevel !== undefined && adminLevel <= 3) || isPlanningLeader || isAdditionalSecretary || (freshRole?.canCreateWorkshop ?? (token as any).canCreateWorkshop);
+        (session.user as any).canApproveWorkshop = isMasterAdmin || isPlanningLeader || isAdditionalSecretary || (freshRole?.canApproveWorkshop ?? (token as any).canApproveWorkshop);
         (session.user as any).canManageUsers = isMasterAdmin || (freshRole?.canManageUsers ?? (token as any).canManageUsers);
         (session.user as any).canViewReports = true;
         (session.user as any).canManageOrganizations = isMasterAdmin || (freshRole?.canManageOrganizations ?? (token as any).canManageOrganizations);
         (session.user as any).canSubmit = freshRole?.canSubmit ?? true;
-        (session.user as any).canReview = isPlanningDivision || isSuperAdmin || (freshRole?.canReview ?? false);
-        (session.user as any).canApprove = isPlanningDivision || isMasterAdmin || (freshRole?.canApprove ?? false);
+        (session.user as any).canReview = isPlanningDivision || isSuperAdmin || isAdditionalSecretary || (freshRole?.canReview ?? false);
+        (session.user as any).canApprove = isPlanningDivision || isMasterAdmin || isAdditionalSecretary || (freshRole?.canApprove ?? false);
         (session.user as any).canVerify = isMonitoringDivision || isSuperAdmin || (freshRole?.canVerify ?? false);
-        (session.user as any).canMonitor = isMonitoringDivision || isSuperAdmin || (freshRole?.canMonitor ?? false);
+        (session.user as any).canMonitor = isMonitoringDivision || isSuperAdmin || isAdditionalSecretary || (freshRole?.canMonitor ?? false);
       }
       return session;
     },

@@ -8689,6 +8689,40 @@
   ],
   "userRoles": [
     {
+      "id": "role-additional-secretary",
+      "name": "Additional Secretary",
+      "description": "Highest executive authority of the branch / division. Approves branch workshops and activities, authorizes internal branch AIP plans and budget proposals, signs off on submissions, and oversees overall branch execution.",
+      "functionalScope": "Normal",
+      "delegatedAuthority": "Approval",
+      "canCreateWorkshop": true,
+      "canApproveWorkshop": true,
+      "canManageUsers": false,
+      "canViewReports": true,
+      "canManageOrganizations": false,
+      "canView": true,
+      "canCreate": true,
+      "canEdit": true,
+      "canDelete": false,
+      "canSubmit": true,
+      "canReview": true,
+      "canRecommend": true,
+      "canApprove": true,
+      "canVerify": false,
+      "canMonitor": true,
+      "canExport": true,
+      "permissions": [
+        "WORKSHOP_CREATE",
+        "WORKSHOP_APPROVE",
+        "AIP_SUBMIT",
+        "AIP_REVIEW",
+        "AIP_APPROVE",
+        "BUDGET_PROPOSE",
+        "BUDGET_RECOMMEND",
+        "BRANCH_APPROVE",
+        "AUDIT_VIEW"
+      ]
+    },
+    {
       "id": "role-moe-officer",
       "name": "MOE Officer / Planner",
       "description": "Creates and schedules workshops for own branch, submits branch budget proposals and AIP activities",
@@ -9089,7 +9123,7 @@
       "organizationId": "org-moe-data",
       "roleId": "role-admin",
       "isActive": true,
-      "lastLogin": "2026-11-23T09:30:27.024Z",
+      "lastLogin": "2026-11-25T03:59:22.987Z",
       "createdAt": "2026-09-28T06:03:41.165Z",
       "aliases": [
         "admin",
@@ -9126,10 +9160,58 @@
           "isDefault": false,
           "isActive": true,
           "assignedAt": "2026-01-01T00:00:00.000Z"
+        },
+        {
+          "id": "ura-admin-addsec",
+          "userId": "user-admin",
+          "roleId": "role-additional-secretary",
+          "roleName": "Additional Secretary (Branch Executive Head)",
+          "organizationId": "org-moe-data",
+          "organizationName": "MOE Data Management Branch",
+          "functionalCategory": "Normal",
+          "delegatedAuthority": "Approval",
+          "description": "Highest executive authority of the branch. Approves branch workshops, authorizes AIP activities and budget proposals.",
+          "isDefault": false,
+          "isActive": true,
+          "assignedAt": "2026-01-01T00:00:00.000Z"
         }
       ],
       "lastSelectedRoleId": "ura-admin-data",
       "rememberLastRole": false
+    },
+    {
+      "id": "user-additional-secretary",
+      "username": "additional.sec",
+      "passwordHash": "$2b$10$./4O5YT/QD9uTYcc46P4ceeeEY7RSq165PIVDe9XgsKcuDE.Xxm/i",
+      "fullName": "Additional Secretary (Branch Executive Head)",
+      "email": "additional.sec@moe.gov.lk",
+      "designation": "Additional Secretary",
+      "organizationId": "org-moe-data",
+      "roleId": "role-additional-secretary",
+      "isActive": true,
+      "createdAt": "2026-11-25T09:30:00.000Z",
+      "aliases": [
+        "additional.sec",
+        "addsec",
+        "additional.secretary"
+      ],
+      "assignedRoles": [
+        {
+          "id": "ura-addsec-main",
+          "userId": "user-additional-secretary",
+          "roleId": "role-additional-secretary",
+          "roleName": "Additional Secretary",
+          "organizationId": "org-moe-data",
+          "organizationName": "MOE Data Management Branch",
+          "functionalCategory": "Normal",
+          "delegatedAuthority": "Approval",
+          "description": "Highest executive authority of the branch. Approves branch workshops, authorizes AIP activities and budget proposals.",
+          "isDefault": true,
+          "isActive": true,
+          "assignedAt": "2026-11-25T09:30:00.000Z"
+        }
+      ],
+      "lastSelectedRoleId": "ura-addsec-main"
     },
     {
       "id": "user-ict-officer",
@@ -11070,6 +11152,28 @@
   "budgetProposalActivities": [],
   "calendarSubscribers": [],
   "auditLogs": [
+    {
+      "id": "audit-1795579162997-2235a006",
+      "timestamp": "2026-11-25T03:59:22.997Z",
+      "userId": "user-admin",
+      "username": "admin",
+      "userFullName": "MOE Data Management Branch",
+      "organizationId": "org-moe-data",
+      "organizationName": "MOE Data Management Branch",
+      "category": "Security",
+      "action": "AUTH_LOGIN_SUCCESS",
+      "entityType": "AUTH",
+      "entityId": "user-admin",
+      "summary": "User \"MOE Data Management Branch\" (admin) authenticated into IPMIS with unified account. Active role: \"MOE Data Management Branch (Operational)\".",
+      "details": {
+        "role": "MOE Data Management Branch (Operational)",
+        "organization": "MOE Data Management Branch",
+        "loginTime": "2026-11-25T03:59:22.996Z",
+        "assignedRoleCount": 2,
+        "rememberLastRole": false
+      },
+      "severity": "Info"
+    },
     {
       "id": "audit-1795429668862-3b508523",
       "timestamp": "2026-11-23T10:27:48.862Z",

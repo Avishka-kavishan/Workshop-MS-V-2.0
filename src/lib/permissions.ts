@@ -379,6 +379,11 @@ export function getUserSecurityContext(
   const isPlanningDivision = isSuperAdmin || isNationalPlanningOfficer || (!isNormalAccount && isLevelAdmin && adminLevel === 1 && user?.organizationId === 'org-moe-planning');
   const isMonitoringDivision = isSuperAdmin || isNationalMonitoringOfficer;
   const isNormalDivision = functionalCategory === 'Normal' && !isSuperAdmin && !isLevelAdmin;
+  const isAdditionalSecretary =
+    user?.roleId === 'role-additional-secretary' ||
+    user?.roleName === 'Additional Secretary' ||
+    user?.roleName?.includes('Additional Secretary') ||
+    user?.designation?.toLowerCase().includes('additional secretary');
 
   return {
     userId: user?.id || '',
@@ -390,7 +395,7 @@ export function getUserSecurityContext(
     organizationName: org?.name || user?.organizationName || 'Education Division',
     administrativeLevel: level,
     functionalCategory,
-    delegatedAuthority: isSuperAdmin || adminLevel === 1 ? 'Approval' : isNationalPlanningOfficer ? 'Review' : isNationalMonitoringOfficer ? 'Verification' : 'Standard',
+    delegatedAuthority: isSuperAdmin || adminLevel === 1 || isAdditionalSecretary ? 'Approval' : isNationalPlanningOfficer ? 'Review' : isNationalMonitoringOfficer ? 'Verification' : 'Standard',
     isSuperAdmin,
     adminLevel,
     isLevelAdmin,
@@ -399,15 +404,15 @@ export function getUserSecurityContext(
     isNormalDivision,
     permissions: {
       canView: true,
-      canCreate: isSuperAdmin || (adminLevel !== undefined && adminLevel <= 3) || isNationalPlanningOfficer || (isNormalDivision && !isPlaceCoordinator),
-      canEdit: isSuperAdmin || (adminLevel !== undefined && adminLevel <= 3) || isNationalPlanningOfficer || (isNormalDivision && !isPlaceCoordinator),
+      canCreate: isSuperAdmin || (adminLevel !== undefined && adminLevel <= 3) || isNationalPlanningOfficer || (isNormalDivision && !isPlaceCoordinator) || isAdditionalSecretary,
+      canEdit: isSuperAdmin || (adminLevel !== undefined && adminLevel <= 3) || isNationalPlanningOfficer || (isNormalDivision && !isPlaceCoordinator) || isAdditionalSecretary,
       canDelete: isSuperAdmin || (adminLevel === 1),
       canSubmit: !isPlaceCoordinator,
-      canReview: isSuperAdmin || (level === 1 && (isNationalPlanningOfficer || isNationalMonitoringOfficer || adminLevel === 1)),
-      canRecommend: isSuperAdmin || (level <= 3 && (isNationalPlanningOfficer || isNationalMonitoringOfficer || (adminLevel !== undefined && adminLevel <= 3))),
-      canApprove: isSuperAdmin || (adminLevel === 1) || (level === 1 && isNationalPlanningOfficer),
+      canReview: isSuperAdmin || (level === 1 && (isNationalPlanningOfficer || isNationalMonitoringOfficer || adminLevel === 1)) || isAdditionalSecretary,
+      canRecommend: isSuperAdmin || (level <= 3 && (isNationalPlanningOfficer || isNationalMonitoringOfficer || (adminLevel !== undefined && adminLevel <= 3))) || isAdditionalSecretary,
+      canApprove: isSuperAdmin || (adminLevel === 1) || (level === 1 && isNationalPlanningOfficer) || isAdditionalSecretary,
       canVerify: isSuperAdmin || isNationalMonitoringOfficer,
-      canMonitor: isSuperAdmin || isNationalMonitoringOfficer,
+      canMonitor: isSuperAdmin || isNationalMonitoringOfficer || isAdditionalSecretary,
       canReallocate: isSuperAdmin || (level === 1 && (adminLevel === 1 || isNationalPlanningOfficer)),
       canRevise: isSuperAdmin || (level === 1 && (adminLevel === 1 || isNationalPlanningOfficer)),
       canExport: true,
