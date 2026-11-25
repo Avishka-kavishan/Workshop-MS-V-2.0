@@ -9123,7 +9123,7 @@
       "organizationId": "org-moe-data",
       "roleId": "role-admin",
       "isActive": true,
-      "lastLogin": "2026-11-25T04:29:29.827Z",
+      "lastLogin": "2026-11-25T05:41:12.590Z",
       "createdAt": "2026-09-28T06:03:41.165Z",
       "aliases": [
         "admin",
@@ -9211,7 +9211,8 @@
           "assignedAt": "2026-11-25T09:30:00.000Z"
         }
       ],
-      "lastSelectedRoleId": "ura-addsec-main"
+      "lastSelectedRoleId": "ura-addsec-main",
+      "lastLogin": "2026-11-25T05:39:46.292Z"
     },
     {
       "id": "user-ict-officer",
@@ -9619,7 +9620,7 @@
       "roleId": "role-superadmin",
       "isActive": true,
       "createdAt": "2026-10-01T08:00:00.000Z",
-      "lastLogin": "2026-11-19T08:46:38.674Z",
+      "lastLogin": "2026-11-25T06:38:49.272Z",
       "aliases": [
         "superadmin"
       ],
@@ -9633,52 +9634,9 @@
           "organizationName": "Ministry of Education National Headquarters",
           "functionalCategory": "All",
           "adminLevel": 0,
-          "delegatedAuthority": "Standard",
+          "delegatedAuthority": "Approval",
           "description": "Full Apex Master administrative access across all 6 levels, global audit, and role access control.",
           "isDefault": true,
-          "isActive": true,
-          "assignedAt": "2026-01-01T00:00:00.000Z"
-        },
-        {
-          "id": "ura-sa-plan",
-          "userId": "user-superadmin",
-          "roleId": "role-planning-officer",
-          "roleName": "National Planning Division Lead",
-          "organizationId": "org-moe-planning",
-          "organizationName": "MOE Planning Division",
-          "functionalCategory": "Planning",
-          "delegatedAuthority": "Review",
-          "description": "Planning division oversight, national vote allocations, and AIP approval authority.",
-          "isDefault": false,
-          "isActive": true,
-          "assignedAt": "2026-01-01T00:00:00.000Z"
-        },
-        {
-          "id": "ura-sa-mon",
-          "userId": "user-superadmin",
-          "roleId": "role-monitoring-officer",
-          "roleName": "National Quality Assurance & M&E Oversight",
-          "organizationId": "org-moe-monitoring",
-          "organizationName": "MOE Quality Assurance & Monitoring Branch",
-          "functionalCategory": "Monitoring",
-          "delegatedAuthority": "Verification",
-          "description": "National results framework telemetry, evaluations, and cross-branch corrective actions.",
-          "isDefault": false,
-          "isActive": true,
-          "assignedAt": "2026-01-01T00:00:00.000Z"
-        },
-        {
-          "id": "ura-sa-data",
-          "userId": "user-superadmin",
-          "roleId": "role-admin",
-          "roleName": "Data Management Branch Administrator",
-          "organizationId": "org-moe-data",
-          "organizationName": "MOE Data Management Branch",
-          "functionalCategory": "Normal",
-          "adminLevel": 1,
-          "delegatedAuthority": "Standard",
-          "description": "Data management branch administrative coordination and operational execution.",
-          "isDefault": false,
           "isActive": true,
           "assignedAt": "2026-01-01T00:00:00.000Z"
         }
@@ -11152,6 +11110,161 @@
   "budgetProposalActivities": [],
   "calendarSubscribers": [],
   "auditLogs": [
+    {
+      "id": "audit-1795588729278-81c291c1",
+      "timestamp": "2026-11-25T06:38:49.278Z",
+      "userId": "user-superadmin",
+      "username": "superadmin",
+      "userFullName": "Ministry Chief Super Administrator",
+      "organizationId": "org-moe",
+      "organizationName": "Ministry of Education National Headquarters",
+      "category": "Security",
+      "action": "AUTH_LOGIN_SUCCESS",
+      "entityType": "AUTH",
+      "entityId": "user-superadmin",
+      "summary": "User \"Ministry Chief Super Administrator\" (superadmin) authenticated into IPMIS with unified account. Active role: \"Ministry Chief Super Administrator\".",
+      "details": {
+        "role": "Ministry Chief Super Administrator",
+        "organization": "Ministry of Education National Headquarters",
+        "loginTime": "2026-11-25T06:38:49.277Z",
+        "assignedRoleCount": 1,
+        "rememberLastRole": false
+      },
+      "severity": "Info"
+    },
+    {
+      "id": "audit-1795587206270-7e9e989b",
+      "timestamp": "2026-11-25T06:13:26.270Z",
+      "userId": "user-superadmin",
+      "username": "superadmin",
+      "userFullName": "Ministry Chief Super Administrator",
+      "organizationId": "org-moe",
+      "organizationName": "Ministry of Education National Headquarters",
+      "category": "Security",
+      "action": "AUTH_LOGIN_SUCCESS",
+      "entityType": "AUTH",
+      "entityId": "user-superadmin",
+      "summary": "User \"Ministry Chief Super Administrator\" (superadmin) authenticated into IPMIS with unified account. Active role: \"Ministry Chief Super Administrator\".",
+      "details": {
+        "role": "Ministry Chief Super Administrator",
+        "organization": "Ministry of Education National Headquarters",
+        "loginTime": "2026-11-25T06:13:26.270Z",
+        "assignedRoleCount": 1,
+        "rememberLastRole": false
+      },
+      "severity": "Info"
+    },
+    {
+      "id": "audit-1795586403668-76ca72b6",
+      "timestamp": "2026-11-25T06:00:03.668Z",
+      "userId": "user-superadmin",
+      "username": "superadmin",
+      "userFullName": "Ministry Chief Super Administrator",
+      "organizationId": "org-moe",
+      "organizationName": "Ministry of Education National Headquarters",
+      "category": "Security",
+      "action": "AUTH_LOGIN_SUCCESS",
+      "entityType": "AUTH",
+      "entityId": "user-superadmin",
+      "summary": "User \"Ministry Chief Super Administrator\" (superadmin) authenticated into IPMIS with unified account. Active role: \"Ministry Chief Super Administrator\".",
+      "details": {
+        "role": "Ministry Chief Super Administrator",
+        "organization": "Ministry of Education National Headquarters",
+        "loginTime": "2026-11-25T06:00:03.668Z",
+        "assignedRoleCount": 4,
+        "rememberLastRole": false
+      },
+      "severity": "Info"
+    },
+    {
+      "id": "audit-1795585272595-709be32b",
+      "timestamp": "2026-11-25T05:41:12.595Z",
+      "userId": "user-admin",
+      "username": "admin",
+      "userFullName": "MOE Data Management Branch",
+      "organizationId": "org-moe-data",
+      "organizationName": "MOE Data Management Branch",
+      "category": "Security",
+      "action": "AUTH_LOGIN_SUCCESS",
+      "entityType": "AUTH",
+      "entityId": "user-admin",
+      "summary": "User \"MOE Data Management Branch\" (admin) authenticated into IPMIS with unified account. Active role: \"Additional Secretary (Branch Executive Head)\".",
+      "details": {
+        "role": "Additional Secretary (Branch Executive Head)",
+        "organization": "MOE Data Management Branch",
+        "loginTime": "2026-11-25T05:41:12.595Z",
+        "assignedRoleCount": 3,
+        "rememberLastRole": false
+      },
+      "severity": "Info"
+    },
+    {
+      "id": "audit-1795585186298-384304fd",
+      "timestamp": "2026-11-25T05:39:46.298Z",
+      "userId": "user-additional-secretary",
+      "username": "additional.sec",
+      "userFullName": "Additional Secretary (Branch Executive Head)",
+      "organizationId": "org-moe-data",
+      "organizationName": "MOE Data Management Branch",
+      "category": "Security",
+      "action": "AUTH_LOGIN_SUCCESS",
+      "entityType": "AUTH",
+      "entityId": "user-additional-secretary",
+      "summary": "User \"Additional Secretary (Branch Executive Head)\" (additional.sec) authenticated into IPMIS with unified account. Active role: \"Additional Secretary\".",
+      "details": {
+        "role": "Additional Secretary",
+        "organization": "MOE Data Management Branch",
+        "loginTime": "2026-11-25T05:39:46.298Z",
+        "assignedRoleCount": 1,
+        "rememberLastRole": false
+      },
+      "severity": "Info"
+    },
+    {
+      "id": "audit-1795584636082-8ceeade3",
+      "timestamp": "2026-11-25T05:30:36.082Z",
+      "userId": "user-admin",
+      "username": "admin",
+      "userFullName": "MOE Data Management Branch",
+      "organizationId": "org-moe-data",
+      "organizationName": "MOE Data Management Branch",
+      "category": "Security",
+      "action": "AUTH_ROLE_SWITCH",
+      "entityType": "AUTH",
+      "entityId": "ura-admin-addsec",
+      "summary": "Officer \"MOE Data Management Branch\" (admin) switched active working role from \"Additional Secretary (Branch Executive Head)\" to \"Additional Secretary (Branch Executive Head)\" (MOE Data Management Branch).",
+      "details": {
+        "previousRole": "Additional Secretary (Branch Executive Head)",
+        "newRole": "Additional Secretary (Branch Executive Head)",
+        "organization": "MOE Data Management Branch",
+        "functionalCategory": "Normal",
+        "rememberedForNextLogin": false,
+        "switchTimestamp": "2026-11-25T05:30:36.082Z"
+      },
+      "severity": "Info"
+    },
+    {
+      "id": "audit-1795584630139-de0c9b3c",
+      "timestamp": "2026-11-25T05:30:30.139Z",
+      "userId": "user-admin",
+      "username": "admin",
+      "userFullName": "MOE Data Management Branch",
+      "organizationId": "org-moe-data",
+      "organizationName": "MOE Data Management Branch",
+      "category": "Security",
+      "action": "AUTH_LOGIN_SUCCESS",
+      "entityType": "AUTH",
+      "entityId": "user-admin",
+      "summary": "User \"MOE Data Management Branch\" (admin) authenticated into IPMIS with unified account. Active role: \"Additional Secretary (Branch Executive Head)\".",
+      "details": {
+        "role": "Additional Secretary (Branch Executive Head)",
+        "organization": "MOE Data Management Branch",
+        "loginTime": "2026-11-25T05:30:30.139Z",
+        "assignedRoleCount": 3,
+        "rememberLastRole": false
+      },
+      "severity": "Info"
+    },
     {
       "id": "audit-1795580988651-64cbc1cd",
       "timestamp": "2026-11-25T04:29:48.651Z",

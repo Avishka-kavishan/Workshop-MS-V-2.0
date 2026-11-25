@@ -1443,49 +1443,6 @@ function readJsonFile(): DbSchema {
         isActive: true,
         assignedAt: '2026-01-01T00:00:00.000Z',
       },
-      {
-        id: 'ura-sa-plan',
-        userId: 'user-superadmin',
-        roleId: 'role-planning-officer',
-        roleName: 'National Planning Division Lead',
-        organizationId: 'org-moe-planning',
-        organizationName: 'MOE Planning Division',
-        functionalCategory: 'Planning',
-        delegatedAuthority: 'Approval',
-        description: 'Planning division oversight, national vote allocations, and AIP approval authority.',
-        isDefault: false,
-        isActive: true,
-        assignedAt: '2026-01-01T00:00:00.000Z',
-      },
-      {
-        id: 'ura-sa-mon',
-        userId: 'user-superadmin',
-        roleId: 'role-monitoring-officer',
-        roleName: 'National Quality Assurance & M&E Oversight',
-        organizationId: 'org-moe-monitoring',
-        organizationName: 'MOE Quality Assurance & Monitoring Branch',
-        functionalCategory: 'Monitoring',
-        delegatedAuthority: 'Verification',
-        description: 'National results framework telemetry, evaluations, and cross-branch corrective actions.',
-        isDefault: false,
-        isActive: true,
-        assignedAt: '2026-01-01T00:00:00.000Z',
-      },
-      {
-        id: 'ura-sa-data',
-        userId: 'user-superadmin',
-        roleId: 'role-admin',
-        roleName: 'Data Management Branch Administrator',
-        organizationId: 'org-moe-data',
-        organizationName: 'MOE Data Management Branch',
-        functionalCategory: 'Normal',
-        adminLevel: 1,
-        delegatedAuthority: 'Approval',
-        description: 'Data management branch administrative coordination and operational execution.',
-        isDefault: false,
-        isActive: true,
-        assignedAt: '2026-01-01T00:00:00.000Z',
-      },
     ];
 
     // Enrich all users with assignedRoles and single login mappings
@@ -1518,12 +1475,11 @@ function readJsonFile(): DbSchema {
           u.assignedRoles = JSON.parse(JSON.stringify(EQD_ROLES)).map((r: any) => ({ ...r, userId: u.id }));
         }
       }
-      // 5. Super Admin
+      // 5. Super Admin (single Apex role only — no multiple authorized roles)
       else if (u.username === 'superadmin') {
         u.aliases = ['superadmin'];
-        if (!u.assignedRoles || u.assignedRoles.length === 0) {
-          u.assignedRoles = JSON.parse(JSON.stringify(SUPERADMIN_ROLES)).map((r: any) => ({ ...r, userId: u.id }));
-        }
+        u.assignedRoles = JSON.parse(JSON.stringify(SUPERADMIN_ROLES)).map((r: any) => ({ ...r, userId: u.id }));
+        u.lastSelectedRoleId = 'ura-sa-apex';
       }
       // 5B. Normal MOE Operational Branches (Short Testing Usernames + Aliases)
       else if (u.username === 'ict' || u.username === 'ict.officer') {

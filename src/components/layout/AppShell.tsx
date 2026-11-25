@@ -275,27 +275,34 @@ export default function AppShell({ children }: AppShellProps) {
     (user as any)?.organizationId?.toLowerCase().includes('plan')
   );
 
-  // Primary System Pillars (Matching the Architecture Flow - Reports restricted to Admins/Governance)
-  const primaryNavItems = [
-    { href: '/dashboard', label: 'Dashboard', icon: DashboardIcon },
-    { href: '/budget-forecasting', label: 'Budget Planning', icon: BudgetPlanningIcon },
-    { href: '/annual-plan', label: 'Annual Plan (AIP)', icon: AnnualPlanIcon },
-    { href: '/monitoring', label: 'Monitoring & Verification', icon: MonitoringIcon },
-    ...(isAdminUser || isGovernanceOfficer ? [
-      { href: '/reports', label: 'Analytics & Audit', icon: AnalyticsIcon },
-    ] : []),
-  ];
+  // Primary System Pillars (Super Admin sees only Dashboard; others see full pillars)
+  const primaryNavItems = isSuperAdmin
+    ? [{ href: '/dashboard', label: 'Dashboard', icon: DashboardIcon }]
+    : [
+        { href: '/dashboard', label: 'Dashboard', icon: DashboardIcon },
+        { href: '/budget-forecasting', label: 'Budget Planning', icon: BudgetPlanningIcon },
+        { href: '/annual-plan', label: 'Annual Plan (AIP)', icon: AnnualPlanIcon },
+        { href: '/monitoring', label: 'Monitoring & Verification', icon: MonitoringIcon },
+        ...(isAdminUser || isGovernanceOfficer
+          ? [{ href: '/reports', label: 'Analytics & Audit', icon: AnalyticsIcon }]
+          : []),
+      ];
 
-  // Secondary Operational Navigation Items (Admin Console & Hierarchy restricted to Admins)
-  const operationalNavItems = [
-    { href: '/workshops', label: 'Workshops Directory', icon: WorkshopsDirectoryIcon },
-    { href: '/workshops/new', label: 'Schedule Workshop', icon: NewWorkshopIcon, badge: 'New' },
-    { href: '/resource-persons', label: 'Resource Persons', icon: DirectoryIcon },
-    { href: '/resource-persons/new', label: 'Register Person', icon: RegisterPersonIcon },
-    { href: '/organizations', label: 'Hierarchy & Branches', icon: HierarchyIcon, adminOnly: true },
-    { href: '/admin', label: 'Admin Console', icon: AdminConsoleIcon, adminOnly: true },
-    { href: '/admin/audit-logs', label: 'System Audit Logs', icon: AuditVaultIcon, superAdminOnly: true, badge: 'Super' },
-  ];
+  // Secondary Operational Navigation Items (Super Admin sees only Admin Console & System Audit Logs)
+  const operationalNavItems = isSuperAdmin
+    ? [
+        { href: '/admin', label: 'Admin Console', icon: AdminConsoleIcon, adminOnly: true },
+        { href: '/admin/audit-logs', label: 'System Audit Logs', icon: AuditVaultIcon, superAdminOnly: true, badge: 'Super' },
+      ]
+    : [
+        { href: '/workshops', label: 'Workshops Directory', icon: WorkshopsDirectoryIcon },
+        { href: '/workshops/new', label: 'Schedule Workshop', icon: NewWorkshopIcon, badge: 'New' },
+        { href: '/resource-persons', label: 'Resource Persons', icon: DirectoryIcon },
+        { href: '/resource-persons/new', label: 'Register Person', icon: RegisterPersonIcon },
+        { href: '/organizations', label: 'Hierarchy & Branches', icon: HierarchyIcon, adminOnly: true },
+        { href: '/admin', label: 'Admin Console', icon: AdminConsoleIcon, adminOnly: true },
+        { href: '/admin/audit-logs', label: 'System Audit Logs', icon: AuditVaultIcon, superAdminOnly: true, badge: 'Super' },
+      ];
 
   const isActive = (href: string, exact = false) => {
     if (exact) return pathname === href;

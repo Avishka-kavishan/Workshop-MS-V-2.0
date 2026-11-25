@@ -11,6 +11,9 @@ export const authOptions: NextAuthOptions = {
       credentials: {
         username: { label: 'Username', type: 'text' },
         password: { label: 'Password', type: 'password' },
+        branchId: { label: 'Branch', type: 'text' },
+        roleId: { label: 'Role', type: 'text' },
+        roleAssignmentId: { label: 'Role Assignment', type: 'text' },
       },
       async authorize(credentials) {
         if (!credentials?.username || !credentials?.password) {
@@ -59,25 +62,69 @@ export const authOptions: NextAuthOptions = {
           return null;
         }
 
-        // Determine active role assignment
+        // Determine active role assignment (respecting explicit branch/role selection if provided)
         const assignedRoles: any[] = user.assignedRoles || [];
-        const activeAssignment =
-          (user.lastSelectedRoleId &&
-            assignedRoles.find((r) => r.id === user.lastSelectedRoleId && r.isActive)) ||
-          assignedRoles.find((r) => r.isDefault && r.isActive) ||
-          assignedRoles[0];
+        const requestedBranchId = credentials.branchId?.trim();
+        const requestedRoleId = credentials.roleId?.trim();
+        const requestedAssignmentId = credentials.roleAssignmentId?.trim();
+
+        let activeAssignment: any = null;
+
+        if (requestedAssignmentId || requestedBranchId || requestedRoleId) {
+          if (assignedRoles.length > 0) {
+            activeAssignment = assignedRoles.find((r) => {
+              if (!r.isActive) return false;
+              if (requestedAssignmentId && r.id !== requestedAssignmentId) return false;
+              if (requestedBranchId && r.organizationId !== requestedBranchId) return false;
+              if (requestedRoleId && r.roleId !== requestedRoleId) return false;
+              return true;
+            });
+          } else {
+            const branchMatches = !requestedBranchId || user.organizationId === requestedBranchId;
+            const roleMatches = !requestedRoleId || user.roleId === requestedRoleId;
+            if (!branchMatches || !roleMatches) {
+              activeAssignment = null;
+            } else {
+              activeAssignment = undefined; // Valid primary user match without assignedRoles array
+            }
+          }
+
+          if (activeAssignment === null || (assignedRoles.length > 0 && !activeAssignment)) {
+            logAuditEvent({
+              user: { id: user.id, username: user.username, fullName: user.fullName },
+              category: 'Security',
+              action: 'AUTH_LOGIN_FAILED',
+              entityType: 'AUTH',
+              entityId: user.id,
+              summary: `Failed login attempt for "${user.fullName}" (${user.username}): Selected branch/role does not match user permissions.`,
+              severity: 'Warning',
+              details: {
+                reason: 'Role or branch mismatch',
+                requestedBranchId,
+                requestedRoleId,
+              },
+            });
+            return null;
+          }
+        } else {
+          activeAssignment =
+            (user.lastSelectedRoleId &&
+              assignedRoles.find((r) => r.id === user.lastSelectedRoleId && r.isActive)) ||
+            assignedRoles.find((r) => r.isDefault && r.isActive) ||
+            assignedRoles[0];
+        }
 
         const role = data.userRoles.find((r) => r.id === (activeAssignment?.roleId || user.roleId));
         const org = data.organizations.find(
           (o) => o.id === (activeAssignment?.organizationId || user.organizationId)
         );
 
-        // Update last login
+        // Update last login (and persist selected role when explicitly chosen at login)
         await updateDb((d) => {
           const u = d.users.find((u) => u.id === user.id);
           if (u) {
             u.lastLogin = new Date().toISOString();
-            if (activeAssignment?.id && !u.lastSelectedRoleId) {
+            if (activeAssignment?.id && (requestedAssignmentId || requestedBranchId || requestedRoleId || !u.lastSelectedRoleId)) {
               u.lastSelectedRoleId = activeAssignment.id;
             }
           }
