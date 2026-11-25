@@ -9123,7 +9123,7 @@
       "organizationId": "org-moe-data",
       "roleId": "role-admin",
       "isActive": true,
-      "lastLogin": "2026-11-25T03:59:22.987Z",
+      "lastLogin": "2026-11-25T04:29:29.827Z",
       "createdAt": "2026-09-28T06:03:41.165Z",
       "aliases": [
         "admin",
@@ -9176,7 +9176,7 @@
           "assignedAt": "2026-01-01T00:00:00.000Z"
         }
       ],
-      "lastSelectedRoleId": "ura-admin-data",
+      "lastSelectedRoleId": "ura-admin-addsec",
       "rememberLastRole": false
     },
     {
@@ -11152,6 +11152,51 @@
   "budgetProposalActivities": [],
   "calendarSubscribers": [],
   "auditLogs": [
+    {
+      "id": "audit-1795580988651-64cbc1cd",
+      "timestamp": "2026-11-25T04:29:48.651Z",
+      "userId": "user-admin",
+      "username": "admin",
+      "userFullName": "MOE Data Management Branch",
+      "organizationId": "org-moe-data",
+      "organizationName": "MOE Data Management Branch",
+      "category": "Security",
+      "action": "AUTH_ROLE_SWITCH",
+      "entityType": "AUTH",
+      "entityId": "ura-admin-addsec",
+      "summary": "Officer \"MOE Data Management Branch\" (admin) switched active working role from \"MOE Data Management Branch (Operational)\" to \"Additional Secretary (Branch Executive Head)\" (MOE Data Management Branch).",
+      "details": {
+        "previousRole": "MOE Data Management Branch (Operational)",
+        "newRole": "Additional Secretary (Branch Executive Head)",
+        "organization": "MOE Data Management Branch",
+        "functionalCategory": "Normal",
+        "rememberedForNextLogin": false,
+        "switchTimestamp": "2026-11-25T04:29:48.651Z"
+      },
+      "severity": "Info"
+    },
+    {
+      "id": "audit-1795580969836-73adbd54",
+      "timestamp": "2026-11-25T04:29:29.836Z",
+      "userId": "user-admin",
+      "username": "admin",
+      "userFullName": "MOE Data Management Branch",
+      "organizationId": "org-moe-data",
+      "organizationName": "MOE Data Management Branch",
+      "category": "Security",
+      "action": "AUTH_LOGIN_SUCCESS",
+      "entityType": "AUTH",
+      "entityId": "user-admin",
+      "summary": "User \"MOE Data Management Branch\" (admin) authenticated into IPMIS with unified account. Active role: \"MOE Data Management Branch (Operational)\".",
+      "details": {
+        "role": "MOE Data Management Branch (Operational)",
+        "organization": "MOE Data Management Branch",
+        "loginTime": "2026-11-25T04:29:29.836Z",
+        "assignedRoleCount": 3,
+        "rememberLastRole": false
+      },
+      "severity": "Info"
+    },
     {
       "id": "audit-1795579162997-2235a006",
       "timestamp": "2026-11-25T03:59:22.997Z",
