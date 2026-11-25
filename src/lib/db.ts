@@ -17,6 +17,7 @@ import {
   MONITORING_ROLE,
   MONITORING_USER,
   ADDITIONAL_SECRETARY_ROLE,
+  DIRECTOR_ROLE,
   SUPERADMIN_ROLE,
   SUPERADMIN_USER,
   DEFAULT_STRATEGIC_OBJECTIVES,
@@ -66,7 +67,12 @@ export interface DbSchema {
   attachments: Attachment[];
   notifications: Notification[];
   workshopReschedules: WorkshopReschedule[];
-  meta: { lastWorkshopNumber: number; showDashboardProgressMeter?: boolean; [key: string]: any };
+  meta: {
+    lastWorkshopNumber: number;
+    showDashboardProgressMeter?: boolean;
+    enableBranchApprovalChain?: boolean;
+    [key: string]: any;
+  };
   aipAmendments: AipAmendment[];
   aipPlans: AipPlan[];
   aipActivities: AipActivity[];
@@ -393,9 +399,13 @@ export interface BudgetProposalActivity {
   estimatedCostMn: number;
   noBudgetRequired?: boolean; // When activity requires zero budget
   // Stage 1 Status:
-  status: 'Draft' | 'Submitted' | 'Under Review' | 'Accepted' | 'Adjusted' | 'Rejected' | 'Deferred' | 'Duplicate';
+  status: 'Draft' | 'Pending Director Approval' | 'Pending Additional Secretary Approval' | 'Submitted' | 'Under Review' | 'Accepted' | 'Adjusted' | 'Rejected' | 'Deferred' | 'Duplicate';
   submittedBy: string;
   submittedAt?: string;
+  directorApprovedBy?: string;
+  directorApprovedAt?: string;
+  addSecApprovedBy?: string;
+  addSecApprovedAt?: string;
   // Stage 2 (Planning Division / PPB attributes):
   activityNumber?: number;            // Automatically assigned by PPB upon acceptance (e.g. 1, 2, 3...)
   assignedActivityCode?: string;      // e.g. "ACT-01", "ACT-02"
@@ -945,7 +955,11 @@ export interface AipPlan {
   dispatchNotes?: string;
   submittedToPlanningOrgId?: string;
   submittedToPlanningOrgName?: string;
-  status: 'Draft' | 'Submitted' | 'Approved';
+  directorApprovedBy?: string;
+  directorApprovedAt?: string;
+  addSecApprovedBy?: string;
+  addSecApprovedAt?: string;
+  status: 'Draft' | 'Pending Director Approval' | 'Pending Additional Secretary Approval' | 'Submitted' | 'Approved';
   createdAt: string;
   updatedAt: string;
 }
@@ -1155,6 +1169,9 @@ function readJsonFile(): DbSchema {
     if (!parsed.userRoles.some((r: any) => r.id === ADDITIONAL_SECRETARY_ROLE.id)) {
       parsed.userRoles.push(ADDITIONAL_SECRETARY_ROLE);
     }
+    if (!parsed.userRoles.some((r: any) => r.id === DIRECTOR_ROLE.id)) {
+      parsed.userRoles.push(DIRECTOR_ROLE);
+    }
     if (!parsed.userRoles.some((r: any) => r.id === SUPERADMIN_ROLE.id)) {
       parsed.userRoles.push(SUPERADMIN_ROLE);
     }
@@ -1352,21 +1369,6 @@ function readJsonFile(): DbSchema {
 
     const DATA_ADMIN_ROLES: UserRoleAssignment[] = [
       {
-        id: 'ura-admin-sys',
-        userId: 'user-admin',
-        roleId: 'role-admin',
-        roleName: 'System Administrator (Level 1 MoE Admin)',
-        organizationId: 'org-moe',
-        organizationName: 'Ministry of Education National Headquarters',
-        functionalCategory: 'All',
-        adminLevel: 1,
-        delegatedAuthority: 'Approval',
-        description: 'Ministry headquarters administrative console, user role management, system settings.',
-        isDefault: true,
-        isActive: true,
-        assignedAt: '2026-01-01T00:00:00.000Z',
-      },
-      {
         id: 'ura-admin-data',
         userId: 'user-admin',
         roleId: 'role-moe-officer',
@@ -1376,7 +1378,7 @@ function readJsonFile(): DbSchema {
         functionalCategory: 'Normal',
         delegatedAuthority: 'Standard',
         description: 'EMIS cloud workshops, infrastructure proposals, and national statistics bulletins.',
-        isDefault: false,
+        isDefault: true,
         isActive: true,
         assignedAt: '2026-01-01T00:00:00.000Z',
       },
@@ -1461,11 +1463,22 @@ function readJsonFile(): DbSchema {
           u.assignedRoles = JSON.parse(JSON.stringify(MONITORING_ROLES)).map((r: any) => ({ ...r, userId: u.id }));
         }
       }
-      // 3. Data Management & System Admin
+      // 3. Data Management Branch (branch-level roles only — no System Administrator)
       else if (u.username === 'admin' || u.username === 'data.management' || u.username === 'data' || u.username === 'data.officer') {
         u.aliases = ['admin', 'data.management', 'data', 'data.officer'];
         if (!u.assignedRoles || u.assignedRoles.length === 0) {
           u.assignedRoles = JSON.parse(JSON.stringify(DATA_ADMIN_ROLES)).map((r: any) => ({ ...r, userId: u.id }));
+        } else {
+          u.assignedRoles = u.assignedRoles.filter((r: any) => r.id !== 'ura-admin-sys' && r.roleId !== 'role-admin');
+          if (u.assignedRoles.length > 0 && !u.assignedRoles.some((r: any) => r.isDefault)) {
+            u.assignedRoles[0].isDefault = true;
+          }
+        }
+        if (u.roleId === 'role-admin') {
+          u.roleId = 'role-moe-officer';
+        }
+        if (u.lastSelectedRoleId === 'ura-admin-sys') {
+          u.lastSelectedRoleId = u.assignedRoles?.[0]?.id || 'ura-admin-data';
         }
       }
       // 4. EQD Director & Branch
@@ -1588,6 +1601,68 @@ function readJsonFile(): DbSchema {
       if (!u.lastSelectedRoleId && u.assignedRoles && u.assignedRoles.length > 0) {
         const def = u.assignedRoles.find((r: any) => r.isDefault && r.isActive) || u.assignedRoles[0];
         u.lastSelectedRoleId = def?.id;
+      }
+    });
+
+    // Ensure every active branch with login users (excluding org-moe HQ) has a Director user
+    const activeBranchIds = new Set<string>();
+    parsed.users.forEach((u: any) => {
+      if (u.isActive && u.organizationId && u.organizationId !== 'org-moe') {
+        activeBranchIds.add(u.organizationId);
+      }
+    });
+
+    activeBranchIds.forEach((branchId) => {
+      const hasDirector = parsed.users.some(
+        (u: any) =>
+          u.isActive &&
+          (u.organizationId === branchId && u.roleId === 'role-director') ||
+          (u.assignedRoles || []).some((r: any) => r.isActive && r.organizationId === branchId && r.roleId === 'role-director')
+      );
+      if (!hasDirector) {
+        const branchOrg = orgMap.get(branchId);
+        if (!branchOrg || !branchOrg.isActive) return;
+        const slug = branchId
+          .replace(/^org-moe-/, '')
+          .replace(/^org-/, '')
+          .replace(/[^a-zA-Z0-9]+/g, '.')
+          .replace(/^\.+|\.+$/g, '')
+          .toLowerCase();
+        const username = `${slug}.director`;
+        if (parsed.users.some((u: any) => u.username === username)) return;
+
+        const dirUserId = `user-director-${branchId}`;
+        const dirAssignmentId = `ura-${dirUserId}`;
+        const funcCat = (branchOrg.functionalCategory as any) || 'Normal';
+        parsed.users.push({
+          id: dirUserId,
+          username,
+          passwordHash: '$2b$10$./4O5YT/QD9uTYcc46P4ceeeEY7RSq165PIVDe9XgsKcuDE.Xxm/i',
+          fullName: `Director — ${branchOrg.name}`,
+          email: `${username}@moe.gov.lk`,
+          designation: `Director (${branchOrg.name})`,
+          organizationId: branchId,
+          roleId: 'role-director',
+          isActive: true,
+          createdAt: '2026-10-01T08:00:00.000Z',
+          assignedRoles: [
+            {
+              id: dirAssignmentId,
+              userId: dirUserId,
+              roleId: 'role-director',
+              roleName: 'Director',
+              organizationId: branchId,
+              organizationName: branchOrg.name,
+              functionalCategory: funcCat,
+              delegatedAuthority: 'Approval',
+              description: DIRECTOR_ROLE.description,
+              isDefault: true,
+              isActive: true,
+              assignedAt: '2026-10-01T08:00:00.000Z',
+            },
+          ],
+          lastSelectedRoleId: dirAssignmentId,
+        });
       }
     });
 

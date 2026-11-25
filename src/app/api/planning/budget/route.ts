@@ -148,6 +148,7 @@ export async function GET(req: NextRequest) {
       organizations,
       aipActivities: data.aipActivities || [],
       deadlines: (data.deadlines || []).filter((d) => !d.financialYear || d.financialYear === year),
+      enableBranchApprovalChain: data.meta?.enableBranchApprovalChain ?? true,
       userContext: {
         userId: security.userId,
         username: (session.user as any)?.username,
@@ -480,6 +481,16 @@ export async function POST(req: NextRequest) {
         }
       }
 
+      const enableBranchApprovalChain = initialDb.meta?.enableBranchApprovalChain ?? true;
+      const sessionUser = session.user as any;
+      const isBranchDirector = Boolean(sessionUser?.isDirector || sessionUser?.roleId === 'role-director' || sessionUser?.roleName === 'Director');
+      const isBranchAddSec = Boolean(sessionUser?.isAdditionalSecretary || sessionUser?.roleId === 'role-additional-secretary' || sessionUser?.roleName?.includes('Additional Secretary'));
+
+      const targetStatus: 'Pending Director Approval' | 'Submitted' =
+        enableBranchApprovalChain && !isPlanningPrivileged && !isBranchDirector && !isBranchAddSec
+          ? 'Pending Director Approval'
+          : 'Submitted';
+
       let submittedCount = 0;
       let totalAmount = 0;
 
@@ -487,27 +498,39 @@ export async function POST(req: NextRequest) {
         if (!dbData.budgetProposalActivities) dbData.budgetProposalActivities = [];
         dbData.budgetProposalActivities.forEach((p) => {
           if (p.divisionId === targetDivId && (!p.financialYear || p.financialYear === financialYear) && p.status === 'Draft') {
-            p.status = 'Submitted';
+            p.status = targetStatus;
             p.submittedAt = now;
-            p.submittedBy = (session.user as any)?.username || security.fullName;
+            p.submittedBy = sessionUser?.username || security.fullName;
             p.updatedAt = now;
             submittedCount++;
             totalAmount += Number(p.estimatedCostMn) || 0;
           }
         });
 
-        // Notify Planning Division
+        // Notify Branch Director (when approval chain is active) OR Planning Division (direct send)
         if (submittedCount > 0) {
           if (!dbData.notifications) dbData.notifications = [];
-          dbData.notifications.push({
-            id: `notif-plan-${randomUUID()}`,
-            recipientOrgId: 'org-moe-planning',
-            workshopId: 'budget-submission',
-            title: `📥 Budgetary Plan Submitted: ${security.organizationName}`,
-            message: `${security.fullName} submitted ${submittedCount} activity proposals totaling Rs. ${formatMillion(totalAmount)} Mn (${formatRupees(totalAmount, true)}) for FY ${financialYear} appraisal.`,
-            isRead: false,
-            createdAt: now,
-          });
+          if (targetStatus === 'Pending Director Approval') {
+            dbData.notifications.push({
+              id: `notif-plan-${randomUUID()}`,
+              recipientOrgId: targetDivId,
+              workshopId: 'budget-submission',
+              title: `📋 Budget Projection Pending Director Approval: ${security.organizationName}`,
+              message: `${security.fullName} submitted ${submittedCount} activity proposals totaling Rs. ${formatMillion(totalAmount)} Mn for FY ${financialYear}. Please review and approve as Branch Director.`,
+              isRead: false,
+              createdAt: now,
+            });
+          } else {
+            dbData.notifications.push({
+              id: `notif-plan-${randomUUID()}`,
+              recipientOrgId: 'org-moe-planning',
+              workshopId: 'budget-submission',
+              title: `📥 Budgetary Plan Submitted: ${security.organizationName}`,
+              message: `${security.fullName} submitted ${submittedCount} activity proposals totaling Rs. ${formatMillion(totalAmount)} Mn (${formatRupees(totalAmount, true)}) for FY ${financialYear} appraisal.`,
+              isRead: false,
+              createdAt: now,
+            });
+          }
         }
       });
 
@@ -527,12 +550,17 @@ export async function POST(req: NextRequest) {
         action: 'BUDGET_PLAN_SUBMITTED',
         entityType: 'BUDGET_PROPOSAL',
         entityId: targetDivId,
-        summary: `Submitted branch budgetary plan for ${security.organizationName}: ${submittedCount} activities (Rs. ${formatMillion(totalAmount)} Mn) for FY ${financialYear}.`,
+        summary:
+          targetStatus === 'Pending Director Approval'
+            ? `Submitted branch budgetary plan for ${security.organizationName} to Branch Director for approval: ${submittedCount} activities (Rs. ${formatMillion(totalAmount)} Mn) for FY ${financialYear}.`
+            : `Submitted branch budgetary plan for ${security.organizationName} directly to Planning Division: ${submittedCount} activities (Rs. ${formatMillion(totalAmount)} Mn) for FY ${financialYear}.`,
         details: {
           divisionId: targetDivId,
           submittedCount,
           totalAmountMn: totalAmount,
           financialYear,
+          targetStatus,
+          enableBranchApprovalChain,
         },
         severity: 'Info',
       });
@@ -540,8 +568,180 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({
         success: true,
         submittedCount,
+        targetStatus,
         totalAmount: roundToCentInMn(totalAmount),
-        message: `Successfully submitted ${submittedCount} activity proposals to the Planning Division.`,
+        message:
+          targetStatus === 'Pending Director Approval'
+            ? `Submitted ${submittedCount} activity proposals to Branch Director for approval.`
+            : `Successfully submitted ${submittedCount} activity proposals to the Planning Division.`,
+      });
+    }
+
+    // 2B. Branch Director Approval / Return for Budget Projections
+    if (action === 'director_approve_branch_plan' || action === 'director_return_branch_plan') {
+      const { divisionId, financialYear = '2027', notes } = body;
+      const sessionUser = session.user as any;
+      const isDirector = Boolean(
+        sessionUser?.isDirector ||
+        sessionUser?.roleId === 'role-director' ||
+        sessionUser?.roleName === 'Director' ||
+        security.isSuperAdmin
+      );
+
+      if (!isDirector) {
+        return NextResponse.json({ error: 'Only Branch Directors can perform Director-level approval.' }, { status: 403 });
+      }
+
+      const targetDivId = security.isSuperAdmin ? (divisionId || security.organizationId) : security.organizationId;
+      const isApprove = action === 'director_approve_branch_plan';
+      let updatedCount = 0;
+
+      await updateDb((dbData) => {
+        if (!dbData.budgetProposalActivities) dbData.budgetProposalActivities = [];
+        dbData.budgetProposalActivities.forEach((p) => {
+          if (
+            p.divisionId === targetDivId &&
+            (!p.financialYear || p.financialYear === financialYear) &&
+            p.status === 'Pending Director Approval'
+          ) {
+            p.status = isApprove ? 'Pending Additional Secretary Approval' : 'Draft';
+            if (isApprove) {
+              p.directorApprovedBy = sessionUser?.fullName || sessionUser?.name || security.fullName;
+              p.directorApprovedAt = now;
+            }
+            p.updatedAt = now;
+            updatedCount++;
+          }
+        });
+
+        if (updatedCount > 0) {
+          if (!dbData.notifications) dbData.notifications = [];
+          dbData.notifications.push({
+            id: `notif-plan-dir-${randomUUID()}`,
+            recipientOrgId: targetDivId,
+            workshopId: 'budget-submission',
+            title: isApprove
+              ? `✅ Budget Projection Approved by Branch Director: ${security.organizationName}`
+              : `↩️ Budget Projection Returned by Branch Director: ${security.organizationName}`,
+            message: isApprove
+              ? `${security.fullName} approved ${updatedCount} proposals for FY ${financialYear}. Now awaiting Branch Additional Secretary approval.`
+              : `${security.fullName} returned ${updatedCount} proposals to Draft.${notes ? ` Remarks: "${notes}"` : ''}`,
+            isRead: false,
+            createdAt: now,
+          });
+        }
+      });
+
+      logAuditEvent({
+        user: {
+          id: sessionUser.id,
+          username: sessionUser.username,
+          fullName: sessionUser.name || sessionUser.fullName,
+          organizationId: targetDivId,
+          organizationName: security.organizationName || 'Branch',
+          roleId: sessionUser.roleId,
+          roleName: sessionUser.roleName,
+        },
+        category: 'Financial',
+        action: isApprove ? 'BUDGET_PLAN_DIRECTOR_APPROVED' : 'BUDGET_PLAN_DIRECTOR_RETURNED',
+        entityType: 'BUDGET_PROPOSAL',
+        entityId: targetDivId,
+        summary: `${isApprove ? 'Branch Director approved' : 'Branch Director returned'} ${updatedCount} budget proposals for ${security.organizationName} (FY ${financialYear}).`,
+        details: { divisionId: targetDivId, updatedCount, financialYear, notes },
+        severity: isApprove ? 'Info' : 'Warning',
+      });
+
+      return NextResponse.json({
+        success: true,
+        updatedCount,
+        message: isApprove
+          ? `Approved ${updatedCount} proposals and forwarded to Branch Additional Secretary.`
+          : `Returned ${updatedCount} proposals to Draft for revision.`,
+      });
+    }
+
+    // 2C. Branch Additional Secretary Approval / Return for Budget Projections -> Forwards to Planning Branch
+    if (action === 'addsec_approve_branch_plan' || action === 'addsec_return_branch_plan') {
+      const { divisionId, financialYear = '2027', notes } = body;
+      const sessionUser = session.user as any;
+      const isAddSec = Boolean(
+        sessionUser?.isAdditionalSecretary ||
+        sessionUser?.roleId === 'role-additional-secretary' ||
+        sessionUser?.roleName?.includes('Additional Secretary') ||
+        security.isSuperAdmin
+      );
+
+      if (!isAddSec) {
+        return NextResponse.json({ error: 'Only Branch Additional Secretaries can perform Additional Secretary approval.' }, { status: 403 });
+      }
+
+      const targetDivId = security.isSuperAdmin ? (divisionId || security.organizationId) : security.organizationId;
+      const isApprove = action === 'addsec_approve_branch_plan';
+      let updatedCount = 0;
+      let totalAmount = 0;
+
+      await updateDb((dbData) => {
+        if (!dbData.budgetProposalActivities) dbData.budgetProposalActivities = [];
+        dbData.budgetProposalActivities.forEach((p) => {
+          if (
+            p.divisionId === targetDivId &&
+            (!p.financialYear || p.financialYear === financialYear) &&
+            p.status === 'Pending Additional Secretary Approval'
+          ) {
+            p.status = isApprove ? 'Submitted' : 'Draft';
+            if (isApprove) {
+              p.addSecApprovedBy = sessionUser?.fullName || sessionUser?.name || security.fullName;
+              p.addSecApprovedAt = now;
+            }
+            p.updatedAt = now;
+            updatedCount++;
+            totalAmount += Number(p.estimatedCostMn) || 0;
+          }
+        });
+
+        if (updatedCount > 0) {
+          if (!dbData.notifications) dbData.notifications = [];
+          dbData.notifications.push({
+            id: `notif-plan-addsec-${randomUUID()}`,
+            recipientOrgId: isApprove ? 'org-moe-planning' : targetDivId,
+            workshopId: 'budget-submission',
+            title: isApprove
+              ? `📥 Budgetary Plan Approved & Submitted: ${security.organizationName}`
+              : `↩️ Budget Projection Returned by Additional Secretary: ${security.organizationName}`,
+            message: isApprove
+              ? `${security.organizationName} (approved by Branch Director & Additional Secretary) submitted ${updatedCount} activity proposals totaling Rs. ${formatMillion(totalAmount)} Mn for FY ${financialYear} appraisal.`
+              : `${security.fullName} returned ${updatedCount} proposals to Draft.${notes ? ` Remarks: "${notes}"` : ''}`,
+            isRead: false,
+            createdAt: now,
+          });
+        }
+      });
+
+      logAuditEvent({
+        user: {
+          id: sessionUser.id,
+          username: sessionUser.username,
+          fullName: sessionUser.name || sessionUser.fullName,
+          organizationId: targetDivId,
+          organizationName: security.organizationName || 'Branch',
+          roleId: sessionUser.roleId,
+          roleName: sessionUser.roleName,
+        },
+        category: 'Financial',
+        action: isApprove ? 'BUDGET_PLAN_ADDSEC_APPROVED' : 'BUDGET_PLAN_ADDSEC_RETURNED',
+        entityType: 'BUDGET_PROPOSAL',
+        entityId: targetDivId,
+        summary: `${isApprove ? 'Additional Secretary approved & forwarded to Planning' : 'Additional Secretary returned'} ${updatedCount} budget proposals for ${security.organizationName} (FY ${financialYear}).`,
+        details: { divisionId: targetDivId, updatedCount, totalAmountMn: totalAmount, financialYear, notes },
+        severity: isApprove ? 'Info' : 'Warning',
+      });
+
+      return NextResponse.json({
+        success: true,
+        updatedCount,
+        message: isApprove
+          ? `Approved ${updatedCount} proposals and submitted to the Planning Branch.`
+          : `Returned ${updatedCount} proposals to Draft for revision.`,
       });
     }
 

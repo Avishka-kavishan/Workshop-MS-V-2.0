@@ -49,6 +49,7 @@ export default function SuperAdminConsolePage() {
   // Active Tab
   const [activeTab, setActiveTab] = useState<'access-control' | 'branches' | 'years' | 'deadlines' | 'announcements' | 'settings' | 'aip-templates'>('access-control');
   const [showProgressMeter, setShowProgressMeter] = useState(true);
+  const [enableBranchApprovalChain, setEnableBranchApprovalChain] = useState(true);
   const [settingsLoading, setSettingsLoading] = useState(false);
 
   // Multi-Role & Access Control States (AUTH-01 – AUTH-12)
@@ -276,6 +277,9 @@ export default function SuperAdminConsolePage() {
         const sData = await setRes.json();
         if (typeof sData.showDashboardProgressMeter === 'boolean') {
           setShowProgressMeter(sData.showDashboardProgressMeter);
+        }
+        if (typeof sData.enableBranchApprovalChain === 'boolean') {
+          setEnableBranchApprovalChain(sData.enableBranchApprovalChain);
         }
       }
       await loadRolesData();
@@ -552,6 +556,36 @@ export default function SuperAdminConsolePage() {
       } else {
         const err = await res.json();
         setActionError(err.error || 'Failed to update settings');
+        setTimeout(() => setActionError(null), 4000);
+      }
+    } catch (err: any) {
+      setActionError(err.message || 'Network error');
+      setTimeout(() => setActionError(null), 4000);
+    } finally {
+      setSettingsLoading(false);
+    }
+  };
+
+  const handleToggleBranchApprovalChain = async () => {
+    try {
+      setSettingsLoading(true);
+      const newVal = !enableBranchApprovalChain;
+      const res = await fetch('/api/admin/settings', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ enableBranchApprovalChain: newVal }),
+      });
+      if (res.ok) {
+        setEnableBranchApprovalChain(newVal);
+        setActionSuccess(
+          `Branch Approval Chain (Director → Additional Secretary) is now ${
+            newVal ? 'ACTIVE' : 'DEACTIVATED (Direct Send to Planning)'
+          }`
+        );
+        setTimeout(() => setActionSuccess(null), 4000);
+      } else {
+        const err = await res.json();
+        setActionError(err.error || 'Failed to update branch approval chain setting');
         setTimeout(() => setActionError(null), 4000);
       }
     } catch (err: any) {
@@ -3534,6 +3568,79 @@ export default function SuperAdminConsolePage() {
                     }}
                   >
                     <span>{settingsLoading ? 'Updating...' : showProgressMeter ? '🔒 Hide from Users' : '✓ Show to All Users'}</span>
+                  </button>
+                </div>
+              </div>
+
+              {/* Branch Approval Chain Setting Card */}
+              <div
+                style={{
+                  marginTop: '1rem',
+                  background: '#F8FAFC',
+                  border: '1px solid var(--border-light)',
+                  borderRadius: '12px',
+                  padding: '1.35rem',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  gap: '1.5rem',
+                  flexWrap: 'wrap',
+                }}
+              >
+                <div style={{ flex: 1, minWidth: '280px' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.35rem', flexWrap: 'wrap' }}>
+                    <span style={{ fontSize: '1.1rem' }}>🔀</span>
+                    <strong style={{ fontSize: '0.98rem', color: 'var(--text-primary)' }}>
+                      Branch Approval Chain (Director → Additional Secretary)
+                    </strong>
+                    <span
+                      style={{
+                        fontSize: '0.68rem',
+                        fontWeight: 800,
+                        padding: '0.15rem 0.5rem',
+                        borderRadius: '12px',
+                        background: enableBranchApprovalChain ? '#D1FAE5' : '#FEF3C7',
+                        color: enableBranchApprovalChain ? '#065F46' : '#92400E',
+                      }}
+                    >
+                      {enableBranchApprovalChain
+                        ? 'ACTIVE: Branch User → Director → Add. Secretary → Planning'
+                        : 'DEACTIVATED: Direct Send (Branch User → Planning)'}
+                    </span>
+                  </div>
+                  <p style={{ margin: 0, fontSize: '0.82rem', color: 'var(--text-secondary)', lineHeight: 1.5 }}>
+                    When <strong>Active</strong>, branch Budget Projections and AIP submissions must be approved by the <strong>Branch Director</strong> and then the <strong>Branch Additional Secretary</strong> before reaching Planning Branch. When <strong>Deactivated</strong>, branch users send directly to Planning Branch.
+                  </p>
+                </div>
+
+                <div>
+                  <button
+                    type="button"
+                    onClick={handleToggleBranchApprovalChain}
+                    disabled={settingsLoading}
+                    className="btn"
+                    style={{
+                      background: enableBranchApprovalChain ? '#DC2626' : '#0F766E',
+                      color: '#FFFFFF',
+                      fontWeight: 700,
+                      fontSize: '0.84rem',
+                      padding: '0.6rem 1.25rem',
+                      borderRadius: '8px',
+                      border: 'none',
+                      cursor: 'pointer',
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '0.45rem',
+                      boxShadow: '0 2px 8px rgba(0,0,0,0.15)',
+                    }}
+                  >
+                    <span>
+                      {settingsLoading
+                        ? 'Updating...'
+                        : enableBranchApprovalChain
+                        ? '⏸ Deactivate Approval Chain'
+                        : '▶ Activate Approval Chain'}
+                    </span>
                   </button>
                 </div>
               </div>

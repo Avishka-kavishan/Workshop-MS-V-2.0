@@ -87,6 +87,31 @@ export const ADDITIONAL_SECRETARY_ROLE: UserRole = {
   canExport: true,
 };
 
+export const DIRECTOR_ROLE: UserRole = {
+  id: 'role-director',
+  name: 'Director',
+  description: 'Branch / Division Director with executive review, workshop approval, AIP authorization, and branch monitoring authority.',
+  functionalScope: 'Normal',
+  delegatedAuthority: 'Approval',
+  canCreateWorkshop: true,
+  canApproveWorkshop: true,
+  canManageUsers: false,
+  canViewReports: true,
+  canManageOrganizations: false,
+  canView: true,
+  canCreate: true,
+  canEdit: true,
+  canDelete: false,
+  canSubmit: true,
+  canReview: true,
+  canRecommend: true,
+  canApprove: true,
+  canVerify: false,
+  canMonitor: true,
+  canRevise: true,
+  canExport: true,
+};
+
 export const SUPERADMIN_ROLE: UserRole = {
   id: 'role-superadmin',
   name: 'Super Administrator',

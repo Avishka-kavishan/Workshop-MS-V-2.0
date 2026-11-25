@@ -23,9 +23,11 @@ export async function GET(req: NextRequest) {
 
     const db = await getDb();
     const showDashboardProgressMeter = db.meta?.showDashboardProgressMeter ?? true;
+    const enableBranchApprovalChain = db.meta?.enableBranchApprovalChain ?? true;
 
     return NextResponse.json({
       showDashboardProgressMeter,
+      enableBranchApprovalChain,
       isSuperAdmin,
     });
   } catch (error: any) {
@@ -57,18 +59,29 @@ export async function POST(req: NextRequest) {
     }
 
     const body = await req.json();
-    if (typeof body.showDashboardProgressMeter !== 'boolean') {
+    const hasMeter = typeof body.showDashboardProgressMeter === 'boolean';
+    const hasChain = typeof body.enableBranchApprovalChain === 'boolean';
+
+    if (!hasMeter && !hasChain) {
       return NextResponse.json(
-        { error: 'showDashboardProgressMeter must be a boolean value' },
+        { error: 'At least one boolean setting (showDashboardProgressMeter or enableBranchApprovalChain) is required' },
         { status: 400 }
       );
     }
 
-    const newValue = body.showDashboardProgressMeter;
+    let updatedMeter: boolean | undefined;
+    let updatedChain: boolean | undefined;
 
     await updateDb((d) => {
       d.meta = d.meta || { lastWorkshopNumber: 0 };
-      d.meta.showDashboardProgressMeter = newValue;
+      if (hasMeter) {
+        d.meta.showDashboardProgressMeter = body.showDashboardProgressMeter;
+      }
+      if (hasChain) {
+        d.meta.enableBranchApprovalChain = body.enableBranchApprovalChain;
+      }
+      updatedMeter = d.meta.showDashboardProgressMeter ?? true;
+      updatedChain = d.meta.enableBranchApprovalChain ?? true;
     });
 
     // Enterprise Audit Trail: Settings update
@@ -85,19 +98,24 @@ export async function POST(req: NextRequest) {
       category: 'Governance',
       action: 'SYSTEM_SETTINGS_UPDATED',
       entityType: 'SYSTEM_SETTINGS',
-      entityId: 'meta-progress-meter',
-      summary: `Updated system settings: Real-Time Progress Meter visibility toggled to ${newValue ? 'VISIBLE' : 'HIDDEN'}.`,
+      entityId: hasChain ? 'meta-branch-approval-chain' : 'meta-progress-meter',
+      summary: hasChain
+        ? `Updated system settings: Branch Approval Chain (Director -> Additional Secretary) ${updatedChain ? 'ACTIVATED' : 'DEACTIVATED (Direct Send to Planning)'}.`
+        : `Updated system settings: Real-Time Progress Meter visibility toggled to ${updatedMeter ? 'VISIBLE' : 'HIDDEN'}.`,
       details: {
-        settingKey: 'showDashboardProgressMeter',
-        newValue,
+        showDashboardProgressMeter: updatedMeter,
+        enableBranchApprovalChain: updatedChain,
       },
       severity: 'Info',
     });
 
     return NextResponse.json({
       success: true,
-      showDashboardProgressMeter: newValue,
-      message: `Real-Time Progress Meter visibility updated to ${newValue ? 'VISIBLE to all users' : 'HIDDEN for regular users'}.`,
+      showDashboardProgressMeter: updatedMeter,
+      enableBranchApprovalChain: updatedChain,
+      message: hasChain
+        ? `Branch Approval Chain (Director → Additional Secretary) is now ${updatedChain ? 'ACTIVE' : 'DEACTIVATED (Direct Send to Planning)'}.`
+        : `Real-Time Progress Meter visibility updated to ${updatedMeter ? 'VISIBLE to all users' : 'HIDDEN for regular users'}.`,
     });
   } catch (error: any) {
     console.error('Error updating admin settings:', error);

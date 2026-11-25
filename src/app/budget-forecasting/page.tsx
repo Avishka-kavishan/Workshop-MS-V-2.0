@@ -38,7 +38,7 @@ interface BudgetProposalActivity {
   beneficiaryCount: number;
   estimatedCostMn: number;
   noBudgetRequired?: boolean;
-  status: 'Draft' | 'Submitted' | 'Under Review' | 'Accepted' | 'Adjusted' | 'Rejected' | 'Deferred' | 'Duplicate';
+  status: 'Draft' | 'Pending Director Approval' | 'Pending Additional Secretary Approval' | 'Submitted' | 'Under Review' | 'Accepted' | 'Adjusted' | 'Rejected' | 'Deferred' | 'Duplicate';
   submittedBy: string;
   submittedAt?: string;
   activityNumber?: number;
@@ -134,7 +134,7 @@ export default function BudgetPlanningWorkspacePage() {
 
   // Active Tab:
   // 'branch-planning' (Stage 1) | 'formulation' (Stage 2) | 'budget-speech' (Outputs) | 'allocations' (Post-Appropriation)
-  const [activeTab, setActiveTab] = useState<'branch-planning' | 'formulation' | 'budget-speech' | 'allocations'>('branch-planning');
+  const [activeTab, setActiveTab] = useState<'branch-planning' | 'aip-form' | 'formulation' | 'budget-speech' | 'allocations'>('branch-planning');
 
   // Server Data
   const [proposals, setProposals] = useState<BudgetProposalActivity[]>([]);
@@ -148,6 +148,24 @@ export default function BudgetPlanningWorkspacePage() {
   const [organizations, setOrganizations] = useState<any[]>([]);
   const [aipActivities, setAipActivities] = useState<any[]>([]);
   const [userContext, setUserContext] = useState<any>(null);
+  const [enableBranchApprovalChain, setEnableBranchApprovalChain] = useState<boolean>(true);
+  const [aipPlan, setAipPlan] = useState<any>(null);
+  const [aipTabActivities, setAipTabActivities] = useState<any[]>([]);
+  const [aipLoading, setAipLoading] = useState(false);
+  const [aipSubmitting, setAipSubmitting] = useState(false);
+  const [aipForm, setAipForm] = useState({
+    outputNo: '1',
+    activityCode: '1.1',
+    activity: '',
+    voteNumber: '',
+    estimatedCost: '',
+    targetQ1: '-',
+    targetQ2: '-',
+    targetQ3: '-',
+    targetQ4: '100%',
+    responsibleOfficer: '',
+    remarks: '',
+  });
 
   // Filter states
   const [selectedDivisionFilter, setSelectedDivisionFilter] = useState<string>('all');
@@ -269,6 +287,9 @@ export default function BudgetPlanningWorkspacePage() {
         setOrganizations(data.organizations || []);
         setAipActivities(data.aipActivities || []);
         if (data.deadlines) setDeadlines(data.deadlines);
+        if (typeof data.enableBranchApprovalChain === 'boolean') {
+          setEnableBranchApprovalChain(data.enableBranchApprovalChain);
+        }
         setUserContext(data.userContext || null);
 
         const isPlanning = Boolean(data.userContext?.isPlanningDivision || data.userContext?.isSuperAdmin);
@@ -297,8 +318,143 @@ export default function BudgetPlanningWorkspacePage() {
     fetchBudgetData();
   }, [selectedYear]);
 
+  const fetchBranchAip = async () => {
+    if (!branchWorkspaceDivId) return;
+    try {
+      setAipLoading(true);
+      const res = await fetch(`/api/annual-plan?branchId=${encodeURIComponent(branchWorkspaceDivId)}&year=${encodeURIComponent(selectedYear)}`);
+      if (res.ok) {
+        const json = await res.json();
+        setAipPlan(json.plan || null);
+        setAipTabActivities(json.activities || []);
+      }
+    } catch (err) {
+      console.error('Failed to fetch AIP form data:', err);
+    } finally {
+      setAipLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (activeTab === 'aip-form' && branchWorkspaceDivId) {
+      fetchBranchAip();
+    }
+  }, [activeTab, branchWorkspaceDivId, selectedYear]);
+
+  const handleSaveAipFormActivity = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!aipForm.activity.trim()) {
+      showToast('error', 'Main Activity description is required.');
+      return;
+    }
+    try {
+      setAipSubmitting(true);
+      const res = await fetch('/api/annual-plan/activities', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          branchId: branchWorkspaceDivId,
+          branchName: currentBranchName,
+          year: selectedYear,
+          outputNo: aipForm.outputNo,
+          activityCode: aipForm.activityCode,
+          activity: aipForm.activity.trim(),
+          voteNumber: aipForm.voteNumber.trim() || '-',
+          estimatedCost: Number(aipForm.estimatedCost) || 0,
+          targetQ1: aipForm.targetQ1 || '-',
+          targetQ2: aipForm.targetQ2 || '-',
+          targetQ3: aipForm.targetQ3 || '-',
+          targetQ4: aipForm.targetQ4 || '100%',
+          responsibleOfficer: aipForm.responsibleOfficer.trim(),
+          remarks: aipForm.remarks.trim(),
+        }),
+      });
+      const json = await res.json();
+      if (res.ok) {
+        showToast('success', 'AIP activity added successfully!');
+        setAipForm((prev) => ({
+          ...prev,
+          activityCode: `1.${aipTabActivities.length + 2}`,
+          activity: '',
+          estimatedCost: '',
+          remarks: '',
+        }));
+        fetchBranchAip();
+      } else {
+        showToast('error', json.error || 'Failed to add AIP activity');
+      }
+    } catch (err: any) {
+      showToast('error', err.message || 'Network error');
+    } finally {
+      setAipSubmitting(false);
+    }
+  };
+
+  const handleSubmitBranchAip = async () => {
+    try {
+      setAipSubmitting(true);
+      const res = await fetch('/api/annual-plan/submit', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          planId: aipPlan?.id,
+          branchId: branchWorkspaceDivId,
+          year: selectedYear,
+          amendmentNumber: 0,
+        }),
+      });
+      const json = await res.json();
+      if (res.ok) {
+        showToast('success', json.message || 'AIP submitted successfully!');
+        fetchBranchAip();
+      } else {
+        showToast('error', json.error || 'Failed to submit AIP');
+      }
+    } catch (err: any) {
+      showToast('error', err.message || 'Network error');
+    } finally {
+      setAipSubmitting(false);
+    }
+  };
+
+  const handleApproveBranchAip = async (
+    action: 'DirectorApprove' | 'DirectorReturn' | 'AddSecApprove' | 'AddSecReturn'
+  ) => {
+    const isReturn = action.includes('Return');
+    const notes = isReturn ? window.prompt('Enter remarks/reason for returning this AIP to Draft:') : '';
+    if (isReturn && notes === null) return;
+    try {
+      setAipSubmitting(true);
+      const res = await fetch('/api/annual-plan/approve', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          branchId: branchWorkspaceDivId,
+          year: selectedYear,
+          amendmentNumber: 0,
+          action,
+          notes: notes || '',
+        }),
+      });
+      const json = await res.json();
+      if (res.ok) {
+        showToast('success', json.message || 'AIP approval updated!');
+        fetchBranchAip();
+      } else {
+        showToast('error', json.error || 'Failed to process AIP approval');
+      }
+    } catch (err: any) {
+      showToast('error', err.message || 'Network error');
+    } finally {
+      setAipSubmitting(false);
+    }
+  };
+
   const isPlanningOfficer = Boolean(userContext?.isPlanningDivision || userContext?.isSuperAdmin);
   const isMonitoringOfficer = Boolean(userContext?.isMonitoringDivision);
+  const sessionUser = session?.user as any;
+  const isBranchDirector = Boolean(sessionUser?.isDirector || sessionUser?.roleId === 'role-director' || sessionUser?.roleName === 'Director');
+  const isBranchAddSec = Boolean(sessionUser?.isAdditionalSecretary || sessionUser?.roleId === 'role-additional-secretary' || sessionUser?.roleName?.includes('Additional Secretary'));
 
   // Strict operational role lockdown: non-planning, non-monitoring users are strictly restricted to their division
   useEffect(() => {
@@ -306,7 +462,7 @@ export default function BudgetPlanningWorkspacePage() {
       if (userContext.divisionId && branchWorkspaceDivId !== userContext.divisionId) {
         setBranchWorkspaceDivId(userContext.divisionId);
       }
-      if (activeTab !== 'branch-planning') {
+      if (activeTab !== 'branch-planning' && activeTab !== 'aip-form') {
         setActiveTab('branch-planning');
       }
     }
@@ -342,6 +498,11 @@ export default function BudgetPlanningWorkspacePage() {
     const draftsCount = drafts.length;
     const draftsCostMn = drafts.reduce((sum, p) => sum + (Number(p.estimatedCostMn) || 0), 0);
 
+    const pendingDirector = list.filter((p) => p.status === 'Pending Director Approval');
+    const pendingDirectorCount = pendingDirector.length;
+    const pendingAddSec = list.filter((p) => p.status === 'Pending Additional Secretary Approval');
+    const pendingAddSecCount = pendingAddSec.length;
+
     const submitted = list.filter((p) => p.status === 'Submitted');
     const submittedCount = submitted.length;
     const submittedCostMn = submitted.reduce((sum, p) => sum + (Number(p.estimatedCostMn) || 0), 0);
@@ -364,6 +525,8 @@ export default function BudgetPlanningWorkspacePage() {
       totalDemandMn: Math.round(totalDemandMn * 1000) / 1000,
       draftsCount,
       draftsCostMn: Math.round(draftsCostMn * 1000) / 1000,
+      pendingDirectorCount,
+      pendingAddSecCount,
       submittedCount,
       submittedCostMn: Math.round(submittedCostMn * 1000) / 1000,
       acceptedCount,
@@ -695,6 +858,37 @@ export default function BudgetPlanningWorkspacePage() {
     }
   };
 
+  // ── Branch Director / Additional Secretary Approval Actions ─────────────
+  const handleBranchApprovalAction = async (
+    action: 'director_approve_branch_plan' | 'director_return_branch_plan' | 'addsec_approve_branch_plan' | 'addsec_return_branch_plan'
+  ) => {
+    const isReturn = action.includes('return');
+    const notes = isReturn ? window.prompt('Enter remarks/reason for returning proposals to Draft:') : '';
+    if (isReturn && notes === null) return;
+
+    try {
+      const res = await fetch('/api/planning/budget', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action,
+          divisionId: branchWorkspaceDivId,
+          financialYear: selectedYear,
+          notes: notes || '',
+        }),
+      });
+      const json = await res.json();
+      if (res.ok) {
+        showToast('success', json.message || 'Approval updated');
+        fetchBudgetData();
+      } else {
+        showToast('error', json.error || 'Failed to process approval');
+      }
+    } catch (err: any) {
+      showToast('error', err.message);
+    }
+  };
+
   // ── Delete Proposal ──────────────────────────────────────────────────────
   const handleDeleteProposal = async (id: string) => {
     if (!window.confirm('Are you sure you want to delete this activity proposal?')) return;
@@ -768,7 +962,7 @@ export default function BudgetPlanningWorkspacePage() {
     const nextNum = maxNum + 1;
 
     setReviewForm({
-      status: p.status === 'Rejected' ? 'Rejected' : (p.status === 'Draft' || p.status === 'Submitted') ? 'Accepted' : p.status,
+      status: p.status === 'Rejected' ? 'Rejected' : (p.status === 'Draft' || p.status === 'Submitted' || p.status === 'Pending Director Approval' || p.status === 'Pending Additional Secretary Approval') ? 'Accepted' : p.status,
       activityNumber: p.activityNumber || nextNum,
       activityTitle: p.activityTitle,
       purpose: p.purpose || '',
@@ -1450,94 +1644,117 @@ export default function BudgetPlanningWorkspacePage() {
           </div>
         )}
 
-        {/* ── WORKSPACE TABS (RESTRICTED FOR OPERATIONAL BRANCHES) ─────────── */}
-        {isPlanningOfficer || isMonitoringOfficer ? (
-          <div style={{ display: 'flex', gap: '0.5rem', borderBottom: '2px solid #E2E8F0', marginBottom: '1.5rem', flexWrap: 'wrap' }}>
-            <button
-              type="button"
-              onClick={() => setActiveTab('branch-planning')}
-              style={{
-                padding: '0.75rem 1.25rem',
-                fontWeight: 700,
-                fontSize: '0.9rem',
-                border: 'none',
-                background: 'none',
-                cursor: 'pointer',
-                borderBottom: activeTab === 'branch-planning' ? '3px solid var(--primary)' : '3px solid transparent',
-                color: activeTab === 'branch-planning' ? 'var(--primary)' : 'var(--text-secondary)',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '0.4rem',
-              }}
-            >
-              <span>🏢</span>
-              <span>Branch Budgetary Planning Workspace</span>
-            </button>
+        {/* ── WORKSPACE TABS ─────────────────────────────────────────────── */}
+        <div style={{ display: 'flex', gap: '0.5rem', borderBottom: '2px solid #E2E8F0', marginBottom: '1.5rem', flexWrap: 'wrap' }}>
+          <button
+            type="button"
+            onClick={() => setActiveTab('branch-planning')}
+            style={{
+              padding: '0.75rem 1.25rem',
+              fontWeight: 700,
+              fontSize: '0.9rem',
+              border: 'none',
+              background: 'none',
+              cursor: 'pointer',
+              borderBottom: activeTab === 'branch-planning' ? '3px solid var(--primary)' : '3px solid transparent',
+              color: activeTab === 'branch-planning' ? 'var(--primary)' : 'var(--text-secondary)',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '0.4rem',
+            }}
+          >
+            <span>🏢</span>
+            <span>Branch Budgetary Planning Workspace</span>
+          </button>
 
-            <button
-              type="button"
-              onClick={() => setActiveTab('formulation')}
-              style={{
-                padding: '0.75rem 1.25rem',
-                fontWeight: 700,
-                fontSize: '0.9rem',
-                border: 'none',
-                background: 'none',
-                cursor: 'pointer',
-                borderBottom: activeTab === 'formulation' ? '3px solid var(--primary)' : '3px solid transparent',
-                color: activeTab === 'formulation' ? 'var(--primary)' : 'var(--text-secondary)',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '0.4rem',
-              }}
-            >
-              <span>🏛️</span>
-              <span>Stage 2: Ministry Formulation & Vision Desk</span>
-            </button>
+          <button
+            type="button"
+            onClick={() => setActiveTab('aip-form')}
+            style={{
+              padding: '0.75rem 1.25rem',
+              fontWeight: 700,
+              fontSize: '0.9rem',
+              border: 'none',
+              background: 'none',
+              cursor: 'pointer',
+              borderBottom: activeTab === 'aip-form' ? '3px solid var(--primary)' : '3px solid transparent',
+              color: activeTab === 'aip-form' ? 'var(--primary)' : 'var(--text-secondary)',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '0.4rem',
+            }}
+          >
+            <span>📋</span>
+            <span>AIP Form (Annual Implementation Plan)</span>
+          </button>
 
-            <button
-              type="button"
-              onClick={() => setActiveTab('budget-speech')}
-              style={{
-                padding: '0.75rem 1.25rem',
-                fontWeight: 700,
-                fontSize: '0.9rem',
-                border: 'none',
-                background: 'none',
-                cursor: 'pointer',
-                borderBottom: activeTab === 'budget-speech' ? '3px solid var(--primary)' : '3px solid transparent',
-                color: activeTab === 'budget-speech' ? 'var(--primary)' : 'var(--text-secondary)',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '0.4rem',
-              }}
-            >
-              <span>📜</span>
-              <span>Annual Budget Speech & Estimates</span>
-            </button>
+          {(isPlanningOfficer || isMonitoringOfficer) && (
+            <>
+              <button
+                type="button"
+                onClick={() => setActiveTab('formulation')}
+                style={{
+                  padding: '0.75rem 1.25rem',
+                  fontWeight: 700,
+                  fontSize: '0.9rem',
+                  border: 'none',
+                  background: 'none',
+                  cursor: 'pointer',
+                  borderBottom: activeTab === 'formulation' ? '3px solid var(--primary)' : '3px solid transparent',
+                  color: activeTab === 'formulation' ? 'var(--primary)' : 'var(--text-secondary)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.4rem',
+                }}
+              >
+                <span>🏛️</span>
+                <span>Stage 2: Ministry Formulation & Vision Desk</span>
+              </button>
 
-            <button
-              type="button"
-              onClick={() => setActiveTab('allocations')}
-              style={{
-                padding: '0.75rem 1.25rem',
-                fontWeight: 700,
-                fontSize: '0.9rem',
-                border: 'none',
-                background: 'none',
-                cursor: 'pointer',
-                borderBottom: activeTab === 'allocations' ? '3px solid var(--primary)' : '3px solid transparent',
-                color: activeTab === 'allocations' ? 'var(--primary)' : 'var(--text-secondary)',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '0.4rem',
-              }}
-            >
-              <span>📊</span>
-              <span>Post-Appropriation 5-Stage Control</span>
-            </button>
-          </div>
-        ) : null}
+              <button
+                type="button"
+                onClick={() => setActiveTab('budget-speech')}
+                style={{
+                  padding: '0.75rem 1.25rem',
+                  fontWeight: 700,
+                  fontSize: '0.9rem',
+                  border: 'none',
+                  background: 'none',
+                  cursor: 'pointer',
+                  borderBottom: activeTab === 'budget-speech' ? '3px solid var(--primary)' : '3px solid transparent',
+                  color: activeTab === 'budget-speech' ? 'var(--primary)' : 'var(--text-secondary)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.4rem',
+                }}
+              >
+                <span>📜</span>
+                <span>Annual Budget Speech & Estimates</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setActiveTab('allocations')}
+                style={{
+                  padding: '0.75rem 1.25rem',
+                  fontWeight: 700,
+                  fontSize: '0.9rem',
+                  border: 'none',
+                  background: 'none',
+                  cursor: 'pointer',
+                  borderBottom: activeTab === 'allocations' ? '3px solid var(--primary)' : '3px solid transparent',
+                  color: activeTab === 'allocations' ? 'var(--primary)' : 'var(--text-secondary)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.4rem',
+                }}
+              >
+                <span>📊</span>
+                <span>Post-Appropriation 5-Stage Control</span>
+              </button>
+            </>
+          )}
+        </div>
 
         {/* ══════════════════════════════════════════════════════════════════════ */}
         {/* TAB 1: STAGE 1 - BRANCH-LEVEL BUDGETARY PLANNING WORKSPACE             */}
@@ -2176,9 +2393,21 @@ export default function BudgetPlanningWorkspacePage() {
                       <span>📝</span>
                       <span>Ready to Submit: <strong>{branchStats.draftsCount} Draft Activit{branchStats.draftsCount === 1 ? 'y' : 'ies'}</strong> ({formatRupees(branchStats.draftsCostMn, true)})</span>
                     </span>
+                    {branchStats.pendingDirectorCount > 0 && (
+                      <span style={{ color: '#7C2D12', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                        <span>👔</span>
+                        <span>Pending Director: <strong>{branchStats.pendingDirectorCount}</strong></span>
+                      </span>
+                    )}
+                    {branchStats.pendingAddSecCount > 0 && (
+                      <span style={{ color: '#6B21A8', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                        <span>🏛️</span>
+                        <span>Pending Add. Sec: <strong>{branchStats.pendingAddSecCount}</strong></span>
+                      </span>
+                    )}
                     <span style={{ color: '#0369A1', display: 'flex', alignItems: 'center', gap: '4px' }}>
                       <span>📤</span>
-                      <span>Already Submitted: <strong>{branchStats.submittedCount}</strong></span>
+                      <span>Sent to Planning: <strong>{branchStats.submittedCount}</strong></span>
                     </span>
                     <span style={{ color: '#065F46', display: 'flex', alignItems: 'center', gap: '4px' }}>
                       <span>✅</span>
@@ -2187,8 +2416,50 @@ export default function BudgetPlanningWorkspacePage() {
                   </div>
                 </div>
 
-                {/* Right side: Action Submit Button */}
-                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '0.4rem', flexShrink: 0 }}>
+                {/* Right side: Action Submit / Approval Buttons */}
+                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '0.45rem', flexShrink: 0 }}>
+                  {isBranchDirector && branchStats.pendingDirectorCount > 0 && (
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.45rem', flexWrap: 'wrap', justifyContent: 'flex-end' }}>
+                      <button
+                        type="button"
+                        onClick={() => handleBranchApprovalAction('director_approve_branch_plan')}
+                        className="btn btn-primary"
+                        style={{ background: '#166534', borderColor: '#166534', color: '#FFFFFF', fontWeight: 700, fontSize: '0.82rem', padding: '0.55rem 1rem', borderRadius: '8px' }}
+                      >
+                        ✅ Director Approve & Forward to Add. Sec ({branchStats.pendingDirectorCount})
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => handleBranchApprovalAction('director_return_branch_plan')}
+                        className="btn"
+                        style={{ background: '#FFFFFF', border: '1px solid #DC2626', color: '#DC2626', fontWeight: 700, fontSize: '0.82rem', padding: '0.55rem 0.9rem', borderRadius: '8px' }}
+                      >
+                        ↩️ Return to Branch User
+                      </button>
+                    </div>
+                  )}
+
+                  {isBranchAddSec && branchStats.pendingAddSecCount > 0 && (
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.45rem', flexWrap: 'wrap', justifyContent: 'flex-end' }}>
+                      <button
+                        type="button"
+                        onClick={() => handleBranchApprovalAction('addsec_approve_branch_plan')}
+                        className="btn btn-primary"
+                        style={{ background: '#0F766E', borderColor: '#0F766E', color: '#FFFFFF', fontWeight: 700, fontSize: '0.82rem', padding: '0.55rem 1rem', borderRadius: '8px' }}
+                      >
+                        ✅ Add. Sec Approve & Send to Planning ({branchStats.pendingAddSecCount})
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => handleBranchApprovalAction('addsec_return_branch_plan')}
+                        className="btn"
+                        style={{ background: '#FFFFFF', border: '1px solid #DC2626', color: '#DC2626', fontWeight: 700, fontSize: '0.82rem', padding: '0.55rem 0.9rem', borderRadius: '8px' }}
+                      >
+                        ↩️ Return to Branch User
+                      </button>
+                    </div>
+                  )}
+
                   <button
                     type="button"
                     onClick={handleSubmitBranchPlan}
@@ -2224,6 +2495,8 @@ export default function BudgetPlanningWorkspacePage() {
                         ? `Cannot submit: Deadline announced by PPB expired on ${deadlineStatus.formattedDueDate}`
                         : branchStats.draftsCount === 0
                         ? 'All proposed activities for this branch are already submitted or accepted by PPB'
+                        : enableBranchApprovalChain && !isPlanningOfficer && !isBranchDirector && !isBranchAddSec
+                        ? `Submit ${branchStats.draftsCount} draft activity proposals to Branch Director for approval`
                         : `Submit ${branchStats.draftsCount} draft activity proposals to Policy Planning Branch`
                     }
                   >
@@ -2234,8 +2507,10 @@ export default function BudgetPlanningWorkspacePage() {
                       {deadlineStatus?.isExpired
                         ? 'Submissions Closed (Deadline Expired)'
                         : branchStats.draftsCount === 0
-                        ? 'All Proposals Submitted to PPB'
-                        : `Submit Proposed Activities to PPB (${branchStats.draftsCount})`}
+                        ? 'All Proposals Submitted'
+                        : enableBranchApprovalChain && !isPlanningOfficer && !isBranchDirector && !isBranchAddSec
+                        ? `Submit to Branch Director (${branchStats.draftsCount})`
+                        : `Direct Submit to PPB (${branchStats.draftsCount})`}
                     </span>
                   </button>
 
@@ -2248,6 +2523,265 @@ export default function BudgetPlanningWorkspacePage() {
                   </div>
                 </div>
               </div>
+            </div>
+          </div>
+        )}
+
+        {/* ══════════════════════════════════════════════════════════════════════ */}
+        {/* TAB 1B: AIP FORM (ANNUAL IMPLEMENTATION PLAN)                        */}
+        {/* ══════════════════════════════════════════════════════════════════════ */}
+        {activeTab === 'aip-form' && (
+          <div>
+            {/* AIP Status & Branch Approval Bar */}
+            <div className="card" style={{ padding: '1.25rem 1.5rem', marginBottom: '1.25rem', borderLeft: '4px solid var(--primary)' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem' }}>
+                <div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', flexWrap: 'wrap' }}>
+                    <h3 style={{ margin: 0, fontSize: '1.08rem', fontWeight: 800, color: '#0F172A' }}>
+                      Annual Implementation Plan (AIP Form) — {currentBranchName} ({selectedYear})
+                    </h3>
+                    <span
+                      style={{
+                        fontSize: '0.74rem',
+                        fontWeight: 800,
+                        padding: '0.2rem 0.6rem',
+                        borderRadius: '999px',
+                        background:
+                          aipPlan?.status === 'Approved'
+                            ? '#DCFCE7'
+                            : aipPlan?.status === 'Submitted'
+                            ? '#FEF3C7'
+                            : aipPlan?.status === 'Pending Director Approval'
+                            ? '#FFEDD5'
+                            : aipPlan?.status === 'Pending Additional Secretary Approval'
+                            ? '#F3E8FF'
+                            : '#F1F5F9',
+                        color:
+                          aipPlan?.status === 'Approved'
+                            ? '#166534'
+                            : aipPlan?.status === 'Submitted'
+                            ? '#92400E'
+                            : aipPlan?.status === 'Pending Director Approval'
+                            ? '#9A3412'
+                            : aipPlan?.status === 'Pending Additional Secretary Approval'
+                            ? '#6B21A8'
+                            : '#334155',
+                      }}
+                    >
+                      Status: {aipPlan?.status || 'Draft'}
+                    </span>
+                  </div>
+                  <p style={{ margin: '0.3rem 0 0', fontSize: '0.82rem', color: '#475569' }}>
+                    Add AIP activities directly from Budget Projection and submit through the {enableBranchApprovalChain ? 'Branch Director → Additional Secretary → Planning' : 'Direct → Planning'} workflow.
+                  </p>
+                </div>
+
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap' }}>
+                  {aipPlan?.status === 'Pending Director Approval' && isBranchDirector && (
+                    <>
+                      <button
+                        type="button"
+                        onClick={() => handleApproveBranchAip('DirectorApprove')}
+                        disabled={aipSubmitting}
+                        className="btn btn-primary"
+                        style={{ background: '#166534', borderColor: '#166534', fontSize: '0.82rem' }}
+                      >
+                        ✅ Director Approve & Forward
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => handleApproveBranchAip('DirectorReturn')}
+                        disabled={aipSubmitting}
+                        className="btn"
+                        style={{ background: '#FFF', border: '1px solid #DC2626', color: '#DC2626', fontSize: '0.82rem' }}
+                      >
+                        ↩️ Return
+                      </button>
+                    </>
+                  )}
+                  {aipPlan?.status === 'Pending Additional Secretary Approval' && isBranchAddSec && (
+                    <>
+                      <button
+                        type="button"
+                        onClick={() => handleApproveBranchAip('AddSecApprove')}
+                        disabled={aipSubmitting}
+                        className="btn btn-primary"
+                        style={{ background: '#0F766E', borderColor: '#0F766E', fontSize: '0.82rem' }}
+                      >
+                        ✅ Add. Sec Approve & Send to Planning
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => handleApproveBranchAip('AddSecReturn')}
+                        disabled={aipSubmitting}
+                        className="btn"
+                        style={{ background: '#FFF', border: '1px solid #DC2626', color: '#DC2626', fontSize: '0.82rem' }}
+                      >
+                        ↩️ Return
+                      </button>
+                    </>
+                  )}
+                  {(!aipPlan?.status || aipPlan?.status === 'Draft') && (
+                    <button
+                      type="button"
+                      onClick={handleSubmitBranchAip}
+                      disabled={aipSubmitting || aipTabActivities.length === 0}
+                      className="btn btn-primary"
+                      style={{ fontSize: '0.84rem' }}
+                    >
+                      {enableBranchApprovalChain && !isPlanningOfficer && !isBranchDirector && !isBranchAddSec
+                        ? '🚀 Submit AIP to Branch Director'
+                        : '🚀 Submit AIP to Planning Branch'}
+                    </button>
+                  )}
+                  <a
+                    href="/annual-plan"
+                    className="btn"
+                    style={{ background: '#F8FAFC', border: '1px solid #CBD5E1', color: '#1E293B', fontSize: '0.82rem', textDecoration: 'none' }}
+                  >
+                    Open Full AIP Matrix →
+                  </a>
+                </div>
+              </div>
+            </div>
+
+            {/* AIP Activity Entry Form */}
+            <div className="card" style={{ padding: '1.35rem 1.5rem', marginBottom: '1.25rem' }}>
+              <h4 style={{ margin: '0 0 1rem', fontSize: '0.96rem', fontWeight: 800, color: 'var(--primary)' }}>
+                ➕ Add New AIP Activity
+              </h4>
+              <form onSubmit={handleSaveAipFormActivity}>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '0.85rem', marginBottom: '0.85rem' }}>
+                  <div>
+                    <label className="form-label" style={{ fontSize: '0.78rem', fontWeight: 700 }}>Output No</label>
+                    <input
+                      type="text"
+                      className="form-input"
+                      value={aipForm.outputNo}
+                      onChange={(e) => setAipForm({ ...aipForm, outputNo: e.target.value })}
+                      placeholder="e.g. 1"
+                    />
+                  </div>
+                  <div>
+                    <label className="form-label" style={{ fontSize: '0.78rem', fontWeight: 700 }}>Activity Code</label>
+                    <input
+                      type="text"
+                      className="form-input"
+                      value={aipForm.activityCode}
+                      onChange={(e) => setAipForm({ ...aipForm, activityCode: e.target.value })}
+                      placeholder="e.g. 1.1"
+                    />
+                  </div>
+                  <div>
+                    <label className="form-label" style={{ fontSize: '0.78rem', fontWeight: 700 }}>Vote Number</label>
+                    <input
+                      type="text"
+                      className="form-input"
+                      value={aipForm.voteNumber}
+                      onChange={(e) => setAipForm({ ...aipForm, voteNumber: e.target.value })}
+                      placeholder="e.g. 126-02-03-2502"
+                    />
+                  </div>
+                  <div>
+                    <label className="form-label" style={{ fontSize: '0.78rem', fontWeight: 700 }}>Estimated Cost (Rs. Mn)</label>
+                    <input
+                      type="number"
+                      step="0.01"
+                      min="0"
+                      className="form-input"
+                      value={aipForm.estimatedCost}
+                      onChange={(e) => setAipForm({ ...aipForm, estimatedCost: e.target.value })}
+                      placeholder="0.00"
+                    />
+                  </div>
+                </div>
+
+                <div style={{ marginBottom: '0.85rem' }}>
+                  <label className="form-label" style={{ fontSize: '0.78rem', fontWeight: 700 }}>Main Activity Description *</label>
+                  <input
+                    type="text"
+                    className="form-input"
+                    value={aipForm.activity}
+                    onChange={(e) => setAipForm({ ...aipForm, activity: e.target.value })}
+                    placeholder="Enter the AIP activity title / description..."
+                    required
+                  />
+                </div>
+
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))', gap: '0.75rem', marginBottom: '0.95rem' }}>
+                  <div>
+                    <label className="form-label" style={{ fontSize: '0.75rem', fontWeight: 700 }}>Q1 Target</label>
+                    <input type="text" className="form-input" value={aipForm.targetQ1} onChange={(e) => setAipForm({ ...aipForm, targetQ1: e.target.value })} />
+                  </div>
+                  <div>
+                    <label className="form-label" style={{ fontSize: '0.75rem', fontWeight: 700 }}>Q2 Target</label>
+                    <input type="text" className="form-input" value={aipForm.targetQ2} onChange={(e) => setAipForm({ ...aipForm, targetQ2: e.target.value })} />
+                  </div>
+                  <div>
+                    <label className="form-label" style={{ fontSize: '0.75rem', fontWeight: 700 }}>Q3 Target</label>
+                    <input type="text" className="form-input" value={aipForm.targetQ3} onChange={(e) => setAipForm({ ...aipForm, targetQ3: e.target.value })} />
+                  </div>
+                  <div>
+                    <label className="form-label" style={{ fontSize: '0.75rem', fontWeight: 700 }}>Q4 Target</label>
+                    <input type="text" className="form-input" value={aipForm.targetQ4} onChange={(e) => setAipForm({ ...aipForm, targetQ4: e.target.value })} />
+                  </div>
+                  <div>
+                    <label className="form-label" style={{ fontSize: '0.75rem', fontWeight: 700 }}>Responsible Officer</label>
+                    <input type="text" className="form-input" value={aipForm.responsibleOfficer} onChange={(e) => setAipForm({ ...aipForm, responsibleOfficer: e.target.value })} placeholder="Officer name / role" />
+                  </div>
+                </div>
+
+                <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+                  <button type="submit" disabled={aipSubmitting} className="btn btn-primary" style={{ fontWeight: 700 }}>
+                    {aipSubmitting ? 'Saving...' : '➕ Add Activity to AIP'}
+                  </button>
+                </div>
+              </form>
+            </div>
+
+            {/* Current AIP Activities Table */}
+            <div className="card" style={{ padding: '1.25rem' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.75rem' }}>
+                <h4 style={{ margin: 0, fontSize: '0.96rem', fontWeight: 800 }}>
+                  Branch AIP Activities ({aipTabActivities.length})
+                </h4>
+              </div>
+              {aipLoading ? (
+                <div style={{ padding: '1.5rem', textAlign: 'center', color: '#64748B' }}>Loading AIP activities...</div>
+              ) : aipTabActivities.length === 0 ? (
+                <div style={{ padding: '1.5rem', textAlign: 'center', color: '#64748B', background: '#F8FAFC', borderRadius: '8px' }}>
+                  No AIP activities recorded yet for {currentBranchName} ({selectedYear}). Use the form above to add your first activity.
+                </div>
+              ) : (
+                <div style={{ overflowX: 'auto' }}>
+                  <table className="table" style={{ width: '100%', fontSize: '0.82rem' }}>
+                    <thead>
+                      <tr>
+                        <th>Output</th>
+                        <th>Code</th>
+                        <th>Main Activity</th>
+                        <th>Vote No</th>
+                        <th>Est. Cost (Rs. Mn)</th>
+                        <th>Q4 Target</th>
+                        <th>Responsible Officer</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {aipTabActivities.map((act: any) => (
+                        <tr key={act.id}>
+                          <td>{act.outputNo || '-'}</td>
+                          <td><strong>{act.activityCode || '-'}</strong></td>
+                          <td>{act.activity}</td>
+                          <td>{act.voteNumber || '-'}</td>
+                          <td>{formatMillion(Number(act.estimatedCost) || 0)}</td>
+                          <td>{act.targetQ4 || '-'}</td>
+                          <td>{act.responsibleOfficer || '-'}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
             </div>
           </div>
         )}

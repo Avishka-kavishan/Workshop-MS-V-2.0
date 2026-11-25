@@ -280,7 +280,7 @@ export default function AppShell({ children }: AppShellProps) {
     ? [{ href: '/dashboard', label: 'Dashboard', icon: DashboardIcon }]
     : [
         { href: '/dashboard', label: 'Dashboard', icon: DashboardIcon },
-        { href: '/budget-forecasting', label: 'Budget Planning', icon: BudgetPlanningIcon },
+        { href: '/budget-forecasting', label: 'Budget Projection', icon: BudgetPlanningIcon },
         { href: '/annual-plan', label: 'Annual Plan (AIP)', icon: AnnualPlanIcon },
         { href: '/monitoring', label: 'Monitoring & Verification', icon: MonitoringIcon },
         ...(isAdminUser || isGovernanceOfficer

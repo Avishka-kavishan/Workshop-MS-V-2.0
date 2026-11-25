@@ -24,24 +24,41 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'branchId and year are required' }, { status: 400 });
     }
 
-    if (action !== 'Approve' && action !== 'Return') {
-      return NextResponse.json({ error: 'Action must be "Approve" or "Return"' }, { status: 400 });
+    const validActions = ['Approve', 'Return', 'DirectorApprove', 'DirectorReturn', 'AddSecApprove', 'AddSecReturn'];
+    if (!validActions.includes(action)) {
+      return NextResponse.json({ error: 'Invalid approval action' }, { status: 400 });
     }
 
     const data = await getDb();
     const isConsolidated = branchId === 'all';
+    const isDirectorAction = action === 'DirectorApprove' || action === 'DirectorReturn';
+    const isAddSecAction = action === 'AddSecApprove' || action === 'AddSecReturn';
 
-    // Verify planning authority jurisdiction over this specific branch or all
-    const isAuthorized = !user || (isConsolidated
-      ? (user?.username === 'planning.officer' || user?.isSuperAdmin || (user?.adminLevel !== undefined && user.adminLevel <= 1) || user?.roleId === 'role-planning-officer' || user?.roleId === 'role-superadmin')
-      : canUserReviewPlan(user, branchId, data.organizations || []));
+    const isSuperAdmin = Boolean(user?.isSuperAdmin || user?.adminLevel === 0 || user?.roleId === 'role-superadmin');
+    const isBranchDirector = Boolean(
+      (user?.isDirector || user?.roleId === 'role-director' || user?.roleName === 'Director') &&
+      (isSuperAdmin || user?.organizationId === branchId)
+    );
+    const isBranchAddSec = Boolean(
+      (user?.isAdditionalSecretary || user?.roleId === 'role-additional-secretary' || user?.roleName?.includes('Additional Secretary')) &&
+      (isSuperAdmin || user?.organizationId === branchId)
+    );
+
+    // Verify jurisdiction for the specific approval stage
+    const isAuthorized = isDirectorAction
+      ? (isBranchDirector || isSuperAdmin)
+      : isAddSecAction
+      ? (isBranchAddSec || isSuperAdmin)
+      : (!user || (isConsolidated
+          ? (user?.username === 'planning.officer' || user?.isSuperAdmin || (user?.adminLevel !== undefined && user.adminLevel <= 1) || user?.roleId === 'role-planning-officer' || user?.roleId === 'role-superadmin')
+          : canUserReviewPlan(user, branchId, data.organizations || [])));
 
     const branchOrg = (data.organizations || []).find((o) => o.id === branchId);
     const branchName = isConsolidated ? 'Consolidated Ministry Implementation Plan' : (branchOrg?.name || 'MOE Branch');
 
     if (!isAuthorized) {
       return NextResponse.json(
-        { error: `Forbidden: You do not have Planning Authority jurisdiction over ${branchName}.` },
+        { error: `Forbidden: You do not have authority for this approval step on ${branchName}.` },
         { status: 403 }
       );
     }
@@ -57,7 +74,14 @@ export async function POST(request: NextRequest) {
       if (!dbData.aipPlans) dbData.aipPlans = [];
       if (!dbData.notifications) dbData.notifications = [];
 
-      const newStatus = action === 'Approve' ? 'Approved' : 'Draft';
+      const newStatus: 'Pending Additional Secretary Approval' | 'Submitted' | 'Approved' | 'Draft' =
+        action === 'DirectorApprove'
+          ? 'Pending Additional Secretary Approval'
+          : action === 'AddSecApprove'
+          ? 'Submitted'
+          : action === 'Approve'
+          ? 'Approved'
+          : 'Draft';
 
       if (isConsolidated) {
         // Approve all branch plans for this year and amendment
@@ -91,8 +115,12 @@ export async function POST(request: NextRequest) {
           dbData.aipPlans[planIdx] = {
             ...dbData.aipPlans[planIdx],
             status: newStatus,
-            approvedAt: action === 'Approve' ? now : undefined,
-            approvedBy: action === 'Approve' ? approverName : undefined,
+            directorApprovedBy: action === 'DirectorApprove' ? approverName : dbData.aipPlans[planIdx].directorApprovedBy,
+            directorApprovedAt: action === 'DirectorApprove' ? now : dbData.aipPlans[planIdx].directorApprovedAt,
+            addSecApprovedBy: action === 'AddSecApprove' ? approverName : dbData.aipPlans[planIdx].addSecApprovedBy,
+            addSecApprovedAt: action === 'AddSecApprove' ? now : dbData.aipPlans[planIdx].addSecApprovedAt,
+            approvedAt: action === 'Approve' ? now : dbData.aipPlans[planIdx].approvedAt,
+            approvedBy: action === 'Approve' ? approverName : dbData.aipPlans[planIdx].approvedBy,
             approvalNotes: notes ? String(notes).trim() : undefined,
             updatedAt: now,
           };
@@ -122,22 +150,37 @@ export async function POST(request: NextRequest) {
         }
       }
 
-      // Notify the responsible operational branch
+      // Notify the appropriate recipient (Additional Secretary, Planning Branch, or operational branch)
       const planTitle = Number(amendmentNumber) === 0
         ? `Original Implementation Plan (${year})`
         : `Amendment 0${amendmentNumber} (${year})`;
 
-      const notifTitle = action === 'Approve'
-        ? `✅ ${planTitle} Approved by ${relevantPlanning.planningAuthorityLabel}`
-        : `⚠️ ${planTitle} Returned for Revision by ${relevantPlanning.planningAuthorityLabel}`;
+      const recipientOrgId = action === 'AddSecApprove' ? relevantPlanning.planningOrgId : branchId;
+      const notifTitle =
+        action === 'DirectorApprove'
+          ? `✅ ${planTitle} Approved by Branch Director`
+          : action === 'DirectorReturn'
+          ? `↩️ ${planTitle} Returned by Branch Director`
+          : action === 'AddSecApprove'
+          ? `📋 ${planTitle} Approved by Additional Secretary (${branchName})`
+          : action === 'AddSecReturn'
+          ? `↩️ ${planTitle} Returned by Additional Secretary`
+          : action === 'Approve'
+          ? `✅ ${planTitle} Approved by ${relevantPlanning.planningAuthorityLabel}`
+          : `⚠️ ${planTitle} Returned for Revision by ${relevantPlanning.planningAuthorityLabel}`;
 
-      const notifMsg = action === 'Approve'
-        ? `${relevantPlanning.planningAuthorityLabel} has approved your ${planTitle}.${notes ? ` Remarks: "${notes}"` : ''}`
-        : `${relevantPlanning.planningAuthorityLabel} has returned your ${planTitle} for adjustments.${notes ? ` Remarks: "${notes}"` : ' Please review and resubmit.'}`;
+      const notifMsg =
+        action === 'DirectorApprove'
+          ? `${approverName} approved the ${planTitle} for ${branchName}. Now awaiting Branch Additional Secretary approval.`
+          : action === 'AddSecApprove'
+          ? `${branchName} (approved by Branch Director & Additional Secretary) has submitted ${planTitle} to ${relevantPlanning.planningAuthorityLabel} for final approval.`
+          : action === 'Approve'
+          ? `${relevantPlanning.planningAuthorityLabel} has approved your ${planTitle}.${notes ? ` Remarks: "${notes}"` : ''}`
+          : `${approverName} has returned your ${planTitle} for adjustments.${notes ? ` Remarks: "${notes}"` : ' Please review and resubmit.'}`;
 
       const notifToBranch: Notification = {
         id: `notif-aip-appr-${randomUUID()}`,
-        recipientOrgId: branchId,
+        recipientOrgId,
         workshopId: 'aip-plan',
         title: notifTitle,
         message: notifMsg,

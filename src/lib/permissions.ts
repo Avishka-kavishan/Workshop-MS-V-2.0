@@ -384,6 +384,9 @@ export function getUserSecurityContext(
     user?.roleName === 'Additional Secretary' ||
     user?.roleName?.includes('Additional Secretary') ||
     user?.designation?.toLowerCase().includes('additional secretary');
+  const isDirector =
+    user?.roleId === 'role-director' ||
+    user?.roleName === 'Director';
 
   return {
     userId: user?.id || '',
@@ -395,7 +398,7 @@ export function getUserSecurityContext(
     organizationName: org?.name || user?.organizationName || 'Education Division',
     administrativeLevel: level,
     functionalCategory,
-    delegatedAuthority: isSuperAdmin || adminLevel === 1 || isAdditionalSecretary ? 'Approval' : isNationalPlanningOfficer ? 'Review' : isNationalMonitoringOfficer ? 'Verification' : 'Standard',
+    delegatedAuthority: isSuperAdmin || adminLevel === 1 || isAdditionalSecretary || isDirector ? 'Approval' : isNationalPlanningOfficer ? 'Review' : isNationalMonitoringOfficer ? 'Verification' : 'Standard',
     isSuperAdmin,
     adminLevel,
     isLevelAdmin,
@@ -404,15 +407,15 @@ export function getUserSecurityContext(
     isNormalDivision,
     permissions: {
       canView: true,
-      canCreate: isSuperAdmin || (adminLevel !== undefined && adminLevel <= 3) || isNationalPlanningOfficer || (isNormalDivision && !isPlaceCoordinator) || isAdditionalSecretary,
-      canEdit: isSuperAdmin || (adminLevel !== undefined && adminLevel <= 3) || isNationalPlanningOfficer || (isNormalDivision && !isPlaceCoordinator) || isAdditionalSecretary,
+      canCreate: isSuperAdmin || (adminLevel !== undefined && adminLevel <= 3) || isNationalPlanningOfficer || (isNormalDivision && !isPlaceCoordinator) || isAdditionalSecretary || isDirector,
+      canEdit: isSuperAdmin || (adminLevel !== undefined && adminLevel <= 3) || isNationalPlanningOfficer || (isNormalDivision && !isPlaceCoordinator) || isAdditionalSecretary || isDirector,
       canDelete: isSuperAdmin || (adminLevel === 1),
       canSubmit: !isPlaceCoordinator,
-      canReview: isSuperAdmin || (level === 1 && (isNationalPlanningOfficer || isNationalMonitoringOfficer || adminLevel === 1)) || isAdditionalSecretary,
-      canRecommend: isSuperAdmin || (level <= 3 && (isNationalPlanningOfficer || isNationalMonitoringOfficer || (adminLevel !== undefined && adminLevel <= 3))) || isAdditionalSecretary,
-      canApprove: isSuperAdmin || (adminLevel === 1) || (level === 1 && isNationalPlanningOfficer) || isAdditionalSecretary,
+      canReview: isSuperAdmin || (level === 1 && (isNationalPlanningOfficer || isNationalMonitoringOfficer || adminLevel === 1)) || isAdditionalSecretary || isDirector,
+      canRecommend: isSuperAdmin || (level <= 3 && (isNationalPlanningOfficer || isNationalMonitoringOfficer || (adminLevel !== undefined && adminLevel <= 3))) || isAdditionalSecretary || isDirector,
+      canApprove: isSuperAdmin || (adminLevel === 1) || (level === 1 && isNationalPlanningOfficer) || isAdditionalSecretary || isDirector,
       canVerify: isSuperAdmin || isNationalMonitoringOfficer,
-      canMonitor: isSuperAdmin || isNationalMonitoringOfficer || isAdditionalSecretary,
+      canMonitor: isSuperAdmin || isNationalMonitoringOfficer || isAdditionalSecretary || isDirector,
       canReallocate: isSuperAdmin || (level === 1 && (adminLevel === 1 || isNationalPlanningOfficer)),
       canRevise: isSuperAdmin || (level === 1 && (adminLevel === 1 || isNationalPlanningOfficer)),
       canExport: true,

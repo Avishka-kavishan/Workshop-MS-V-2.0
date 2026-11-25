@@ -9021,6 +9021,30 @@
         "WORKSHOP_CREATE",
         "AUDIT_VIEW"
       ]
+    },
+    {
+      "id": "role-director",
+      "name": "Director",
+      "description": "Branch / Division Director with executive review, workshop approval, AIP authorization, and branch monitoring authority.",
+      "functionalScope": "Normal",
+      "delegatedAuthority": "Approval",
+      "canCreateWorkshop": true,
+      "canApproveWorkshop": true,
+      "canManageUsers": false,
+      "canViewReports": true,
+      "canManageOrganizations": false,
+      "canView": true,
+      "canCreate": true,
+      "canEdit": true,
+      "canDelete": false,
+      "canSubmit": true,
+      "canReview": true,
+      "canRecommend": true,
+      "canApprove": true,
+      "canVerify": false,
+      "canMonitor": true,
+      "canRevise": true,
+      "canExport": true
     }
   ],
   "users": [
@@ -9121,9 +9145,9 @@
       "email": "data.management@moe.gov.lk",
       "designation": "Data Management Branch",
       "organizationId": "org-moe-data",
-      "roleId": "role-admin",
+      "roleId": "role-moe-officer",
       "isActive": true,
-      "lastLogin": "2026-11-25T05:41:12.590Z",
+      "lastLogin": "2026-11-25T10:03:11.786Z",
       "createdAt": "2026-09-28T06:03:41.165Z",
       "aliases": [
         "admin",
@@ -9132,21 +9156,6 @@
         "data.officer"
       ],
       "assignedRoles": [
-        {
-          "id": "ura-admin-sys",
-          "userId": "user-admin",
-          "roleId": "role-admin",
-          "roleName": "System Administrator (Level 1 MoE Admin)",
-          "organizationId": "org-moe",
-          "organizationName": "Ministry of Education National Headquarters",
-          "functionalCategory": "All",
-          "adminLevel": 1,
-          "delegatedAuthority": "Standard",
-          "description": "Ministry headquarters administrative console, user role management, system settings.",
-          "isDefault": true,
-          "isActive": true,
-          "assignedAt": "2026-01-01T00:00:00.000Z"
-        },
         {
           "id": "ura-admin-data",
           "userId": "user-admin",
@@ -9157,7 +9166,7 @@
           "functionalCategory": "Normal",
           "delegatedAuthority": "Standard",
           "description": "EMIS cloud workshops, infrastructure proposals, and national statistics bulletins.",
-          "isDefault": false,
+          "isDefault": true,
           "isActive": true,
           "assignedAt": "2026-01-01T00:00:00.000Z"
         },
@@ -9176,7 +9185,7 @@
           "assignedAt": "2026-01-01T00:00:00.000Z"
         }
       ],
-      "lastSelectedRoleId": "ura-admin-addsec",
+      "lastSelectedRoleId": "ura-admin-data",
       "rememberLastRole": false
     },
     {
@@ -9936,21 +9945,6 @@
       ],
       "assignedRoles": [
         {
-          "id": "ura-admin-sys",
-          "userId": "user-moe-data-normal",
-          "roleId": "role-admin",
-          "roleName": "System Administrator (Level 1 MoE Admin)",
-          "organizationId": "org-moe",
-          "organizationName": "Ministry of Education National Headquarters",
-          "functionalCategory": "All",
-          "adminLevel": 1,
-          "delegatedAuthority": "Standard",
-          "description": "Ministry headquarters administrative console, user role management, system settings.",
-          "isDefault": true,
-          "isActive": true,
-          "assignedAt": "2026-01-01T00:00:00.000Z"
-        },
-        {
           "id": "ura-admin-data",
           "userId": "user-moe-data-normal",
           "roleId": "role-moe-officer",
@@ -9960,12 +9954,12 @@
           "functionalCategory": "Normal",
           "delegatedAuthority": "Standard",
           "description": "EMIS cloud workshops, infrastructure proposals, and national statistics bulletins.",
-          "isDefault": false,
+          "isDefault": true,
           "isActive": true,
           "assignedAt": "2026-01-01T00:00:00.000Z"
         }
       ],
-      "lastSelectedRoleId": "ura-admin-sys"
+      "lastSelectedRoleId": "ura-admin-data"
     },
     {
       "id": "user-moe-data-alias",
@@ -9987,21 +9981,6 @@
       ],
       "assignedRoles": [
         {
-          "id": "ura-admin-sys",
-          "userId": "user-moe-data-alias",
-          "roleId": "role-admin",
-          "roleName": "System Administrator (Level 1 MoE Admin)",
-          "organizationId": "org-moe",
-          "organizationName": "Ministry of Education National Headquarters",
-          "functionalCategory": "All",
-          "adminLevel": 1,
-          "delegatedAuthority": "Standard",
-          "description": "Ministry headquarters administrative console, user role management, system settings.",
-          "isDefault": true,
-          "isActive": true,
-          "assignedAt": "2026-01-01T00:00:00.000Z"
-        },
-        {
           "id": "ura-admin-data",
           "userId": "user-moe-data-alias",
           "roleId": "role-moe-officer",
@@ -10011,12 +9990,12 @@
           "functionalCategory": "Normal",
           "delegatedAuthority": "Standard",
           "description": "EMIS cloud workshops, infrastructure proposals, and national statistics bulletins.",
-          "isDefault": false,
+          "isDefault": true,
           "isActive": true,
           "assignedAt": "2026-01-01T00:00:00.000Z"
         }
       ],
-      "lastSelectedRoleId": "ura-admin-sys"
+      "lastSelectedRoleId": "ura-admin-data"
     },
     {
       "id": "user-moe-data-officer",
@@ -10026,7 +10005,7 @@
       "email": "data.management@moe.gov.lk",
       "designation": "Chief System Administrator",
       "organizationId": "org-moe-data",
-      "roleId": "role-admin",
+      "roleId": "role-moe-officer",
       "isActive": true,
       "createdAt": "2026-11-13T20:25:41.563Z",
       "aliases": [
@@ -10037,21 +10016,6 @@
       ],
       "assignedRoles": [
         {
-          "id": "ura-admin-sys",
-          "userId": "user-moe-data-officer",
-          "roleId": "role-admin",
-          "roleName": "System Administrator (Level 1 MoE Admin)",
-          "organizationId": "org-moe",
-          "organizationName": "Ministry of Education National Headquarters",
-          "functionalCategory": "All",
-          "adminLevel": 1,
-          "delegatedAuthority": "Standard",
-          "description": "Ministry headquarters administrative console, user role management, system settings.",
-          "isDefault": true,
-          "isActive": true,
-          "assignedAt": "2026-01-01T00:00:00.000Z"
-        },
-        {
           "id": "ura-admin-data",
           "userId": "user-moe-data-officer",
           "roleId": "role-moe-officer",
@@ -10061,12 +10025,12 @@
           "functionalCategory": "Normal",
           "delegatedAuthority": "Standard",
           "description": "EMIS cloud workshops, infrastructure proposals, and national statistics bulletins.",
-          "isDefault": false,
+          "isDefault": true,
           "isActive": true,
           "assignedAt": "2026-01-01T00:00:00.000Z"
         }
       ],
-      "lastSelectedRoleId": "ura-admin-sys"
+      "lastSelectedRoleId": "ura-admin-data"
     },
     {
       "id": "user-eqd-officer",
@@ -10293,6 +10257,702 @@
         }
       ],
       "lastSelectedRoleId": "ura-user-curriculum"
+    },
+    {
+      "id": "user-director-org-zone-colombo-it",
+      "username": "zone.colombo.it.director",
+      "passwordHash": "\\$./4O5YT/QD9uTYcc46P4ceeeEY7RSq165PIVDe9XgsKcuDE.Xxm/i",
+      "fullName": "Director — Colombo Zone IT Branch",
+      "email": "zone.colombo.it.director@moe.gov.lk",
+      "designation": "Director (Colombo Zone IT Branch)",
+      "organizationId": "org-zone-colombo-it",
+      "roleId": "role-director",
+      "isActive": true,
+      "createdAt": "2026-10-01T08:00:00.000Z",
+      "assignedRoles": [
+        {
+          "id": "ura-user-director-org-zone-colombo-it",
+          "userId": "user-director-org-zone-colombo-it",
+          "roleId": "role-director",
+          "roleName": "Director",
+          "organizationId": "org-zone-colombo-it",
+          "organizationName": "Colombo Zone IT Branch",
+          "functionalCategory": "Normal",
+          "delegatedAuthority": "Approval",
+          "description": "Branch / Division Director with executive review, workshop approval, AIP authorization, and branch monitoring authority.",
+          "isDefault": true,
+          "isActive": true,
+          "assignedAt": "2026-10-01T08:00:00.000Z"
+        }
+      ],
+      "lastSelectedRoleId": "ura-user-director-org-zone-colombo-it"
+    },
+    {
+      "id": "user-director-org-zone-galle-it",
+      "username": "zone.galle.it.director",
+      "passwordHash": "\\$./4O5YT/QD9uTYcc46P4ceeeEY7RSq165PIVDe9XgsKcuDE.Xxm/i",
+      "fullName": "Director — Galle Zone IT Branch",
+      "email": "zone.galle.it.director@moe.gov.lk",
+      "designation": "Director (Galle Zone IT Branch)",
+      "organizationId": "org-zone-galle-it",
+      "roleId": "role-director",
+      "isActive": true,
+      "createdAt": "2026-10-01T08:00:00.000Z",
+      "assignedRoles": [
+        {
+          "id": "ura-user-director-org-zone-galle-it",
+          "userId": "user-director-org-zone-galle-it",
+          "roleId": "role-director",
+          "roleName": "Director",
+          "organizationId": "org-zone-galle-it",
+          "organizationName": "Galle Zone IT Branch",
+          "functionalCategory": "Normal",
+          "delegatedAuthority": "Approval",
+          "description": "Branch / Division Director with executive review, workshop approval, AIP authorization, and branch monitoring authority.",
+          "isDefault": true,
+          "isActive": true,
+          "assignedAt": "2026-10-01T08:00:00.000Z"
+        }
+      ],
+      "lastSelectedRoleId": "ura-user-director-org-zone-galle-it"
+    },
+    {
+      "id": "user-director-org-zone-galle-plan",
+      "username": "zone.galle.plan.director",
+      "passwordHash": "\\$./4O5YT/QD9uTYcc46P4ceeeEY7RSq165PIVDe9XgsKcuDE.Xxm/i",
+      "fullName": "Director — Galle Zone Planning Branch",
+      "email": "zone.galle.plan.director@moe.gov.lk",
+      "designation": "Director (Galle Zone Planning Branch)",
+      "organizationId": "org-zone-galle-plan",
+      "roleId": "role-director",
+      "isActive": true,
+      "createdAt": "2026-10-01T08:00:00.000Z",
+      "assignedRoles": [
+        {
+          "id": "ura-user-director-org-zone-galle-plan",
+          "userId": "user-director-org-zone-galle-plan",
+          "roleId": "role-director",
+          "roleName": "Director",
+          "organizationId": "org-zone-galle-plan",
+          "organizationName": "Galle Zone Planning Branch",
+          "functionalCategory": "Planning",
+          "delegatedAuthority": "Approval",
+          "description": "Branch / Division Director with executive review, workshop approval, AIP authorization, and branch monitoring authority.",
+          "isDefault": true,
+          "isActive": true,
+          "assignedAt": "2026-10-01T08:00:00.000Z"
+        }
+      ],
+      "lastSelectedRoleId": "ura-user-director-org-zone-galle-plan"
+    },
+    {
+      "id": "user-director-org-moe-data",
+      "username": "data.director",
+      "passwordHash": "\\$./4O5YT/QD9uTYcc46P4ceeeEY7RSq165PIVDe9XgsKcuDE.Xxm/i",
+      "fullName": "Director — MOE Data Management Branch",
+      "email": "data.director@moe.gov.lk",
+      "designation": "Director (MOE Data Management Branch)",
+      "organizationId": "org-moe-data",
+      "roleId": "role-director",
+      "isActive": true,
+      "createdAt": "2026-10-01T08:00:00.000Z",
+      "assignedRoles": [
+        {
+          "id": "ura-user-director-org-moe-data",
+          "userId": "user-director-org-moe-data",
+          "roleId": "role-director",
+          "roleName": "Director",
+          "organizationId": "org-moe-data",
+          "organizationName": "MOE Data Management Branch",
+          "functionalCategory": "Normal",
+          "delegatedAuthority": "Approval",
+          "description": "Branch / Division Director with executive review, workshop approval, AIP authorization, and branch monitoring authority.",
+          "isDefault": true,
+          "isActive": true,
+          "assignedAt": "2026-10-01T08:00:00.000Z"
+        }
+      ],
+      "lastSelectedRoleId": "ura-user-director-org-moe-data"
+    },
+    {
+      "id": "user-director-org-moe-ict",
+      "username": "ict.director",
+      "passwordHash": "\\$./4O5YT/QD9uTYcc46P4ceeeEY7RSq165PIVDe9XgsKcuDE.Xxm/i",
+      "fullName": "Director — MOE ICT Branch",
+      "email": "ict.director@moe.gov.lk",
+      "designation": "Director (MOE ICT Branch)",
+      "organizationId": "org-moe-ict",
+      "roleId": "role-director",
+      "isActive": true,
+      "createdAt": "2026-10-01T08:00:00.000Z",
+      "assignedRoles": [
+        {
+          "id": "ura-user-director-org-moe-ict",
+          "userId": "user-director-org-moe-ict",
+          "roleId": "role-director",
+          "roleName": "Director",
+          "organizationId": "org-moe-ict",
+          "organizationName": "MOE ICT Branch",
+          "functionalCategory": "Normal",
+          "delegatedAuthority": "Approval",
+          "description": "Branch / Division Director with executive review, workshop approval, AIP authorization, and branch monitoring authority.",
+          "isDefault": true,
+          "isActive": true,
+          "assignedAt": "2026-10-01T08:00:00.000Z"
+        }
+      ],
+      "lastSelectedRoleId": "ura-user-director-org-moe-ict"
+    },
+    {
+      "id": "user-director-org-moe-planning",
+      "username": "planning.director",
+      "passwordHash": "\\$./4O5YT/QD9uTYcc46P4ceeeEY7RSq165PIVDe9XgsKcuDE.Xxm/i",
+      "fullName": "Director — MOE Planning Branch",
+      "email": "planning.director@moe.gov.lk",
+      "designation": "Director (MOE Planning Branch)",
+      "organizationId": "org-moe-planning",
+      "roleId": "role-director",
+      "isActive": true,
+      "createdAt": "2026-10-01T08:00:00.000Z",
+      "assignedRoles": [
+        {
+          "id": "ura-user-director-org-moe-planning",
+          "userId": "user-director-org-moe-planning",
+          "roleId": "role-director",
+          "roleName": "Director",
+          "organizationId": "org-moe-planning",
+          "organizationName": "MOE Planning Branch",
+          "functionalCategory": "Planning",
+          "delegatedAuthority": "Approval",
+          "description": "Branch / Division Director with executive review, workshop approval, AIP authorization, and branch monitoring authority.",
+          "isDefault": true,
+          "isActive": true,
+          "assignedAt": "2026-10-01T08:00:00.000Z"
+        }
+      ],
+      "lastSelectedRoleId": "ura-user-director-org-moe-planning"
+    },
+    {
+      "id": "user-director-org-prov-southern-it",
+      "username": "prov.southern.it.director",
+      "passwordHash": "\\$./4O5YT/QD9uTYcc46P4ceeeEY7RSq165PIVDe9XgsKcuDE.Xxm/i",
+      "fullName": "Director — Southern Province IT Branch",
+      "email": "prov.southern.it.director@moe.gov.lk",
+      "designation": "Director (Southern Province IT Branch)",
+      "organizationId": "org-prov-southern-it",
+      "roleId": "role-director",
+      "isActive": true,
+      "createdAt": "2026-10-01T08:00:00.000Z",
+      "assignedRoles": [
+        {
+          "id": "ura-user-director-org-prov-southern-it",
+          "userId": "user-director-org-prov-southern-it",
+          "roleId": "role-director",
+          "roleName": "Director",
+          "organizationId": "org-prov-southern-it",
+          "organizationName": "Southern Province IT Branch",
+          "functionalCategory": "Normal",
+          "delegatedAuthority": "Approval",
+          "description": "Branch / Division Director with executive review, workshop approval, AIP authorization, and branch monitoring authority.",
+          "isDefault": true,
+          "isActive": true,
+          "assignedAt": "2026-10-01T08:00:00.000Z"
+        }
+      ],
+      "lastSelectedRoleId": "ura-user-director-org-prov-southern-it"
+    },
+    {
+      "id": "user-director-org-moe-piriven",
+      "username": "piriven.director",
+      "passwordHash": "\\$./4O5YT/QD9uTYcc46P4ceeeEY7RSq165PIVDe9XgsKcuDE.Xxm/i",
+      "fullName": "Director — Piriven division",
+      "email": "piriven.director@moe.gov.lk",
+      "designation": "Director (Piriven division)",
+      "organizationId": "org-moe-piriven",
+      "roleId": "role-director",
+      "isActive": true,
+      "createdAt": "2026-10-01T08:00:00.000Z",
+      "assignedRoles": [
+        {
+          "id": "ura-user-director-org-moe-piriven",
+          "userId": "user-director-org-moe-piriven",
+          "roleId": "role-director",
+          "roleName": "Director",
+          "organizationId": "org-moe-piriven",
+          "organizationName": "Piriven division",
+          "functionalCategory": "Normal",
+          "delegatedAuthority": "Approval",
+          "description": "Branch / Division Director with executive review, workshop approval, AIP authorization, and branch monitoring authority.",
+          "isDefault": true,
+          "isActive": true,
+          "assignedAt": "2026-10-01T08:00:00.000Z"
+        }
+      ],
+      "lastSelectedRoleId": "ura-user-director-org-moe-piriven"
+    },
+    {
+      "id": "user-director-org-moe-reforms",
+      "username": "reforms.director",
+      "passwordHash": "\\$./4O5YT/QD9uTYcc46P4ceeeEY7RSq165PIVDe9XgsKcuDE.Xxm/i",
+      "fullName": "Director — Education Reforms",
+      "email": "reforms.director@moe.gov.lk",
+      "designation": "Director (Education Reforms)",
+      "organizationId": "org-moe-reforms",
+      "roleId": "role-director",
+      "isActive": true,
+      "createdAt": "2026-10-01T08:00:00.000Z",
+      "assignedRoles": [
+        {
+          "id": "ura-user-director-org-moe-reforms",
+          "userId": "user-director-org-moe-reforms",
+          "roleId": "role-director",
+          "roleName": "Director",
+          "organizationId": "org-moe-reforms",
+          "organizationName": "Education Reforms",
+          "functionalCategory": "Normal",
+          "delegatedAuthority": "Approval",
+          "description": "Branch / Division Director with executive review, workshop approval, AIP authorization, and branch monitoring authority.",
+          "isDefault": true,
+          "isActive": true,
+          "assignedAt": "2026-10-01T08:00:00.000Z"
+        }
+      ],
+      "lastSelectedRoleId": "ura-user-director-org-moe-reforms"
+    },
+    {
+      "id": "user-director-org-moe-ncoe",
+      "username": "ncoe.director",
+      "passwordHash": "\\$./4O5YT/QD9uTYcc46P4ceeeEY7RSq165PIVDe9XgsKcuDE.Xxm/i",
+      "fullName": "Director — National College of Education",
+      "email": "ncoe.director@moe.gov.lk",
+      "designation": "Director (National College of Education)",
+      "organizationId": "org-moe-ncoe",
+      "roleId": "role-director",
+      "isActive": true,
+      "createdAt": "2026-10-01T08:00:00.000Z",
+      "assignedRoles": [
+        {
+          "id": "ura-user-director-org-moe-ncoe",
+          "userId": "user-director-org-moe-ncoe",
+          "roleId": "role-director",
+          "roleName": "Director",
+          "organizationId": "org-moe-ncoe",
+          "organizationName": "National College of Education",
+          "functionalCategory": "Normal",
+          "delegatedAuthority": "Approval",
+          "description": "Branch / Division Director with executive review, workshop approval, AIP authorization, and branch monitoring authority.",
+          "isDefault": true,
+          "isActive": true,
+          "assignedAt": "2026-10-01T08:00:00.000Z"
+        }
+      ],
+      "lastSelectedRoleId": "ura-user-director-org-moe-ncoe"
+    },
+    {
+      "id": "user-director-org-moe-agri",
+      "username": "agri.director",
+      "passwordHash": "\\$./4O5YT/QD9uTYcc46P4ceeeEY7RSq165PIVDe9XgsKcuDE.Xxm/i",
+      "fullName": "Director — Agriculture and Environmental",
+      "email": "agri.director@moe.gov.lk",
+      "designation": "Director (Agriculture and Environmental)",
+      "organizationId": "org-moe-agri",
+      "roleId": "role-director",
+      "isActive": true,
+      "createdAt": "2026-10-01T08:00:00.000Z",
+      "assignedRoles": [
+        {
+          "id": "ura-user-director-org-moe-agri",
+          "userId": "user-director-org-moe-agri",
+          "roleId": "role-director",
+          "roleName": "Director",
+          "organizationId": "org-moe-agri",
+          "organizationName": "Agriculture and Environmental",
+          "functionalCategory": "Normal",
+          "delegatedAuthority": "Approval",
+          "description": "Branch / Division Director with executive review, workshop approval, AIP authorization, and branch monitoring authority.",
+          "isDefault": true,
+          "isActive": true,
+          "assignedAt": "2026-10-01T08:00:00.000Z"
+        }
+      ],
+      "lastSelectedRoleId": "ura-user-director-org-moe-agri"
+    },
+    {
+      "id": "user-director-org-moe-digital-infra",
+      "username": "digital.infra.director",
+      "passwordHash": "\\$./4O5YT/QD9uTYcc46P4ceeeEY7RSq165PIVDe9XgsKcuDE.Xxm/i",
+      "fullName": "Director — Digital Education Infrastructure Development",
+      "email": "digital.infra.director@moe.gov.lk",
+      "designation": "Director (Digital Education Infrastructure Development)",
+      "organizationId": "org-moe-digital-infra",
+      "roleId": "role-director",
+      "isActive": true,
+      "createdAt": "2026-10-01T08:00:00.000Z",
+      "assignedRoles": [
+        {
+          "id": "ura-user-director-org-moe-digital-infra",
+          "userId": "user-director-org-moe-digital-infra",
+          "roleId": "role-director",
+          "roleName": "Director",
+          "organizationId": "org-moe-digital-infra",
+          "organizationName": "Digital Education Infrastructure Development",
+          "functionalCategory": "Normal",
+          "delegatedAuthority": "Approval",
+          "description": "Branch / Division Director with executive review, workshop approval, AIP authorization, and branch monitoring authority.",
+          "isDefault": true,
+          "isActive": true,
+          "assignedAt": "2026-10-01T08:00:00.000Z"
+        }
+      ],
+      "lastSelectedRoleId": "ura-user-director-org-moe-digital-infra"
+    },
+    {
+      "id": "user-director-org-moe-maths",
+      "username": "maths.director",
+      "passwordHash": "\\$./4O5YT/QD9uTYcc46P4ceeeEY7RSq165PIVDe9XgsKcuDE.Xxm/i",
+      "fullName": "Director — Mathematics",
+      "email": "maths.director@moe.gov.lk",
+      "designation": "Director (Mathematics)",
+      "organizationId": "org-moe-maths",
+      "roleId": "role-director",
+      "isActive": true,
+      "createdAt": "2026-10-01T08:00:00.000Z",
+      "assignedRoles": [
+        {
+          "id": "ura-user-director-org-moe-maths",
+          "userId": "user-director-org-moe-maths",
+          "roleId": "role-director",
+          "roleName": "Director",
+          "organizationId": "org-moe-maths",
+          "organizationName": "Mathematics",
+          "functionalCategory": "Normal",
+          "delegatedAuthority": "Approval",
+          "description": "Branch / Division Director with executive review, workshop approval, AIP authorization, and branch monitoring authority.",
+          "isDefault": true,
+          "isActive": true,
+          "assignedAt": "2026-10-01T08:00:00.000Z"
+        }
+      ],
+      "lastSelectedRoleId": "ura-user-director-org-moe-maths"
+    },
+    {
+      "id": "user-director-org-moe-health",
+      "username": "health.director",
+      "passwordHash": "\\$./4O5YT/QD9uTYcc46P4ceeeEY7RSq165PIVDe9XgsKcuDE.Xxm/i",
+      "fullName": "Director — School Health and Nutrition",
+      "email": "health.director@moe.gov.lk",
+      "designation": "Director (School Health and Nutrition)",
+      "organizationId": "org-moe-health",
+      "roleId": "role-director",
+      "isActive": true,
+      "createdAt": "2026-10-01T08:00:00.000Z",
+      "assignedRoles": [
+        {
+          "id": "ura-user-director-org-moe-health",
+          "userId": "user-director-org-moe-health",
+          "roleId": "role-director",
+          "roleName": "Director",
+          "organizationId": "org-moe-health",
+          "organizationName": "School Health and Nutrition",
+          "functionalCategory": "Normal",
+          "delegatedAuthority": "Approval",
+          "description": "Branch / Division Director with executive review, workshop approval, AIP authorization, and branch monitoring authority.",
+          "isDefault": true,
+          "isActive": true,
+          "assignedAt": "2026-10-01T08:00:00.000Z"
+        }
+      ],
+      "lastSelectedRoleId": "ura-user-director-org-moe-health"
+    },
+    {
+      "id": "user-director-org-moe-monitoring",
+      "username": "monitoring.director",
+      "passwordHash": "\\$./4O5YT/QD9uTYcc46P4ceeeEY7RSq165PIVDe9XgsKcuDE.Xxm/i",
+      "fullName": "Director — MOE Monitoring & Performance Branch",
+      "email": "monitoring.director@moe.gov.lk",
+      "designation": "Director (MOE Monitoring & Performance Branch)",
+      "organizationId": "org-moe-monitoring",
+      "roleId": "role-director",
+      "isActive": true,
+      "createdAt": "2026-10-01T08:00:00.000Z",
+      "assignedRoles": [
+        {
+          "id": "ura-user-director-org-moe-monitoring",
+          "userId": "user-director-org-moe-monitoring",
+          "roleId": "role-director",
+          "roleName": "Director",
+          "organizationId": "org-moe-monitoring",
+          "organizationName": "MOE Monitoring & Performance Branch",
+          "functionalCategory": "Monitoring",
+          "delegatedAuthority": "Approval",
+          "description": "Branch / Division Director with executive review, workshop approval, AIP authorization, and branch monitoring authority.",
+          "isDefault": true,
+          "isActive": true,
+          "assignedAt": "2026-10-01T08:00:00.000Z"
+        }
+      ],
+      "lastSelectedRoleId": "ura-user-director-org-moe-monitoring"
+    },
+    {
+      "id": "user-director-org-nie",
+      "username": "nie.director",
+      "passwordHash": "\\$./4O5YT/QD9uTYcc46P4ceeeEY7RSq165PIVDe9XgsKcuDE.Xxm/i",
+      "fullName": "Director — National Institute of Education",
+      "email": "nie.director@moe.gov.lk",
+      "designation": "Director (National Institute of Education)",
+      "organizationId": "org-nie",
+      "roleId": "role-director",
+      "isActive": true,
+      "createdAt": "2026-10-01T08:00:00.000Z",
+      "assignedRoles": [
+        {
+          "id": "ura-user-director-org-nie",
+          "userId": "user-director-org-nie",
+          "roleId": "role-director",
+          "roleName": "Director",
+          "organizationId": "org-nie",
+          "organizationName": "National Institute of Education",
+          "functionalCategory": "Normal",
+          "delegatedAuthority": "Approval",
+          "description": "Branch / Division Director with executive review, workshop approval, AIP authorization, and branch monitoring authority.",
+          "isDefault": true,
+          "isActive": true,
+          "assignedAt": "2026-10-01T08:00:00.000Z"
+        }
+      ],
+      "lastSelectedRoleId": "ura-user-director-org-nie"
+    },
+    {
+      "id": "user-director-org-prov-southern",
+      "username": "prov.southern.director",
+      "passwordHash": "\\$./4O5YT/QD9uTYcc46P4ceeeEY7RSq165PIVDe9XgsKcuDE.Xxm/i",
+      "fullName": "Director — Southern Province Education Department",
+      "email": "prov.southern.director@moe.gov.lk",
+      "designation": "Director (Southern Province Education Department)",
+      "organizationId": "org-prov-southern",
+      "roleId": "role-director",
+      "isActive": true,
+      "createdAt": "2026-10-01T08:00:00.000Z",
+      "assignedRoles": [
+        {
+          "id": "ura-user-director-org-prov-southern",
+          "userId": "user-director-org-prov-southern",
+          "roleId": "role-director",
+          "roleName": "Director",
+          "organizationId": "org-prov-southern",
+          "organizationName": "Southern Province Education Department",
+          "functionalCategory": "Normal",
+          "delegatedAuthority": "Approval",
+          "description": "Branch / Division Director with executive review, workshop approval, AIP authorization, and branch monitoring authority.",
+          "isDefault": true,
+          "isActive": true,
+          "assignedAt": "2026-10-01T08:00:00.000Z"
+        }
+      ],
+      "lastSelectedRoleId": "ura-user-director-org-prov-southern"
+    },
+    {
+      "id": "user-director-org-zone-galle",
+      "username": "zone.galle.director",
+      "passwordHash": "\\$./4O5YT/QD9uTYcc46P4ceeeEY7RSq165PIVDe9XgsKcuDE.Xxm/i",
+      "fullName": "Director — Galle Zonal Education Office",
+      "email": "zone.galle.director@moe.gov.lk",
+      "designation": "Director (Galle Zonal Education Office)",
+      "organizationId": "org-zone-galle",
+      "roleId": "role-director",
+      "isActive": true,
+      "createdAt": "2026-10-01T08:00:00.000Z",
+      "assignedRoles": [
+        {
+          "id": "ura-user-director-org-zone-galle",
+          "userId": "user-director-org-zone-galle",
+          "roleId": "role-director",
+          "roleName": "Director",
+          "organizationId": "org-zone-galle",
+          "organizationName": "Galle Zonal Education Office",
+          "functionalCategory": "Normal",
+          "delegatedAuthority": "Approval",
+          "description": "Branch / Division Director with executive review, workshop approval, AIP authorization, and branch monitoring authority.",
+          "isDefault": true,
+          "isActive": true,
+          "assignedAt": "2026-10-01T08:00:00.000Z"
+        }
+      ],
+      "lastSelectedRoleId": "ura-user-director-org-zone-galle"
+    },
+    {
+      "id": "user-director-org-div-galle-galle",
+      "username": "div.galle.galle.director",
+      "passwordHash": "\\$./4O5YT/QD9uTYcc46P4ceeeEY7RSq165PIVDe9XgsKcuDE.Xxm/i",
+      "fullName": "Director — Galle Divisional Education Office",
+      "email": "div.galle.galle.director@moe.gov.lk",
+      "designation": "Director (Galle Divisional Education Office)",
+      "organizationId": "org-div-galle-galle",
+      "roleId": "role-director",
+      "isActive": true,
+      "createdAt": "2026-10-01T08:00:00.000Z",
+      "assignedRoles": [
+        {
+          "id": "ura-user-director-org-div-galle-galle",
+          "userId": "user-director-org-div-galle-galle",
+          "roleId": "role-director",
+          "roleName": "Director",
+          "organizationId": "org-div-galle-galle",
+          "organizationName": "Galle Divisional Education Office",
+          "functionalCategory": "Normal",
+          "delegatedAuthority": "Approval",
+          "description": "Branch / Division Director with executive review, workshop approval, AIP authorization, and branch monitoring authority.",
+          "isDefault": true,
+          "isActive": true,
+          "assignedAt": "2026-10-01T08:00:00.000Z"
+        }
+      ],
+      "lastSelectedRoleId": "ura-user-director-org-div-galle-galle"
+    },
+    {
+      "id": "user-director-org-moe-eqd",
+      "username": "eqd.director",
+      "passwordHash": "\\$./4O5YT/QD9uTYcc46P4ceeeEY7RSq165PIVDe9XgsKcuDE.Xxm/i",
+      "fullName": "Director — Education Quality Development Branch",
+      "email": "eqd.director@moe.gov.lk",
+      "designation": "Director (Education Quality Development Branch)",
+      "organizationId": "org-moe-eqd",
+      "roleId": "role-director",
+      "isActive": true,
+      "createdAt": "2026-10-01T08:00:00.000Z",
+      "assignedRoles": [
+        {
+          "id": "ura-user-director-org-moe-eqd",
+          "userId": "user-director-org-moe-eqd",
+          "roleId": "role-director",
+          "roleName": "Director",
+          "organizationId": "org-moe-eqd",
+          "organizationName": "Education Quality Development Branch",
+          "functionalCategory": "Normal",
+          "delegatedAuthority": "Approval",
+          "description": "Branch / Division Director with executive review, workshop approval, AIP authorization, and branch monitoring authority.",
+          "isDefault": true,
+          "isActive": true,
+          "assignedAt": "2026-10-01T08:00:00.000Z"
+        }
+      ],
+      "lastSelectedRoleId": "ura-user-director-org-moe-eqd"
+    },
+    {
+      "id": "user-director-org-doe-planning",
+      "username": "doe.planning.director",
+      "passwordHash": "\\$./4O5YT/QD9uTYcc46P4ceeeEY7RSq165PIVDe9XgsKcuDE.Xxm/i",
+      "fullName": "Director — Department of Examinations Planning & Research Branch",
+      "email": "doe.planning.director@moe.gov.lk",
+      "designation": "Director (Department of Examinations Planning & Research Branch)",
+      "organizationId": "org-doe-planning",
+      "roleId": "role-director",
+      "isActive": true,
+      "createdAt": "2026-10-01T08:00:00.000Z",
+      "assignedRoles": [
+        {
+          "id": "ura-user-director-org-doe-planning",
+          "userId": "user-director-org-doe-planning",
+          "roleId": "role-director",
+          "roleName": "Director",
+          "organizationId": "org-doe-planning",
+          "organizationName": "Department of Examinations Planning & Research Branch",
+          "functionalCategory": "Planning",
+          "delegatedAuthority": "Approval",
+          "description": "Branch / Division Director with executive review, workshop approval, AIP authorization, and branch monitoring authority.",
+          "isDefault": true,
+          "isActive": true,
+          "assignedAt": "2026-10-01T08:00:00.000Z"
+        }
+      ],
+      "lastSelectedRoleId": "ura-user-director-org-doe-planning"
+    },
+    {
+      "id": "user-director-org-doe-eval",
+      "username": "doe.eval.director",
+      "passwordHash": "\\$./4O5YT/QD9uTYcc46P4ceeeEY7RSq165PIVDe9XgsKcuDE.Xxm/i",
+      "fullName": "Director — DOE School Examinations & Assessment Evaluation Branch",
+      "email": "doe.eval.director@moe.gov.lk",
+      "designation": "Director (DOE School Examinations & Assessment Evaluation Branch)",
+      "organizationId": "org-doe-eval",
+      "roleId": "role-director",
+      "isActive": true,
+      "createdAt": "2026-10-01T08:00:00.000Z",
+      "assignedRoles": [
+        {
+          "id": "ura-user-director-org-doe-eval",
+          "userId": "user-director-org-doe-eval",
+          "roleId": "role-director",
+          "roleName": "Director",
+          "organizationId": "org-doe-eval",
+          "organizationName": "DOE School Examinations & Assessment Evaluation Branch",
+          "functionalCategory": "Normal",
+          "delegatedAuthority": "Approval",
+          "description": "Branch / Division Director with executive review, workshop approval, AIP authorization, and branch monitoring authority.",
+          "isDefault": true,
+          "isActive": true,
+          "assignedAt": "2026-10-01T08:00:00.000Z"
+        }
+      ],
+      "lastSelectedRoleId": "ura-user-director-org-doe-eval"
+    },
+    {
+      "id": "user-director-org-doe-tech",
+      "username": "doe.tech.director",
+      "passwordHash": "\\$./4O5YT/QD9uTYcc46P4ceeeEY7RSq165PIVDe9XgsKcuDE.Xxm/i",
+      "fullName": "Director — DOE Technology & Examination Systems Branch",
+      "email": "doe.tech.director@moe.gov.lk",
+      "designation": "Director (DOE Technology & Examination Systems Branch)",
+      "organizationId": "org-doe-tech",
+      "roleId": "role-director",
+      "isActive": true,
+      "createdAt": "2026-10-01T08:00:00.000Z",
+      "assignedRoles": [
+        {
+          "id": "ura-user-director-org-doe-tech",
+          "userId": "user-director-org-doe-tech",
+          "roleId": "role-director",
+          "roleName": "Director",
+          "organizationId": "org-doe-tech",
+          "organizationName": "DOE Technology & Examination Systems Branch",
+          "functionalCategory": "Normal",
+          "delegatedAuthority": "Approval",
+          "description": "Branch / Division Director with executive review, workshop approval, AIP authorization, and branch monitoring authority.",
+          "isDefault": true,
+          "isActive": true,
+          "assignedAt": "2026-10-01T08:00:00.000Z"
+        }
+      ],
+      "lastSelectedRoleId": "ura-user-director-org-doe-tech"
+    },
+    {
+      "id": "user-director-org-moe-curriculum",
+      "username": "curriculum.director",
+      "passwordHash": "\\$./4O5YT/QD9uTYcc46P4ceeeEY7RSq165PIVDe9XgsKcuDE.Xxm/i",
+      "fullName": "Director — MOE Curriculum Development Branch",
+      "email": "curriculum.director@moe.gov.lk",
+      "designation": "Director (MOE Curriculum Development Branch)",
+      "organizationId": "org-moe-curriculum",
+      "roleId": "role-director",
+      "isActive": true,
+      "createdAt": "2026-10-01T08:00:00.000Z",
+      "assignedRoles": [
+        {
+          "id": "ura-user-director-org-moe-curriculum",
+          "userId": "user-director-org-moe-curriculum",
+          "roleId": "role-director",
+          "roleName": "Director",
+          "organizationId": "org-moe-curriculum",
+          "organizationName": "MOE Curriculum Development Branch",
+          "functionalCategory": "Normal",
+          "delegatedAuthority": "Approval",
+          "description": "Branch / Division Director with executive review, workshop approval, AIP authorization, and branch monitoring authority.",
+          "isDefault": true,
+          "isActive": true,
+          "assignedAt": "2026-10-01T08:00:00.000Z"
+        }
+      ],
+      "lastSelectedRoleId": "ura-user-director-org-moe-curriculum"
     }
   ],
   "userOrgPermissions": [
@@ -11110,6 +11770,117 @@
   "budgetProposalActivities": [],
   "calendarSubscribers": [],
   "auditLogs": [
+    {
+      "id": "audit-1795600991793-89211467",
+      "timestamp": "2026-11-25T10:03:11.793Z",
+      "userId": "user-admin",
+      "username": "admin",
+      "userFullName": "MOE Data Management Branch",
+      "organizationId": "org-moe-data",
+      "organizationName": "MOE Data Management Branch",
+      "category": "Security",
+      "action": "AUTH_LOGIN_SUCCESS",
+      "entityType": "AUTH",
+      "entityId": "user-admin",
+      "summary": "User \"MOE Data Management Branch\" (admin) authenticated into IPMIS with unified account. Active role: \"MOE Data Management Branch (Operational)\".",
+      "details": {
+        "role": "MOE Data Management Branch (Operational)",
+        "organization": "MOE Data Management Branch",
+        "loginTime": "2026-11-25T10:03:11.792Z",
+        "assignedRoleCount": 2,
+        "rememberLastRole": false
+      },
+      "severity": "Info"
+    },
+    {
+      "id": "audit-1795600686799-df3a8942",
+      "timestamp": "2026-11-25T09:58:06.799Z",
+      "userId": "user-admin",
+      "username": "admin",
+      "userFullName": "MOE Data Management Branch",
+      "organizationId": "org-moe-data",
+      "organizationName": "MOE Data Management Branch",
+      "category": "Security",
+      "action": "AUTH_LOGIN_SUCCESS",
+      "entityType": "AUTH",
+      "entityId": "user-admin",
+      "summary": "User \"MOE Data Management Branch\" (admin) authenticated into IPMIS with unified account. Active role: \"MOE Data Management Branch (Operational)\".",
+      "details": {
+        "role": "MOE Data Management Branch (Operational)",
+        "organization": "MOE Data Management Branch",
+        "loginTime": "2026-11-25T09:58:06.799Z",
+        "assignedRoleCount": 2,
+        "rememberLastRole": false
+      },
+      "severity": "Info"
+    },
+    {
+      "id": "audit-1795595333366-f8844af3",
+      "timestamp": "2026-11-25T08:28:53.366Z",
+      "userId": "user-admin",
+      "username": "admin",
+      "userFullName": "MOE Data Management Branch",
+      "organizationId": "org-moe-data",
+      "organizationName": "MOE Data Management Branch",
+      "category": "Security",
+      "action": "AUTH_ROLE_SWITCH",
+      "entityType": "AUTH",
+      "entityId": "ura-admin-data",
+      "summary": "Officer \"MOE Data Management Branch\" (admin) switched active working role from \"Additional Secretary (Branch Executive Head)\" to \"MOE Data Management Branch (Operational)\" (MOE Data Management Branch).",
+      "details": {
+        "previousRole": "Additional Secretary (Branch Executive Head)",
+        "newRole": "MOE Data Management Branch (Operational)",
+        "organization": "MOE Data Management Branch",
+        "functionalCategory": "Normal",
+        "rememberedForNextLogin": false,
+        "switchTimestamp": "2026-11-25T08:28:53.366Z"
+      },
+      "severity": "Info"
+    },
+    {
+      "id": "audit-1795595297208-acb231b8",
+      "timestamp": "2026-11-25T08:28:17.208Z",
+      "userId": "user-admin",
+      "username": "admin",
+      "userFullName": "MOE Data Management Branch",
+      "organizationId": "org-moe-data",
+      "organizationName": "MOE Data Management Branch",
+      "category": "Security",
+      "action": "AUTH_LOGIN_SUCCESS",
+      "entityType": "AUTH",
+      "entityId": "user-admin",
+      "summary": "User \"MOE Data Management Branch\" (admin) authenticated into IPMIS with unified account. Active role: \"Additional Secretary (Branch Executive Head)\".",
+      "details": {
+        "role": "Additional Secretary (Branch Executive Head)",
+        "organization": "MOE Data Management Branch",
+        "loginTime": "2026-11-25T08:28:17.208Z",
+        "assignedRoleCount": 2,
+        "rememberLastRole": false
+      },
+      "severity": "Info"
+    },
+    {
+      "id": "audit-1795589704773-fe92e56c",
+      "timestamp": "2026-11-25T06:55:04.773Z",
+      "userId": "user-admin",
+      "username": "admin",
+      "userFullName": "MOE Data Management Branch",
+      "organizationId": "org-moe-data",
+      "organizationName": "MOE Data Management Branch",
+      "category": "Security",
+      "action": "AUTH_LOGIN_SUCCESS",
+      "entityType": "AUTH",
+      "entityId": "user-admin",
+      "summary": "User \"MOE Data Management Branch\" (admin) authenticated into IPMIS with unified account. Active role: \"Additional Secretary (Branch Executive Head)\".",
+      "details": {
+        "role": "Additional Secretary (Branch Executive Head)",
+        "organization": "MOE Data Management Branch",
+        "loginTime": "2026-11-25T06:55:04.773Z",
+        "assignedRoleCount": 3,
+        "rememberLastRole": false
+      },
+      "severity": "Info"
+    },
     {
       "id": "audit-1795588729278-81c291c1",
       "timestamp": "2026-11-25T06:38:49.278Z",

@@ -76,6 +76,15 @@ export async function POST(request: NextRequest) {
     // Dynamically identify the relevant planning branch (MOE branches -> MOE Planning, DOE branches -> DOE Planning)
     const targetPlanning = getRelevantPlanningBranch(branchId, data.organizations || []);
 
+    const enableBranchApprovalChain = data.meta?.enableBranchApprovalChain ?? true;
+    const isBranchDirector = Boolean(user?.isDirector || user?.roleId === 'role-director' || user?.roleName === 'Director');
+    const isBranchAddSec = Boolean(user?.isAdditionalSecretary || user?.roleId === 'role-additional-secretary' || user?.roleName?.includes('Additional Secretary'));
+
+    const targetStatus: 'Pending Director Approval' | 'Submitted' =
+      enableBranchApprovalChain && !isPrivileged && !isBranchDirector && !isBranchAddSec
+        ? 'Pending Director Approval'
+        : 'Submitted';
+
     await updateDb((dbData) => {
       if (!dbData.aipPlans) dbData.aipPlans = [];
       if (!dbData.notifications) dbData.notifications = [];
@@ -89,7 +98,7 @@ export async function POST(request: NextRequest) {
       if (planIdx !== -1) {
         dbData.aipPlans[planIdx] = {
           ...dbData.aipPlans[planIdx],
-          status: 'Submitted',
+          status: targetStatus,
           submittedAt: now,
           submissionNotes,
           submittedToPlanningOrgId: targetPlanning.planningOrgId,
@@ -98,7 +107,7 @@ export async function POST(request: NextRequest) {
         };
         updatedPlan = dbData.aipPlans[planIdx];
       } else {
-        // Create as submitted
+        // Create as submitted / pending director
         const newPlan = {
           id: planId || `plan-${branchId}-${year}${amendmentNumber > 0 ? `-amend-${amendmentNumber}` : ''}`,
           branchId,
@@ -111,7 +120,7 @@ export async function POST(request: NextRequest) {
           mainContactNo: '',
           overallResponsibility: '',
           overallContactNo: '',
-          status: 'Submitted' as const,
+          status: targetStatus,
           submittedAt: now,
           submissionNotes,
           submittedToPlanningOrgId: targetPlanning.planningOrgId,
@@ -123,24 +132,36 @@ export async function POST(request: NextRequest) {
         updatedPlan = newPlan;
       }
 
-      // Notify the specific relevant Planning Branch (MOE or DOE)
-      const titlePrefix = amendmentNumber === 0 
-        ? `📋 Original Plan Submitted: ${branchName}` 
-        : `🔄 Amendment 0${amendmentNumber} Submitted: ${branchName}`;
-      const msgDesc = amendmentNumber === 0
-        ? `${branchName} has submitted their Original Implementation Plan (${year}) to ${targetPlanning.planningAuthorityLabel} for review & approval.`
-        : `${branchName} has submitted their Amendment 0${amendmentNumber} progress update (${year}) to ${targetPlanning.planningAuthorityLabel} for review.`;
+      // Notify Branch Director (when approval chain is active) OR Planning Branch (direct send)
+      if (targetStatus === 'Pending Director Approval') {
+        dbData.notifications.push({
+          id: `notif-aip-dir-${randomUUID()}`,
+          recipientOrgId: branchId,
+          workshopId: 'aip-plan',
+          title: `📋 AIP Pending Branch Director Approval: ${branchName}`,
+          message: `${branchName} submitted their ${amendmentNumber === 0 ? `Original Implementation Plan (${year})` : `Amendment 0${amendmentNumber} (${year})`} for Branch Director review & approval.${submissionNotes ? ` Note: "${submissionNotes}"` : ''}`,
+          isRead: false,
+          createdAt: now,
+        });
+      } else {
+        const titlePrefix = amendmentNumber === 0
+          ? `📋 Original Plan Submitted: ${branchName}`
+          : `🔄 Amendment 0${amendmentNumber} Submitted: ${branchName}`;
+        const msgDesc = amendmentNumber === 0
+          ? `${branchName} has submitted their Original Implementation Plan (${year}) to ${targetPlanning.planningAuthorityLabel} for review & approval.`
+          : `${branchName} has submitted their Amendment 0${amendmentNumber} progress update (${year}) to ${targetPlanning.planningAuthorityLabel} for review.`;
 
-      const notifToPlanning: Notification = {
-        id: `notif-aip-sub-${randomUUID()}`,
-        recipientOrgId: targetPlanning.planningOrgId,
-        workshopId: 'aip-plan',
-        title: titlePrefix,
-        message: `${msgDesc}${submissionNotes ? ` Note: "${submissionNotes}"` : ''}`,
-        isRead: false,
-        createdAt: now,
-      };
-      dbData.notifications.push(notifToPlanning);
+        const notifToPlanning: Notification = {
+          id: `notif-aip-sub-${randomUUID()}`,
+          recipientOrgId: targetPlanning.planningOrgId,
+          workshopId: 'aip-plan',
+          title: titlePrefix,
+          message: `${msgDesc}${submissionNotes ? ` Note: "${submissionNotes}"` : ''}`,
+          isRead: false,
+          createdAt: now,
+        };
+        dbData.notifications.push(notifToPlanning);
+      }
     });
 
     await logAuditEvent({
@@ -149,14 +170,20 @@ export async function POST(request: NextRequest) {
       action: 'AIP_PLAN_SUBMITTED',
       entityType: 'AIP_PLAN',
       entityId: `${branchId}-${year}-amend-${amendmentNumber}`,
-      summary: `Submitted Annual Implementation Plan for ${branchName} (FY ${year}) to ${targetPlanning.planningAuthorityLabel} for review & approval.`,
-      details: { branchId, branchName, year, amendmentNumber, targetPlanningOrgId: targetPlanning.planningOrgId, targetPlanningAuthority: targetPlanning.planningAuthorityLabel, submissionNotes },
+      summary:
+        targetStatus === 'Pending Director Approval'
+          ? `Submitted Annual Implementation Plan for ${branchName} (FY ${year}) to Branch Director for approval.`
+          : `Submitted Annual Implementation Plan for ${branchName} (FY ${year}) to ${targetPlanning.planningAuthorityLabel} for review & approval.`,
+      details: { branchId, branchName, year, amendmentNumber, targetStatus, enableBranchApprovalChain, targetPlanningOrgId: targetPlanning.planningOrgId, targetPlanningAuthority: targetPlanning.planningAuthorityLabel, submissionNotes },
       severity: 'Info',
     });
 
-    const successMsg = amendmentNumber === 0
-      ? `Original Implementation Plan successfully submitted to ${targetPlanning.planningAuthorityLabel} for approval!`
-      : `Amendment 0${amendmentNumber} successfully submitted to ${targetPlanning.planningAuthorityLabel}!`;
+    const successMsg =
+      targetStatus === 'Pending Director Approval'
+        ? `Implementation Plan submitted to Branch Director for approval!`
+        : amendmentNumber === 0
+        ? `Original Implementation Plan successfully submitted to ${targetPlanning.planningAuthorityLabel} for approval!`
+        : `Amendment 0${amendmentNumber} successfully submitted to ${targetPlanning.planningAuthorityLabel}!`;
 
     return NextResponse.json({
       success: true,

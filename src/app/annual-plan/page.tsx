@@ -62,7 +62,7 @@ interface AipPlan {
   isDispatchedToBranch?: boolean;
   submittedToPlanningOrgId?: string;
   submittedToPlanningOrgName?: string;
-  status: 'Draft' | 'Submitted' | 'Approved';
+  status: 'Draft' | 'Pending Director Approval' | 'Pending Additional Secretary Approval' | 'Submitted' | 'Approved';
   createdAt: string;
   updatedAt: string;
 }
@@ -1570,12 +1570,31 @@ export default function AnnualPlanPage() {
   };
 
   // Approve or Return Plan (Planning Branch & Admin)
+  const isBranchDirector = Boolean(
+    (user as any)?.isDirector ||
+    (user as any)?.roleId === 'role-director' ||
+    (user as any)?.roleName === 'Director'
+  );
+  const isBranchAddSec = Boolean(
+    (user as any)?.isAdditionalSecretary ||
+    (user as any)?.roleId === 'role-additional-secretary' ||
+    (user as any)?.roleName?.includes('Additional Secretary')
+  );
+
   const [isApproving, setIsApproving] = useState(false);
-  const handleApproveOrReturnPlan = async (action: 'Approve' | 'Return', notesPrompt?: string) => {
+  const handleApproveOrReturnPlan = async (
+    action: 'Approve' | 'Return' | 'DirectorApprove' | 'DirectorReturn' | 'AddSecApprove' | 'AddSecReturn',
+    notesPrompt?: string
+  ) => {
     const planLabel = selectedAmendmentNumber === 0 ? 'Original Implementation Plan' : `Amendment 0${selectedAmendmentNumber}`;
-    const confirmMsg = action === 'Approve'
-      ? `Approve this ${planLabel} for ${branchInfo?.name}?`
-      : `Return this ${planLabel} to ${branchInfo?.name} for revision?`;
+    const isReturn = action.includes('Return');
+    const confirmMsg = isReturn
+      ? `Return this ${planLabel} to ${branchInfo?.name} for revision?`
+      : action === 'DirectorApprove'
+      ? `Approve this ${planLabel} as Branch Director and forward to Branch Additional Secretary?`
+      : action === 'AddSecApprove'
+      ? `Approve this ${planLabel} as Branch Additional Secretary and send to Planning Branch?`
+      : `Approve this ${planLabel} for ${branchInfo?.name}?`;
     if (!window.confirm(confirmMsg)) return;
 
     try {
@@ -1869,8 +1888,98 @@ export default function AnnualPlanPage() {
           </div>
 
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem', flexWrap: 'wrap' }}>
-            {/* Plan Approval / Status Pill */}
-            {isPrivileged ? (
+            {/* Branch Director / Additional Secretary Stage Approval Controls */}
+            {plan?.status === 'Pending Director Approval' && (isBranchDirector || isPrivileged) ? (
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                <button
+                  onClick={() => handleApproveOrReturnPlan('DirectorApprove')}
+                  disabled={isApproving}
+                  style={{
+                    background: '#166534',
+                    color: '#ffffff',
+                    border: 'none',
+                    padding: '0.45rem 1rem',
+                    borderRadius: '8px',
+                    fontWeight: 700,
+                    fontSize: '0.82rem',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '0.35rem',
+                    boxShadow: '0 2px 4px rgba(22, 101, 52, 0.25)',
+                  }}
+                >
+                  <span>✅</span> {isApproving ? 'Approving...' : 'Director Approve & Forward to Add. Sec'}
+                </button>
+                <button
+                  onClick={() => {
+                    const notes = prompt('Enter remarks/reason for returning this plan for revision:');
+                    if (notes !== null) handleApproveOrReturnPlan('DirectorReturn', notes);
+                  }}
+                  disabled={isApproving}
+                  style={{
+                    background: '#fff',
+                    color: '#b91c1c',
+                    border: '1px solid #b91c1c',
+                    padding: '0.45rem 0.8rem',
+                    borderRadius: '8px',
+                    fontWeight: 700,
+                    fontSize: '0.82rem',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '0.35rem',
+                  }}
+                >
+                  <span>↩️</span> Return
+                </button>
+              </div>
+            ) : plan?.status === 'Pending Additional Secretary Approval' && (isBranchAddSec || isPrivileged) ? (
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                <button
+                  onClick={() => handleApproveOrReturnPlan('AddSecApprove')}
+                  disabled={isApproving}
+                  style={{
+                    background: '#0F766E',
+                    color: '#ffffff',
+                    border: 'none',
+                    padding: '0.45rem 1rem',
+                    borderRadius: '8px',
+                    fontWeight: 700,
+                    fontSize: '0.82rem',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '0.35rem',
+                    boxShadow: '0 2px 4px rgba(15, 118, 110, 0.25)',
+                  }}
+                >
+                  <span>✅</span> {isApproving ? 'Approving...' : 'Add. Sec Approve & Send to Planning'}
+                </button>
+                <button
+                  onClick={() => {
+                    const notes = prompt('Enter remarks/reason for returning this plan for revision:');
+                    if (notes !== null) handleApproveOrReturnPlan('AddSecReturn', notes);
+                  }}
+                  disabled={isApproving}
+                  style={{
+                    background: '#fff',
+                    color: '#b91c1c',
+                    border: '1px solid #b91c1c',
+                    padding: '0.45rem 0.8rem',
+                    borderRadius: '8px',
+                    fontWeight: 700,
+                    fontSize: '0.82rem',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '0.35rem',
+                  }}
+                >
+                  <span>↩️</span> Return
+                </button>
+              </div>
+            ) : isPrivileged ? (
               plan?.status === 'Submitted' ? (
                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
                   <button
@@ -1949,6 +2058,36 @@ export default function AnnualPlanPage() {
                   gap: '0.35rem',
                 }}>
                   <span>✅</span> Approved by Planning Branch
+                </div>
+              ) : plan?.status === 'Pending Director Approval' ? (
+                <div style={{
+                  background: '#ffedd5',
+                  color: '#9a3412',
+                  border: '1px solid #fdba74',
+                  padding: '0.45rem 0.85rem',
+                  borderRadius: '8px',
+                  fontWeight: 700,
+                  fontSize: '0.8rem',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.35rem',
+                }}>
+                  <span>👔</span> Pending Branch Director Approval
+                </div>
+              ) : plan?.status === 'Pending Additional Secretary Approval' ? (
+                <div style={{
+                  background: '#f3e8ff',
+                  color: '#6b21a8',
+                  border: '1px solid #d8b4fe',
+                  padding: '0.45rem 0.85rem',
+                  borderRadius: '8px',
+                  fontWeight: 700,
+                  fontSize: '0.8rem',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.35rem',
+                }}>
+                  <span>🏛️</span> Pending Additional Secretary Approval
                 </div>
               ) : plan?.status === 'Submitted' ? (
                 <div style={{
