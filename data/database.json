@@ -11400,7 +11400,8 @@
   ],
   "workshopReschedules": [],
   "meta": {
-    "lastWorkshopNumber": 0
+    "lastWorkshopNumber": 0,
+    "enableBranchApprovalChain": false
   },
   "aipPlans": [
     {
@@ -11411,22 +11412,94 @@
       "amendmentNumber": 0,
       "phaseTitle": "3. Implementation Phase",
       "targetTitle": "Overall Physical and Financial Targets 2027",
-      "mainResponsibility": "",
-      "mainContactNo": "",
-      "overallResponsibility": "",
-      "overallContactNo": "",
+      "mainResponsibility": "Udara",
+      "mainContactNo": "0714929279",
+      "overallResponsibility": "Dakshina",
+      "overallContactNo": "0714325568",
       "status": "Approved",
       "submittedAt": "2026-11-23T09:50:19.395Z",
       "submissionNotes": "",
       "submittedToPlanningOrgId": "org-moe-planning",
       "submittedToPlanningOrgName": "Ministry of Education Planning Branch (PPB)",
       "createdAt": "2026-11-23T09:50:19.395Z",
-      "updatedAt": "2026-11-23T10:24:01.533Z",
+      "updatedAt": "2026-11-26T10:07:20.339Z",
       "approvedAt": "2026-11-23T10:24:01.533Z",
-      "approvedBy": "MOE Planning Division Officer (Special)"
+      "approvedBy": "MOE Planning Division Officer (Special)",
+      "outcome": "Test",
+      "thematicPriorityArea": "Test",
+      "intermediateOutcome": "Test",
+      "mainFocusArea": "Test"
     }
   ],
-  "aipActivities": [],
+  "aipActivities": [
+    {
+      "id": "act-3b4af69a-6ae9-4695-9287-e48ee4f4454a",
+      "branchId": "org-moe-data",
+      "branchName": "MOE Data Management Branch",
+      "year": "2027",
+      "amendmentNumber": 0,
+      "outputNo": "1",
+      "activityCode": "1",
+      "activity": "test",
+      "voteNumber": "-",
+      "estimatedCost": 80,
+      "financialMonths": [
+        0,
+        10,
+        0,
+        0,
+        0,
+        0,
+        20,
+        0,
+        0,
+        0,
+        0,
+        60
+      ],
+      "physicalMonths": [
+        "-",
+        "-",
+        "-",
+        "-",
+        "-",
+        "-",
+        "-",
+        "-",
+        "-",
+        "-",
+        "-",
+        "-"
+      ],
+      "financialQ1": 10,
+      "financialQ2": 10,
+      "financialQ3": 30,
+      "financialQ4": 90,
+      "targetQ1": "-",
+      "targetQ2": "-",
+      "targetQ3": "-",
+      "targetQ4": "100%",
+      "responsibleOfficer": "Udara",
+      "remarks": "",
+      "isAddedByPlanning": false,
+      "isAdjustedByPlanning": false,
+      "planningNotes": "",
+      "physicalProgress": "",
+      "physicalProgressPct": "",
+      "financialProgressPct": "",
+      "customFields": {
+        "programme": "test",
+        "subActivities": "test",
+        "sourceOfFinance": "GOSL / Treasury",
+        "kpi": "test",
+        "indicateRcp": "R"
+      },
+      "createdBy": "user-admin",
+      "creatorName": "MOE Data Management Branch",
+      "createdAt": "2026-11-26T10:08:48.296Z",
+      "updatedAt": "2026-11-26T10:08:48.296Z"
+    }
+  ],
   "aipAmendments": [],
   "strategicObjectives": [
     {
@@ -11705,6 +11778,63 @@
   "budgetProposalActivities": [],
   "calendarSubscribers": [],
   "auditLogs": [
+    {
+      "id": "audit-1795677874445-d3ca46b8",
+      "timestamp": "2026-11-26T07:24:34.444Z",
+      "userId": "user-superadmin",
+      "username": "superadmin",
+      "userFullName": "Ministry Chief Super Administrator",
+      "organizationId": "org-moe",
+      "organizationName": "Ministry of Education National Headquarters",
+      "category": "Governance",
+      "action": "SYSTEM_SETTINGS_UPDATED",
+      "entityType": "SYSTEM_SETTINGS",
+      "entityId": "meta-branch-approval-chain",
+      "summary": "Updated system settings: Branch Approval Chain (Director -> Additional Secretary) DEACTIVATED (Direct Send to Planning).",
+      "details": {
+        "showDashboardProgressMeter": true,
+        "enableBranchApprovalChain": false
+      },
+      "severity": "Info"
+    },
+    {
+      "id": "audit-1795677868965-1ed19a75",
+      "timestamp": "2026-11-26T07:24:28.965Z",
+      "userId": "user-superadmin",
+      "username": "superadmin",
+      "userFullName": "Ministry Chief Super Administrator",
+      "organizationId": "org-moe",
+      "organizationName": "Ministry of Education National Headquarters",
+      "category": "Governance",
+      "action": "SYSTEM_SETTINGS_UPDATED",
+      "entityType": "SYSTEM_SETTINGS",
+      "entityId": "meta-branch-approval-chain",
+      "summary": "Updated system settings: Branch Approval Chain (Director -> Additional Secretary) ACTIVATED.",
+      "details": {
+        "showDashboardProgressMeter": true,
+        "enableBranchApprovalChain": true
+      },
+      "severity": "Info"
+    },
+    {
+      "id": "audit-1795677857316-a0819505",
+      "timestamp": "2026-11-26T07:24:17.316Z",
+      "userId": "user-superadmin",
+      "username": "superadmin",
+      "userFullName": "Ministry Chief Super Administrator",
+      "organizationId": "org-moe",
+      "organizationName": "Ministry of Education National Headquarters",
+      "category": "Governance",
+      "action": "SYSTEM_SETTINGS_UPDATED",
+      "entityType": "SYSTEM_SETTINGS",
+      "entityId": "meta-branch-approval-chain",
+      "summary": "Updated system settings: Branch Approval Chain (Director -> Additional Secretary) DEACTIVATED (Direct Send to Planning).",
+      "details": {
+        "showDashboardProgressMeter": true,
+        "enableBranchApprovalChain": false
+      },
+      "severity": "Info"
+    },
     {
       "id": "audit-1795676834895-f13903b9",
       "timestamp": "2026-11-26T07:07:14.895Z",
@@ -12639,7 +12769,7 @@
       "isDefault": true,
       "status": "Active",
       "createdAt": "2026-01-01T08:00:00.000Z",
-      "updatedAt": "2026-11-26T08:00:00.000Z",
+      "updatedAt": "2026-11-26T08:55:39.757Z",
       "createdBy": "user-superadmin",
       "columns": [
         {
@@ -12658,7 +12788,7 @@
         {
           "id": "col-programme",
           "key": "programme",
-          "label": "Programme",
+          "label": "Programme / Key Activities",
           "description": "Ministry or branch programme classification",
           "dataType": "text",
           "width": "105px",
@@ -12666,19 +12796,6 @@
           "required": true,
           "visible": true,
           "order": 2,
-          "isSystemCore": true
-        },
-        {
-          "id": "col-main-activity",
-          "key": "activity",
-          "label": "Key Activities",
-          "description": "Full narrative title and operational description of the key activity",
-          "dataType": "textarea",
-          "width": "220px",
-          "textAlign": "left",
-          "required": true,
-          "visible": true,
-          "order": 3,
           "isSystemCore": true
         },
         {
@@ -12691,7 +12808,7 @@
           "textAlign": "left",
           "required": true,
           "visible": true,
-          "order": 4,
+          "order": 3,
           "isSystemCore": true
         },
         {
@@ -12714,7 +12831,7 @@
           "textAlign": "center",
           "required": true,
           "visible": true,
-          "order": 5,
+          "order": 4,
           "isSystemCore": true
         },
         {
@@ -12727,7 +12844,7 @@
           "textAlign": "center",
           "required": true,
           "visible": true,
-          "order": 6,
+          "order": 5,
           "isSystemCore": true
         },
         {
@@ -12740,7 +12857,7 @@
           "textAlign": "right",
           "required": true,
           "visible": true,
-          "order": 7,
+          "order": 6,
           "isSystemCore": true
         },
         {
@@ -12753,7 +12870,7 @@
           "textAlign": "left",
           "required": true,
           "visible": true,
-          "order": 8,
+          "order": 7,
           "isSystemCore": true
         },
         {
@@ -12765,6 +12882,19 @@
           "width": "90px",
           "textAlign": "center",
           "required": true,
+          "visible": true,
+          "order": 8,
+          "isSystemCore": true
+        },
+        {
+          "id": "col-quarterly-targets",
+          "key": "quarterlyTargets",
+          "label": "Q1 to Q4 - Quarterly basis (Cumulative)",
+          "description": "Cumulative quarterly financial and physical targets (Q1, Q2, Q3, Q4)",
+          "dataType": "text",
+          "width": "190px",
+          "textAlign": "center",
+          "required": false,
           "visible": true,
           "order": 9,
           "isSystemCore": true

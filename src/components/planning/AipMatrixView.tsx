@@ -167,6 +167,7 @@ export default function AipMatrixView({
     );
     const monthlyFinancial = Array(12).fill(0);
     const monthlyPhysicalCounts = Array(12).fill(0);
+    const quarterlyFinancial = [0, 0, 0, 0];
 
     displayedActivities.forEach((a) => {
       const fm = a.financialMonths || Array(12).fill(0);
@@ -178,6 +179,14 @@ export default function AipMatrixView({
           monthlyPhysicalCounts[i] += pVal;
         }
       }
+      const q1 = Number(a.financialQ1 ?? (fm[0] + fm[1] + fm[2])) || 0;
+      const q2 = Number(a.financialQ2 ?? (q1 + fm[3] + fm[4] + fm[5])) || 0;
+      const q3 = Number(a.financialQ3 ?? (q2 + fm[6] + fm[7] + fm[8])) || 0;
+      const q4 = Number(a.financialQ4 ?? (q3 + fm[9] + fm[10] + fm[11])) || 0;
+      quarterlyFinancial[0] += q1;
+      quarterlyFinancial[1] += q2;
+      quarterlyFinancial[2] += q3;
+      quarterlyFinancial[3] += q4;
     });
 
     const n = displayedActivities.length;
@@ -185,10 +194,24 @@ export default function AipMatrixView({
       n > 0 ? Math.round(sum / n) : 0
     );
 
+    const quarterTargetSum = [0, 0, 0, 0];
+    displayedActivities.forEach((a) => {
+      const targets = [a.targetQ1, a.targetQ2, a.targetQ3, a.targetQ4];
+      targets.forEach((t, idx) => {
+        const val = parseFloat(String(t || '').replace('%', ''));
+        if (!isNaN(val)) quarterTargetSum[idx] += val;
+      });
+    });
+    const quarterlyPhysical = quarterTargetSum.map((sum) =>
+      n > 0 ? Math.round(sum / n) : 0
+    );
+
     return {
       totalEstimatedCost,
       monthlyFinancial,
       monthlyPhysical,
+      quarterlyFinancial,
+      quarterlyPhysical,
     };
   }, [displayedActivities]);
 
@@ -222,6 +245,295 @@ export default function AipMatrixView({
     );
   };
 
+  const hasActions = Boolean(onEditActivity || onDeleteActivity);
+
+  const customColumns: any[] = useMemo(() => {
+    if (!aipTemplate?.columns) return [];
+    return aipTemplate.columns
+      .filter((c: any) => !c.isSystemCore && c.visible !== false)
+      .sort((a: any, b: any) => (a.order || 0) - (b.order || 0));
+  }, [aipTemplate]);
+
+  const getTemplateCol = (key: string) => {
+    if (!aipTemplate?.columns) return null;
+    return aipTemplate.columns.find((c: any) => c.key === key) || null;
+  };
+
+  const isCoreVisible = (key: string) => {
+    if (!aipTemplate?.columns) return true;
+    const found = getTemplateCol(key);
+    return Boolean(found && found.visible !== false);
+  };
+
+  const getCoreLabel = (key: string, fallback: string) => {
+    const found = getTemplateCol(key);
+    return found?.label || fallback;
+  };
+
+  const showOutputNo = isCoreVisible('outputNo');
+  const showProgramme = isCoreVisible('programme');
+  const showActivity = isCoreVisible('activity');
+  const showSubActivities = isCoreVisible('subActivities');
+  const showVoteNumber = isCoreVisible('voteNumber');
+  const showSourceOfFinance = isCoreVisible('sourceOfFinance');
+  const showEstimatedCost = isCoreVisible('estimatedCost');
+  const showKpi = isCoreVisible('kpi');
+  const showIndicateRcp = isCoreVisible('indicateRcp');
+  const showResponsibility = isCoreVisible('responsibility');
+  const showQuarterlyTargets = !aipTemplate?.columns || !getTemplateCol('quarterlyTargets') || getTemplateCol('quarterlyTargets')?.visible !== false;
+
+  const leftColsCount =
+    (showOutputNo ? 1 : 0) +
+    (showProgramme ? 1 : 0) +
+    (showActivity ? 1 : 0) +
+    (showSubActivities ? 1 : 0) +
+    (showVoteNumber ? 1 : 0) +
+    (showSourceOfFinance ? 1 : 0);
+
+  const rightColsCount =
+    (showKpi ? 1 : 0) +
+    (showIndicateRcp ? 1 : 0) +
+    (showResponsibility ? 1 : 0);
+
+  const handleExportFullCsv = () => {
+    const esc = (v: any) => `"${String(v ?? '').replace(/"/g, '""')}"`;
+    const rows: string[][] = [
+      [`Ministry of Education Sri Lanka - Budget Projection Form (${year})`],
+      [`Branch / Institution`, branchName],
+      [`Outcome`, outcome || ''],
+      [`* Thematic Priority Area`, thematicPriorityArea || ''],
+      [`Intermediate Outcome`, intermediateOutcome || ''],
+      [`* Main Focus Area`, mainFocusArea || ''],
+      [`Main responsibility`, mainResp || '', `Contact No`, mainContact || ''],
+      [`Overall responsibility`, overallResp || '', `Contact No`, overallContact || ''],
+      [],
+    ];
+
+    const headers: string[] = [];
+    if (showOutputNo) headers.push(getCoreLabel('outputNo', 'Outcome / Output No.'));
+    if (showProgramme) headers.push(getCoreLabel('programme', 'Programme'));
+    if (showActivity) headers.push(getCoreLabel('activity', 'Key Activities'));
+    if (showSubActivities) headers.push(getCoreLabel('subActivities', 'Sub Activities'));
+    if (showVoteNumber) headers.push(getCoreLabel('voteNumber', 'Vote Number'));
+    if (showSourceOfFinance) headers.push(getCoreLabel('sourceOfFinance', 'Source of Finance'));
+    if (showEstimatedCost) headers.push(getCoreLabel('estimatedCost', 'Allocation / Estimated Cost (Mn)'));
+    headers.push('Target Type');
+    MONTH_NAMES_SHORT.forEach((m) => headers.push(m));
+    if (showQuarterlyTargets) ['Q1', 'Q2', 'Q3', 'Q4'].forEach((q) => headers.push(q));
+    if (showKpi) headers.push(getCoreLabel('kpi', 'KPI'));
+    if (showIndicateRcp) headers.push(getCoreLabel('indicateRcp', 'Indicate R/C/P'));
+    if (showResponsibility) headers.push(getCoreLabel('responsibility', 'Responsibility'));
+    customColumns.forEach((c: any) => headers.push(c.label));
+    rows.push(headers);
+
+    displayedActivities.forEach((act) => {
+      const fm = act.financialMonths || Array(12).fill(0);
+      const pm = act.physicalMonths || Array(12).fill('-');
+      const cf = act.customFields || {};
+      const q1Fin = Number(act.financialQ1 ?? (fm[0] + fm[1] + fm[2])) || 0;
+      const q2Fin = Number(act.financialQ2 ?? (q1Fin + fm[3] + fm[4] + fm[5])) || 0;
+      const q3Fin = Number(act.financialQ3 ?? (q2Fin + fm[6] + fm[7] + fm[8])) || 0;
+      const q4Fin = Number(act.financialQ4 ?? (q3Fin + fm[9] + fm[10] + fm[11])) || 0;
+
+      const finRow: string[] = [];
+      if (showOutputNo) finRow.push(act.outputNo || '-');
+      if (showProgramme) finRow.push(cf.programme || (!showActivity ? act.activity : '-'));
+      if (showActivity) finRow.push(act.activity || '');
+      if (showSubActivities) finRow.push(cf.subActivities || '-');
+      if (showVoteNumber) finRow.push(act.voteNumber || '-');
+      if (showSourceOfFinance) finRow.push(cf.sourceOfFinance || '-');
+      if (showEstimatedCost) finRow.push(String(Number(act.estimatedCost) || 0));
+      finRow.push('Financial Target');
+      fm.forEach((v) => finRow.push(String(Number(v) || 0)));
+      if (showQuarterlyTargets) [q1Fin, q2Fin, q3Fin, q4Fin].forEach((q) => finRow.push(String(q)));
+      if (showKpi) finRow.push(cf.kpi || '-');
+      if (showIndicateRcp) finRow.push(cf.indicateRcp || '-');
+      if (showResponsibility) finRow.push(act.responsibleOfficer || '-');
+      customColumns.forEach((c: any) => finRow.push(String(cf[c.key] ?? '-')));
+      rows.push(finRow);
+
+      const physRow: string[] = [];
+      for (let i = 0; i < leftColsCount + (showEstimatedCost ? 1 : 0); i++) physRow.push('');
+      physRow.push('Physical Target');
+      pm.forEach((v) => physRow.push(String(v || '-')));
+      if (showQuarterlyTargets) {
+        physRow.push(act.targetQ1 || '-', act.targetQ2 || '-', act.targetQ3 || '-', act.targetQ4 || '100%');
+      }
+      for (let i = 0; i < rightColsCount + customColumns.length; i++) physRow.push('');
+      rows.push(physRow);
+    });
+
+    const totFinRow: string[] = [];
+    if (leftColsCount > 0) {
+      totFinRow.push('Total');
+      for (let i = 1; i < leftColsCount; i++) totFinRow.push('');
+    }
+    if (showEstimatedCost) totFinRow.push(String(totals.totalEstimatedCost));
+    totFinRow.push('Financial Target');
+    totals.monthlyFinancial.forEach((v) => totFinRow.push(String(v)));
+    if (showQuarterlyTargets) totals.quarterlyFinancial.forEach((q) => totFinRow.push(String(q)));
+    rows.push(totFinRow);
+
+    const totPhysRow: string[] = [];
+    for (let i = 0; i < leftColsCount + (showEstimatedCost ? 1 : 0); i++) totPhysRow.push('');
+    totPhysRow.push('Physical Target');
+    totals.monthlyPhysical.forEach((v) => totPhysRow.push(`${v}%`));
+    if (showQuarterlyTargets) totals.quarterlyPhysical.forEach((q) => totPhysRow.push(`${q}%`));
+    rows.push(totPhysRow);
+
+    rows.push([]);
+    rows.push(['R – Reforms', 'C – Construction', 'P – Procurement']);
+
+    const csv = '\uFEFF' + rows.map((r) => r.map(esc).join(',')).join('\n');
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `Budget_Projection_${branchCode.toUpperCase()}_${year}.csv`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  };
+
+  const handleExportFullPdfPrint = () => {
+    const win = window.open('', '_blank', 'width=1280,height=850');
+    if (!win) return;
+
+    const thStyle = 'border:1px solid #64748b;padding:5px 6px;background:#f8fafc;font-size:11px;font-weight:700;text-align:center;';
+    const tdStyle = 'border:1px solid #94a3b8;padding:4px 6px;font-size:11px;text-align:center;vertical-align:middle;';
+    const escHtml = (s: any) =>
+      String(s ?? '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;');
+
+    const bodyRows = displayedActivities
+      .map((act) => {
+        const fm = act.financialMonths || Array(12).fill(0);
+        const pm = act.physicalMonths || Array(12).fill('-');
+        const cf = act.customFields || {};
+        const q1Fin = Number(act.financialQ1 ?? (fm[0] + fm[1] + fm[2])) || 0;
+        const q2Fin = Number(act.financialQ2 ?? (q1Fin + fm[3] + fm[4] + fm[5])) || 0;
+        const q3Fin = Number(act.financialQ3 ?? (q2Fin + fm[6] + fm[7] + fm[8])) || 0;
+        const q4Fin = Number(act.financialQ4 ?? (q3Fin + fm[9] + fm[10] + fm[11])) || 0;
+
+        return `
+          <tr>
+            ${showOutputNo ? `<td rowspan="2" style="${tdStyle}font-weight:700;">${escHtml(act.outputNo || '-')}</td>` : ''}
+            ${showProgramme ? `<td rowspan="2" style="${tdStyle}text-align:left;">${escHtml(cf.programme || (!showActivity ? act.activity : '-'))}</td>` : ''}
+            ${showActivity ? `<td rowspan="2" style="${tdStyle}text-align:left;font-weight:700;">${escHtml(act.activity)}</td>` : ''}
+            ${showSubActivities ? `<td rowspan="2" style="${tdStyle}text-align:left;">${escHtml(cf.subActivities || '-')}</td>` : ''}
+            ${showVoteNumber ? `<td rowspan="2" style="${tdStyle}">${escHtml(act.voteNumber || '-')}</td>` : ''}
+            ${showSourceOfFinance ? `<td rowspan="2" style="${tdStyle}">${escHtml(cf.sourceOfFinance || '-')}</td>` : ''}
+            ${showEstimatedCost ? `<td rowspan="2" style="${tdStyle}font-weight:700;">${formatMillion(Number(act.estimatedCost) || 0)}</td>` : ''}
+            <td style="${tdStyle}background:#fdf2f4;color:#7a1c2d;font-weight:700;">Financial Target</td>
+            ${fm.map((v) => `<td style="${tdStyle}">${formatMillion(Number(v) || 0)}</td>`).join('')}
+            ${showQuarterlyTargets ? `<td style="${tdStyle}background:#fffbeb;">${formatMillion(q1Fin)}</td><td style="${tdStyle}background:#fffbeb;">${formatMillion(q2Fin)}</td><td style="${tdStyle}background:#fffbeb;">${formatMillion(q3Fin)}</td><td style="${tdStyle}background:#fffbeb;font-weight:700;">${formatMillion(q4Fin)}</td>` : ''}
+            ${showKpi ? `<td rowspan="2" style="${tdStyle}text-align:left;">${escHtml(cf.kpi || '-')}</td>` : ''}
+            ${showIndicateRcp ? `<td rowspan="2" style="${tdStyle}font-weight:700;color:#7a1c2d;">${escHtml(cf.indicateRcp || '-')}</td>` : ''}
+            ${showResponsibility ? `<td rowspan="2" style="${tdStyle}">${escHtml(act.responsibleOfficer || '-')}</td>` : ''}
+            ${customColumns.map((c: any) => `<td rowspan="2" style="${tdStyle}">${escHtml(cf[c.key] ?? '-')}</td>`).join('')}
+          </tr>
+          <tr>
+            <td style="${tdStyle}background:#f0fdf4;color:#166534;font-weight:700;">Physical Target</td>
+            ${pm.map((v) => `<td style="${tdStyle}color:#166534;">${escHtml(v || '-')}</td>`).join('')}
+            ${showQuarterlyTargets ? `<td style="${tdStyle}background:#f0fdf4;">${escHtml(act.targetQ1 || '-')}</td><td style="${tdStyle}background:#f0fdf4;">${escHtml(act.targetQ2 || '-')}</td><td style="${tdStyle}background:#f0fdf4;">${escHtml(act.targetQ3 || '-')}</td><td style="${tdStyle}background:#f0fdf4;font-weight:700;">${escHtml(act.targetQ4 || '100%')}</td>` : ''}
+          </tr>
+        `;
+      })
+      .join('');
+
+    win.document.write(`<!DOCTYPE html>
+<html>
+<head>
+  <title>Budget Projection Form - ${escHtml(branchName)} (${year})</title>
+  <style>
+    @page { size: A4 landscape; margin: 10mm; }
+    body { font-family: Arial, sans-serif; color: #0f172a; margin: 0; padding: 12px; }
+    table { width: 100%; border-collapse: collapse; }
+  </style>
+</head>
+<body>
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+    <div>
+      <div style="font-size:11px;font-weight:700;color:#7a1c2d;text-transform:uppercase;">Ministry of Education Sri Lanka</div>
+      <div style="font-size:16px;font-weight:800;">Budget Projection &amp; Annual Implementation Plan ${year} — ${escHtml(branchName)}</div>
+    </div>
+    <div style="font-size:11px;color:#475569;">IPMIS-AIP-${year}-${escHtml(branchCode.toUpperCase())}</div>
+  </div>
+  <table style="margin-bottom:10px;font-size:11px;">
+    <tr><td style="${tdStyle}text-align:left;font-weight:700;width:190px;background:#f8fafc;">Outcome:</td><td colspan="3" style="${tdStyle}text-align:left;">${escHtml(outcome)}</td></tr>
+    <tr><td style="${tdStyle}text-align:left;font-weight:700;background:#f8fafc;">* Thematic Priority Area:</td><td colspan="3" style="${tdStyle}text-align:left;">${escHtml(thematicPriorityArea)}</td></tr>
+    <tr><td style="${tdStyle}text-align:left;font-weight:700;background:#f8fafc;">Intermediate Outcome:</td><td colspan="3" style="${tdStyle}text-align:left;">${escHtml(intermediateOutcome)}</td></tr>
+    <tr><td style="${tdStyle}text-align:left;font-weight:700;background:#f8fafc;">* Main Focus Area:</td><td colspan="3" style="${tdStyle}text-align:left;">${escHtml(mainFocusArea)}</td></tr>
+    <tr><td style="${tdStyle}text-align:left;font-weight:700;background:#f8fafc;">Main responsibility:</td><td style="${tdStyle}text-align:left;">${escHtml(mainResp)}</td><td style="${tdStyle}text-align:left;font-weight:700;width:100px;background:#f8fafc;">Contact No:</td><td style="${tdStyle}text-align:left;">${escHtml(mainContact)}</td></tr>
+    <tr><td style="${tdStyle}text-align:left;font-weight:700;background:#f8fafc;">Overall responsibility:</td><td style="${tdStyle}text-align:left;">${escHtml(overallResp)}</td><td style="${tdStyle}text-align:left;font-weight:700;background:#f8fafc;">Contact No:</td><td style="${tdStyle}text-align:left;">${escHtml(overallContact)}</td></tr>
+  </table>
+  <table>
+    <thead>
+      <tr>
+        ${showOutputNo ? `<th rowspan="3" style="${thStyle}">${escHtml(getCoreLabel('outputNo', 'Outcome / Output No.'))}</th>` : ''}
+        ${showProgramme ? `<th rowspan="3" style="${thStyle}">* ${escHtml(getCoreLabel('programme', 'Programme'))}</th>` : ''}
+        ${showActivity ? `<th rowspan="3" style="${thStyle}">${escHtml(getCoreLabel('activity', 'Key Activities'))}</th>` : ''}
+        ${showSubActivities ? `<th rowspan="3" style="${thStyle}">* ${escHtml(getCoreLabel('subActivities', 'Sub Activities'))}</th>` : ''}
+        ${showVoteNumber ? `<th rowspan="3" style="${thStyle}">${escHtml(getCoreLabel('voteNumber', 'Vote Number'))}</th>` : ''}
+        ${showSourceOfFinance ? `<th rowspan="3" style="${thStyle}">* ${escHtml(getCoreLabel('sourceOfFinance', 'Source of Finance'))}</th>` : ''}
+        ${showEstimatedCost ? `<th rowspan="3" style="${thStyle}">${escHtml(getCoreLabel('estimatedCost', 'Allocation / Estimated Cost (Mn)'))}</th>` : ''}
+        <th rowspan="3" style="${thStyle}">Target</th>
+        <th colspan="${12 + (showQuarterlyTargets ? 4 : 0)}" style="${thStyle}background:#7a1c2d;color:#fff;">Overall Physical and Financial Targets ${year}</th>
+        ${showKpi ? `<th rowspan="3" style="${thStyle}">* ${escHtml(getCoreLabel('kpi', 'KPI'))}</th>` : ''}
+        ${showIndicateRcp ? `<th rowspan="3" style="${thStyle}">* ${escHtml(getCoreLabel('indicateRcp', 'Indicate R/C/P'))}</th>` : ''}
+        ${showResponsibility ? `<th rowspan="3" style="${thStyle}">${escHtml(getCoreLabel('responsibility', 'Responsibility'))}</th>` : ''}
+        ${customColumns.map((c: any) => `<th rowspan="3" style="${thStyle}">${escHtml(c.label)}</th>`).join('')}
+      </tr>
+      <tr>
+        <th colspan="12" style="${thStyle}background:#eff6ff;color:#1e3a8a;">Time Frame</th>
+        ${showQuarterlyTargets ? `<th colspan="4" style="${thStyle}background:#fef3c7;color:#92400e;">Q1 to Q4 - Quarterly basis (Cumulative)</th>` : ''}
+      </tr>
+      <tr>
+        ${MONTH_NAMES_SHORT.map((m) => `<th style="${thStyle}">${m}</th>`).join('')}
+        ${showQuarterlyTargets ? ['Q1', 'Q2', 'Q3', 'Q4'].map((q) => `<th style="${thStyle}background:#fef3c7;color:#92400e;">${q}</th>`).join('') : ''}
+      </tr>
+    </thead>
+    <tbody>${bodyRows}</tbody>
+    <tfoot>
+      <tr>
+        ${leftColsCount > 0 ? `<td colspan="${leftColsCount}" rowspan="2" style="${tdStyle}font-weight:800;text-align:left;">Total</td>` : ''}
+        ${showEstimatedCost ? `<td rowspan="2" style="${tdStyle}font-weight:800;">${formatMillion(totals.totalEstimatedCost)}</td>` : ''}
+        <td style="${tdStyle}background:#fef2f2;color:#991b1b;font-weight:700;">Financial Target</td>
+        ${totals.monthlyFinancial.map((v) => `<td style="${tdStyle}background:#fef2f2;color:#991b1b;font-weight:700;">${formatMillion(v)}</td>`).join('')}
+        ${showQuarterlyTargets ? totals.quarterlyFinancial.map((q) => `<td style="${tdStyle}background:#fee2e2;color:#991b1b;font-weight:700;">${formatMillion(q)}</td>`).join('') : ''}
+        ${showKpi ? `<td rowspan="2" style="${tdStyle}"></td>` : ''}
+        ${showIndicateRcp ? `<td rowspan="2" style="${tdStyle}"></td>` : ''}
+        ${showResponsibility ? `<td rowspan="2" style="${tdStyle}"></td>` : ''}
+        ${customColumns.map(() => `<td rowspan="2" style="${tdStyle}"></td>`).join('')}
+      </tr>
+      <tr>
+        <td style="${tdStyle}background:#f0fdf4;color:#166534;font-weight:700;">Physical Target</td>
+        ${totals.monthlyPhysical.map((v) => `<td style="${tdStyle}background:#f0fdf4;color:#166534;font-weight:700;">${v}%</td>`).join('')}
+        ${showQuarterlyTargets ? totals.quarterlyPhysical.map((q) => `<td style="${tdStyle}background:#dcfce7;color:#166534;font-weight:700;">${q}%</td>`).join('') : ''}
+      </tr>
+    </tfoot>
+  </table>
+  <div style="margin-top:8px;font-size:11px;color:#334155;">
+    <strong>R</strong> – Reforms &nbsp;|&nbsp; <strong>C</strong> – Construction &nbsp;|&nbsp; <strong>P</strong> – Procurement &nbsp;
+    <span style="color:#64748b;">(Use different serial numbers for different activities within the same category. Ex. R1, R2, R3, etc.)</span>
+  </div>
+  <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:14px;margin-top:22px;font-size:11px;">
+    <div style="border-top:1px solid #64748b;padding-top:4px;"><strong>Prepared By (Subject Officer):</strong><br/>${escHtml(mainResp || 'Subject Officer')}<br/><br/>Signature: __________________</div>
+    <div style="border-top:1px solid #64748b;padding-top:4px;"><strong>Checked &amp; Verified:</strong><br/>Assistant Director / Planning Officer<br/><br/>Signature: __________________</div>
+    <div style="border-top:1px solid #64748b;padding-top:4px;"><strong>Approved (Head of Branch):</strong><br/>${escHtml(overallResp || 'Director of Education')}<br/><br/>Signature: __________________</div>
+    <div style="border-top:1px solid #64748b;padding-top:4px;"><strong>Additional Secretary:</strong><br/>Additional Secretary (Branch Executive Head)<br/><br/>Signature: __________________</div>
+    <div style="border-top:1px solid #64748b;padding-top:4px;"><strong>Official Stamp &amp; Filing Date:</strong><br/>Date: ____ / ____ / ${year}<br/><br/>Seal: [ Stamp ]</div>
+  </div>
+</body>
+</html>`);
+    win.document.close();
+    win.focus();
+    setTimeout(() => win.print(), 250);
+  };
+
   if (loading) {
     return (
       <div
@@ -238,21 +550,6 @@ export default function AipMatrixView({
       </div>
     );
   }
-
-  const hasActions = Boolean(onEditActivity || onDeleteActivity);
-
-  const customColumns: any[] = useMemo(() => {
-    if (!aipTemplate?.columns) return [];
-    return aipTemplate.columns
-      .filter((c: any) => !c.isSystemCore && c.visible !== false)
-      .sort((a: any, b: any) => (a.order || 0) - (b.order || 0));
-  }, [aipTemplate]);
-
-  const isCoreVisible = (key: string) => {
-    if (!aipTemplate?.columns) return true;
-    const found = aipTemplate.columns.find((c: any) => c.key === key);
-    return found ? found.visible !== false : true;
-  };
 
   return (
     <div
@@ -499,6 +796,50 @@ export default function AipMatrixView({
             </button>
           </div>
 
+          <button
+            type="button"
+            onClick={handleExportFullCsv}
+            title="Export full Budget Projection Form as Excel-compatible CSV"
+            style={{
+              background: '#FFFFFF',
+              color: '#0F766E',
+              border: '1px solid #99F6E4',
+              padding: '0.4rem 0.75rem',
+              borderRadius: '8px',
+              fontWeight: 700,
+              fontSize: '0.76rem',
+              cursor: 'pointer',
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '0.3rem',
+            }}
+          >
+            <span>📊</span>
+            <span>Export Excel</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={handleExportFullPdfPrint}
+            title="Export or Print full Budget Projection Form as PDF"
+            style={{
+              background: '#FFFFFF',
+              color: '#1E293B',
+              border: '1px solid #CBD5E1',
+              padding: '0.4rem 0.75rem',
+              borderRadius: '8px',
+              fontWeight: 700,
+              fontSize: '0.76rem',
+              cursor: 'pointer',
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '0.3rem',
+            }}
+          >
+            <span>🖨️</span>
+            <span>Export PDF / Print</span>
+          </button>
+
           {onAddActivityClick && (
             <button
               type="button"
@@ -675,32 +1016,46 @@ export default function AipMatrixView({
         <table className="aip-table">
           <thead>
             <tr>
-              <th rowSpan={3} style={{ width: '68px' }}>
-                Outcome / Output No.
-              </th>
-              <th rowSpan={3} style={{ width: '105px' }}>
-                <span style={{ color: '#dc2626' }}>*</span> Programme
-              </th>
-              <th rowSpan={3} style={{ minWidth: '180px' }}>
-                Key Activities
-              </th>
-              <th rowSpan={3} style={{ minWidth: '155px' }}>
-                <span style={{ color: '#dc2626' }}>*</span> Sub Activities
-              </th>
-              <th rowSpan={3} style={{ width: '105px' }}>
-                Vote Number
-              </th>
-              <th rowSpan={3} style={{ width: '105px' }}>
-                <span style={{ color: '#dc2626' }}>*</span> Source of Finance
-              </th>
-              <th rowSpan={3} style={{ width: '98px' }}>
-                Allocation / Estimated Cost (Mn)
-              </th>
+              {showOutputNo && (
+                <th rowSpan={3} style={{ width: '68px' }}>
+                  {getCoreLabel('outputNo', 'Outcome / Output No.')}
+                </th>
+              )}
+              {showProgramme && (
+                <th rowSpan={3} style={{ width: '125px' }}>
+                  <span style={{ color: '#dc2626' }}>*</span> {getCoreLabel('programme', 'Programme')}
+                </th>
+              )}
+              {showActivity && (
+                <th rowSpan={3} style={{ minWidth: '180px' }}>
+                  {getCoreLabel('activity', 'Key Activities')}
+                </th>
+              )}
+              {showSubActivities && (
+                <th rowSpan={3} style={{ minWidth: '155px' }}>
+                  <span style={{ color: '#dc2626' }}>*</span> {getCoreLabel('subActivities', 'Sub Activities')}
+                </th>
+              )}
+              {showVoteNumber && (
+                <th rowSpan={3} style={{ width: '105px' }}>
+                  {getCoreLabel('voteNumber', 'Vote Number')}
+                </th>
+              )}
+              {showSourceOfFinance && (
+                <th rowSpan={3} style={{ width: '105px' }}>
+                  <span style={{ color: '#dc2626' }}>*</span> {getCoreLabel('sourceOfFinance', 'Source of Finance')}
+                </th>
+              )}
+              {showEstimatedCost && (
+                <th rowSpan={3} style={{ width: '98px' }}>
+                  {getCoreLabel('estimatedCost', 'Allocation / Estimated Cost (Mn)')}
+                </th>
+              )}
               <th rowSpan={3} style={{ width: '108px' }}>
                 Target
               </th>
               <th
-                colSpan={12}
+                colSpan={12 + (showQuarterlyTargets ? 4 : 0)}
                 style={{
                   background: 'linear-gradient(90deg, #7A1C2D 0%, #8D153A 100%)',
                   color: '#FFFFFF',
@@ -713,15 +1068,21 @@ export default function AipMatrixView({
               >
                 Overall Physical and Financial Targets {year}
               </th>
-              <th rowSpan={3} style={{ minWidth: '115px' }}>
-                <span style={{ color: '#dc2626' }}>*</span> KPI
-              </th>
-              <th rowSpan={3} style={{ width: '90px' }}>
-                <span style={{ color: '#dc2626' }}>*</span> Indicate R/C/P
-              </th>
-              <th rowSpan={3} style={{ minWidth: '120px' }}>
-                Responsibility
-              </th>
+              {showKpi && (
+                <th rowSpan={3} style={{ minWidth: '115px' }}>
+                  <span style={{ color: '#dc2626' }}>*</span> {getCoreLabel('kpi', 'KPI')}
+                </th>
+              )}
+              {showIndicateRcp && (
+                <th rowSpan={3} style={{ width: '90px' }}>
+                  <span style={{ color: '#dc2626' }}>*</span> {getCoreLabel('indicateRcp', 'Indicate R/C/P')}
+                </th>
+              )}
+              {showResponsibility && (
+                <th rowSpan={3} style={{ minWidth: '120px' }}>
+                  {getCoreLabel('responsibility', 'Responsibility')}
+                </th>
+              )}
               {customColumns.map((col: any) => (
                 <th
                   key={col.id}
@@ -751,6 +1112,11 @@ export default function AipMatrixView({
               <th colSpan={12} style={{ background: '#EFF6FF', fontWeight: 700, color: '#1E3A8A' }}>
                 Time Frame
               </th>
+              {showQuarterlyTargets && (
+                <th colSpan={4} style={{ background: '#FEF3C7', fontWeight: 700, color: '#92400E' }}>
+                  Q1 to Q4 - Quarterly basis (Cumulative)
+                </th>
+              )}
             </tr>
             <tr>
               {MONTH_NAMES_SHORT.map((m, i) => (
@@ -758,6 +1124,14 @@ export default function AipMatrixView({
                   {m}
                 </th>
               ))}
+              {showQuarterlyTargets && (
+                <>
+                  <th style={{ width: '48px', background: '#FEF3C7', color: '#92400E', fontSize: '0.75rem' }}>Q1</th>
+                  <th style={{ width: '48px', background: '#FEF3C7', color: '#92400E', fontSize: '0.75rem' }}>Q2</th>
+                  <th style={{ width: '48px', background: '#FEF3C7', color: '#92400E', fontSize: '0.75rem' }}>Q3</th>
+                  <th style={{ width: '48px', background: '#FEF3C7', color: '#92400E', fontSize: '0.75rem' }}>Q4</th>
+                </>
+              )}
             </tr>
           </thead>
 
@@ -765,7 +1139,7 @@ export default function AipMatrixView({
             {displayedActivities.length === 0 ? (
               <tr>
                 <td
-                  colSpan={23 + customColumns.length + (hasActions ? 1 : 0)}
+                  colSpan={leftColsCount + (showEstimatedCost ? 1 : 0) + 13 + (showQuarterlyTargets ? 4 : 0) + rightColsCount + customColumns.length + (hasActions ? 1 : 0)}
                   style={{ padding: '3rem 1rem', textAlign: 'center', color: '#64748B', background: '#FFFFFF' }}
                 >
                   <div style={{ fontSize: '1.6rem', marginBottom: '0.35rem' }}>📋</div>
@@ -784,107 +1158,144 @@ export default function AipMatrixView({
                   const pm = act.physicalMonths || Array(12).fill('-');
                   const cf = act.customFields || {};
                   const rcpStyle = getRcpBadgeStyle(cf.indicateRcp);
+                  const q1Fin = Number(act.financialQ1 ?? (fm[0] + fm[1] + fm[2])) || 0;
+                  const q2Fin = Number(act.financialQ2 ?? (q1Fin + fm[3] + fm[4] + fm[5])) || 0;
+                  const q3Fin = Number(act.financialQ3 ?? (q2Fin + fm[6] + fm[7] + fm[8])) || 0;
+                  const q4Fin = Number(act.financialQ4 ?? (q3Fin + fm[9] + fm[10] + fm[11])) || 0;
 
                   return (
                     <React.Fragment key={act.id}>
                       <tr>
-                        <td rowSpan={2} style={{ fontWeight: 800, color: '#0F172A' }}>
-                          {act.outputNo || '-'}
-                        </td>
-                        <td rowSpan={2} className="text-left" style={{ fontSize: '0.77rem', color: '#334155' }}>
-                          {cf.programme || '-'}
-                        </td>
-                        <td rowSpan={2} className="text-left" style={{ lineHeight: 1.45 }}>
-                          <div style={{ fontWeight: 700, color: '#0F172A' }}>{act.activity}</div>
-                          {act.isAdjustedByPlanning &&
-                            act.originalProposedCost !== undefined && (
-                              <div style={{ fontSize: '0.7rem', color: '#78350F', marginTop: '3px' }}>
-                                Voted: <strong>Rs. {formatMillion(Number(act.estimatedCost) || 0)} Mn</strong>{' '}
-                                (Branch Demand: Rs. {formatMillion(Number(act.originalProposedCost) || 0)} Mn)
-                              </div>
+                        {showOutputNo && (
+                          <td rowSpan={2} style={{ fontWeight: 800, color: '#0F172A' }}>
+                            {act.outputNo || '-'}
+                          </td>
+                        )}
+                        {showProgramme && (
+                          <td rowSpan={2} className="text-left" style={{ fontSize: '0.77rem', color: '#334155' }}>
+                            <div style={{ fontWeight: !showActivity ? 700 : 500, color: '#0F172A' }}>
+                              {cf.programme || (!showActivity ? act.activity : '-')}
+                            </div>
+                            {!showActivity && cf.programme && act.activity && act.activity !== cf.programme && (
+                              <div style={{ fontSize: '0.72rem', color: '#475569', marginTop: '2px' }}>{act.activity}</div>
                             )}
-                        </td>
-                        <td rowSpan={2} className="text-left" style={{ fontSize: '0.77rem', color: '#334155' }}>
-                          {cf.subActivities || '-'}
-                        </td>
-                        <td rowSpan={2}>
-                          {act.voteNumber && act.voteNumber !== '-' ? (
-                            <span
-                              style={{
-                                display: 'inline-block',
-                                background: '#ECFEFF',
-                                color: '#0E7490',
-                                border: '1px solid #A5F3FC',
-                                borderRadius: '6px',
-                                padding: '2px 7px',
-                                fontWeight: 700,
-                                fontSize: '0.72rem',
-                              }}
-                            >
-                              {act.voteNumber}
-                            </span>
-                          ) : (
-                            '-'
-                          )}
-                        </td>
-                        <td rowSpan={2}>
-                          {cf.sourceOfFinance ? (
-                            <span
-                              style={{
-                                display: 'inline-block',
-                                background: '#F1F5F9',
-                                color: '#334155',
-                                border: '1px solid #CBD5E1',
-                                borderRadius: '999px',
-                                padding: '2px 8px',
-                                fontWeight: 600,
-                                fontSize: '0.71rem',
-                              }}
-                            >
-                              {cf.sourceOfFinance}
-                            </span>
-                          ) : (
-                            '-'
-                          )}
-                        </td>
-                        <td rowSpan={2}>
-                          {renderMnCell(Number(act.estimatedCost) || 0, {
-                            bold: true,
-                            color: '#0F172A',
-                          })}
-                        </td>
+                          </td>
+                        )}
+                        {showActivity && (
+                          <td rowSpan={2} className="text-left" style={{ lineHeight: 1.45 }}>
+                            <div style={{ fontWeight: 700, color: '#0F172A' }}>{act.activity}</div>
+                            {act.isAdjustedByPlanning &&
+                              act.originalProposedCost !== undefined && (
+                                <div style={{ fontSize: '0.7rem', color: '#78350F', marginTop: '3px' }}>
+                                  Voted: <strong>Rs. {formatMillion(Number(act.estimatedCost) || 0)} Mn</strong>{' '}
+                                  (Branch Demand: Rs. {formatMillion(Number(act.originalProposedCost) || 0)} Mn)
+                                </div>
+                              )}
+                          </td>
+                        )}
+                        {showSubActivities && (
+                          <td rowSpan={2} className="text-left" style={{ fontSize: '0.77rem', color: '#334155' }}>
+                            {cf.subActivities || '-'}
+                          </td>
+                        )}
+                        {showVoteNumber && (
+                          <td rowSpan={2}>
+                            {act.voteNumber && act.voteNumber !== '-' ? (
+                              <span
+                                style={{
+                                  display: 'inline-block',
+                                  background: '#ECFEFF',
+                                  color: '#0E7490',
+                                  border: '1px solid #A5F3FC',
+                                  borderRadius: '6px',
+                                  padding: '2px 7px',
+                                  fontWeight: 700,
+                                  fontSize: '0.72rem',
+                                }}
+                              >
+                                {act.voteNumber}
+                              </span>
+                            ) : (
+                              '-'
+                            )}
+                          </td>
+                        )}
+                        {showSourceOfFinance && (
+                          <td rowSpan={2}>
+                            {cf.sourceOfFinance ? (
+                              <span
+                                style={{
+                                  display: 'inline-block',
+                                  background: '#F1F5F9',
+                                  color: '#334155',
+                                  border: '1px solid #CBD5E1',
+                                  borderRadius: '999px',
+                                  padding: '2px 8px',
+                                  fontWeight: 600,
+                                  fontSize: '0.71rem',
+                                }}
+                              >
+                                {cf.sourceOfFinance}
+                              </span>
+                            ) : (
+                              '-'
+                            )}
+                          </td>
+                        )}
+                        {showEstimatedCost && (
+                          <td rowSpan={2}>
+                            {renderMnCell(Number(act.estimatedCost) || 0, {
+                              bold: true,
+                              color: '#0F172A',
+                            })}
+                          </td>
+                        )}
                         <td className="type-financial">Financial Target</td>
                         {fm.map((val, idx) => (
                           <td key={`f-${act.id}-${idx}`} style={{ padding: '4px' }}>
                             {renderMnCell(Number(val) || 0)}
                           </td>
                         ))}
-                        <td rowSpan={2} className="text-left" style={{ fontSize: '0.77rem', color: '#334155' }}>
-                          {cf.kpi || '-'}
-                        </td>
-                        <td rowSpan={2}>
-                          {cf.indicateRcp ? (
-                            <span
-                              style={{
-                                display: 'inline-block',
-                                background: rcpStyle.bg,
-                                color: rcpStyle.text,
-                                border: `1px solid ${rcpStyle.border}`,
-                                borderRadius: '6px',
-                                padding: '2px 8px',
-                                fontWeight: 800,
-                                fontSize: '0.73rem',
-                              }}
-                            >
-                              {cf.indicateRcp}
-                            </span>
-                          ) : (
-                            '-'
-                          )}
-                        </td>
-                        <td rowSpan={2} style={{ fontSize: '0.76rem', color: '#334155' }}>
-                          {act.responsibleOfficer || '-'}
-                        </td>
+                        {showQuarterlyTargets && (
+                          <>
+                            <td style={{ background: '#FFFBEB', padding: '4px' }}>{renderMnCell(q1Fin, { bold: true })}</td>
+                            <td style={{ background: '#FFFBEB', padding: '4px' }}>{renderMnCell(q2Fin, { bold: true })}</td>
+                            <td style={{ background: '#FFFBEB', padding: '4px' }}>{renderMnCell(q3Fin, { bold: true })}</td>
+                            <td style={{ background: '#FFFBEB', padding: '4px' }}>{renderMnCell(q4Fin, { bold: true, color: '#7A1C2D' })}</td>
+                          </>
+                        )}
+                        {showKpi && (
+                          <td rowSpan={2} className="text-left" style={{ fontSize: '0.77rem', color: '#334155' }}>
+                            {cf.kpi || '-'}
+                          </td>
+                        )}
+                        {showIndicateRcp && (
+                          <td rowSpan={2}>
+                            {cf.indicateRcp ? (
+                              <span
+                                style={{
+                                  display: 'inline-block',
+                                  background: rcpStyle.bg,
+                                  color: rcpStyle.text,
+                                  border: `1px solid ${rcpStyle.border}`,
+                                  borderRadius: '6px',
+                                  padding: '2px 8px',
+                                  fontWeight: 800,
+                                  fontSize: '0.73rem',
+                                }}
+                              >
+                                {cf.indicateRcp}
+                              </span>
+                            ) : (
+                              '-'
+                            )}
+                          </td>
+                        )}
+                        {showResponsibility && (
+                          <td rowSpan={2} style={{ fontSize: '0.76rem', color: '#334155' }}>
+                            {act.responsibleOfficer || '-'}
+                          </td>
+                        )}
                         {customColumns.map((col: any) => {
                           const rawVal = act.customFields?.[col.key];
                           const displayVal =
@@ -965,6 +1376,14 @@ export default function AipMatrixView({
                             {val || '-'}
                           </td>
                         ))}
+                        {showQuarterlyTargets && (
+                          <>
+                            <td style={{ background: '#F0FDF4', color: '#166534', fontWeight: 700 }}>{act.targetQ1 || '-'}</td>
+                            <td style={{ background: '#F0FDF4', color: '#166534', fontWeight: 700 }}>{act.targetQ2 || '-'}</td>
+                            <td style={{ background: '#F0FDF4', color: '#166534', fontWeight: 700 }}>{act.targetQ3 || '-'}</td>
+                            <td style={{ background: '#F0FDF4', color: '#166534', fontWeight: 800 }}>{act.targetQ4 || '100%'}</td>
+                          </>
+                        )}
                       </tr>
                     </React.Fragment>
                   );
@@ -972,16 +1391,20 @@ export default function AipMatrixView({
 
                 {/* Totals Footer Rows */}
                 <tr className="total-row-fin">
-                  <td colSpan={6} rowSpan={2} style={{ fontSize: '0.92rem', fontWeight: 800, textAlign: 'left', paddingLeft: '14px' }}>
-                    Total
-                  </td>
-                  <td rowSpan={2} style={{ padding: '5px 6px' }}>
-                    {renderMnCell(totals.totalEstimatedCost, {
-                      align: 'center',
-                      bold: true,
-                      color: '#991B1B',
-                    })}
-                  </td>
+                  {leftColsCount > 0 && (
+                    <td colSpan={leftColsCount} rowSpan={2} style={{ fontSize: '0.92rem', fontWeight: 800, textAlign: 'left', paddingLeft: '14px' }}>
+                      Total
+                    </td>
+                  )}
+                  {showEstimatedCost && (
+                    <td rowSpan={2} style={{ padding: '5px 6px' }}>
+                      {renderMnCell(totals.totalEstimatedCost, {
+                        align: 'center',
+                        bold: true,
+                        color: '#991B1B',
+                      })}
+                    </td>
+                  )}
                   <td style={{ fontWeight: 700, fontSize: '0.75rem', whiteSpace: 'nowrap' }}>
                     Financial Target
                   </td>
@@ -990,9 +1413,14 @@ export default function AipMatrixView({
                       {renderMnCell(mVal, { align: 'center', bold: true, color: '#991B1B' })}
                     </td>
                   ))}
-                  <td rowSpan={2}></td>
-                  <td rowSpan={2}></td>
-                  <td rowSpan={2}></td>
+                  {showQuarterlyTargets && totals.quarterlyFinancial.map((qVal, idx) => (
+                    <td key={`tot-qfin-${idx}`} style={{ background: '#FEE2E2', padding: '4px' }}>
+                      {renderMnCell(qVal, { align: 'center', bold: true, color: '#991B1B' })}
+                    </td>
+                  ))}
+                  {showKpi && <td rowSpan={2}></td>}
+                  {showIndicateRcp && <td rowSpan={2}></td>}
+                  {showResponsibility && <td rowSpan={2}></td>}
                   {customColumns.map((col: any) => (
                     <td key={`tot-c-${col.id}`} rowSpan={2}></td>
                   ))}
@@ -1005,6 +1433,11 @@ export default function AipMatrixView({
                   {totals.monthlyPhysical.map((pVal, idx) => (
                     <td key={`tot-phys-${idx}`} style={{ fontWeight: 700 }}>
                       {pVal}%
+                    </td>
+                  ))}
+                  {showQuarterlyTargets && totals.quarterlyPhysical.map((qVal, idx) => (
+                    <td key={`tot-qphys-${idx}`} style={{ fontWeight: 800, background: '#DCFCE7' }}>
+                      {qVal}%
                     </td>
                   ))}
                 </tr>
@@ -1103,15 +1536,15 @@ export default function AipMatrixView({
             Institutional Hard Copy Filing &amp; Certification — Ministry of Education Sri Lanka
           </div>
           <div style={{ fontSize: '0.75rem', color: '#64748B' }}>
-            Document Telemetry: IPMIS-AIP-${year}-${branchCode.toUpperCase()}
+            Document Telemetry: IPMIS-AIP-{year}-{branchCode.toUpperCase()}
           </div>
         </div>
 
         <div
           style={{
             display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
-            gap: '1.5rem',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(185px, 1fr))',
+            gap: '1.25rem',
             fontSize: '0.8rem',
             color: '#334155',
           }}
@@ -1140,6 +1573,16 @@ export default function AipMatrixView({
             <div style={{ fontWeight: 800, color: '#0F172A' }}>Approved (Head of Branch):</div>
             <div style={{ fontSize: '0.75rem', color: '#64748B', marginTop: '2px' }}>
               {overallResp || 'Director of Education'} • {overallContact || 'Office Phone'}
+            </div>
+            <div style={{ marginTop: '16px', fontSize: '0.72rem', color: '#94A3B8' }}>
+              Signature: _______________________
+            </div>
+          </div>
+
+          <div style={{ borderTop: '1px solid #94A3B8', paddingTop: '6px' }}>
+            <div style={{ fontWeight: 800, color: '#0F172A' }}>Additional Secretary:</div>
+            <div style={{ fontSize: '0.75rem', color: '#64748B', marginTop: '2px' }}>
+              Additional Secretary (Branch Executive Head)
             </div>
             <div style={{ marginTop: '16px', fontSize: '0.72rem', color: '#94A3B8' }}>
               Signature: _______________________

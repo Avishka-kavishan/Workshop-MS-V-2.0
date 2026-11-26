@@ -1325,6 +1325,19 @@ export const DEFAULT_AIP_TEMPLATES: AipTemplate[] = [
         isSystemCore: true,
       },
       {
+        id: 'col-quarterly-targets',
+        key: 'quarterlyTargets',
+        label: 'Q1 to Q4 - Quarterly basis (Cumulative)',
+        description: 'Cumulative quarterly financial and physical targets (Q1, Q2, Q3, Q4)',
+        dataType: 'text',
+        width: '190px',
+        textAlign: 'center',
+        required: false,
+        visible: true,
+        order: 10,
+        isSystemCore: true,
+      },
+      {
         id: 'col-responsibility',
         key: 'responsibility',
         label: 'Responsibility',
@@ -1334,7 +1347,7 @@ export const DEFAULT_AIP_TEMPLATES: AipTemplate[] = [
         textAlign: 'left',
         required: true,
         visible: true,
-        order: 10,
+        order: 11,
         isSystemCore: true,
       },
       {

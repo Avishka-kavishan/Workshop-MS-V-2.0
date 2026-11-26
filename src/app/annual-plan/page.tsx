@@ -242,6 +242,39 @@ export default function AnnualPlanPage() {
     [aipTemplate]
   );
 
+  const getTemplateCol = (key: string) => {
+    if (!aipTemplate?.columns) return null;
+    return aipTemplate.columns.find((c: any) => c.key === key) || null;
+  };
+  const isCoreVisible = (key: string) => {
+    if (!aipTemplate?.columns) return true;
+    const c = getTemplateCol(key);
+    return Boolean(c && c.visible !== false);
+  };
+  const getCoreLabel = (key: string, fallback: string) => getTemplateCol(key)?.label || fallback;
+
+  const showOutputNo = isCoreVisible('outputNo');
+  const showProgramme = isCoreVisible('programme');
+  const showActivityCode = isCoreVisible('activityCode');
+  const showActivity = isCoreVisible('activity');
+  const showSubActivities = isCoreVisible('subActivities');
+  const showVoteNumber = isCoreVisible('voteNumber');
+  const showSourceOfFinance = isCoreVisible('sourceOfFinance');
+  const showEstimatedCost = isCoreVisible('estimatedCost');
+  const showKpi = isCoreVisible('kpi');
+  const showIndicateRcp = isCoreVisible('indicateRcp');
+  const showResponsibility = isCoreVisible('responsibility');
+
+  const aipLeftColsCount =
+    (isConsolidated ? 1 : 0) +
+    (showOutputNo ? 1 : 0) +
+    (showProgramme ? 1 : 0) +
+    (showActivityCode ? 1 : 0) +
+    (showActivity ? 1 : 0) +
+    (showSubActivities ? 1 : 0) +
+    (showVoteNumber ? 1 : 0) +
+    (showSourceOfFinance ? 1 : 0);
+
   // Activity Form Fields
   const [formOutputNo, setFormOutputNo] = useState('1');
   const [formActivityCode, setFormActivityCode] = useState('');
@@ -3826,14 +3859,14 @@ export default function AnnualPlanPage() {
                         Executing Branch
                       </th>
                     )}
-                    <th rowSpan={3} style={{ width: '60px' }}>Outcome / Output No</th>
-                    <th rowSpan={3} style={{ width: '95px' }}><span style={{ color: '#dc2626' }}>*</span> Programme</th>
-                    <th rowSpan={3} style={{ width: '55px' }}>Activity No</th>
-                    <th rowSpan={3} style={{ minWidth: '240px', maxWidth: '340px' }}>Main Activities (Key Activities)</th>
-                    <th rowSpan={3} style={{ minWidth: '140px' }}><span style={{ color: '#dc2626' }}>*</span> Sub Activities</th>
-                    <th rowSpan={3} style={{ width: '130px' }}>Vote Number</th>
-                    <th rowSpan={3} style={{ width: '100px' }}><span style={{ color: '#dc2626' }}>*</span> Source of Finance</th>
-                    <th rowSpan={3} style={{ width: '90px' }}>Allocation / Estimated Cost (Mn)</th>
+                    {showOutputNo && <th rowSpan={3} style={{ width: '60px' }}>{getCoreLabel('outputNo', 'Outcome / Output No')}</th>}
+                    {showProgramme && <th rowSpan={3} style={{ width: '115px' }}><span style={{ color: '#dc2626' }}>*</span> {getCoreLabel('programme', 'Programme')}</th>}
+                    {showActivityCode && <th rowSpan={3} style={{ width: '55px' }}>{getCoreLabel('activityCode', 'Activity No')}</th>}
+                    {showActivity && <th rowSpan={3} style={{ minWidth: '240px', maxWidth: '340px' }}>{getCoreLabel('activity', 'Main Activities (Key Activities)')}</th>}
+                    {showSubActivities && <th rowSpan={3} style={{ minWidth: '140px' }}><span style={{ color: '#dc2626' }}>*</span> {getCoreLabel('subActivities', 'Sub Activities')}</th>}
+                    {showVoteNumber && <th rowSpan={3} style={{ width: '130px' }}>{getCoreLabel('voteNumber', 'Vote Number')}</th>}
+                    {showSourceOfFinance && <th rowSpan={3} style={{ width: '100px' }}><span style={{ color: '#dc2626' }}>*</span> {getCoreLabel('sourceOfFinance', 'Source of Finance')}</th>}
+                    {showEstimatedCost && <th rowSpan={3} style={{ width: '90px' }}>{getCoreLabel('estimatedCost', 'Allocation / Estimated Cost (Mn)')}</th>}
                     <th rowSpan={3} style={{ width: '75px' }}>Remark</th>
                     <th rowSpan={3} style={{ width: '115px' }}>Indicator</th>
                     <th
@@ -3867,9 +3900,9 @@ export default function AnnualPlanPage() {
                         title="Click to edit target heading"
                       />
                     </th>
-                    <th rowSpan={3} style={{ minWidth: '110px' }}><span style={{ color: '#dc2626' }}>*</span> KPI</th>
-                    <th rowSpan={3} style={{ width: '85px' }}><span style={{ color: '#dc2626' }}>*</span> Indicate R/C/P</th>
-                    <th rowSpan={3} style={{ minWidth: '160px' }}>Responsibility</th>
+                    {showKpi && <th rowSpan={3} style={{ minWidth: '110px' }}><span style={{ color: '#dc2626' }}>*</span> {getCoreLabel('kpi', 'KPI')}</th>}
+                    {showIndicateRcp && <th rowSpan={3} style={{ width: '85px' }}><span style={{ color: '#dc2626' }}>*</span> {getCoreLabel('indicateRcp', 'Indicate R/C/P')}</th>}
+                    {showResponsibility && <th rowSpan={3} style={{ minWidth: '160px' }}>{getCoreLabel('responsibility', 'Responsibility')}</th>}
                     {customColumns.map((col: any) => (
                       <th
                         key={col.id}
@@ -4042,9 +4075,19 @@ export default function AnnualPlanPage() {
                                 <BranchBadge name={act.branchName || 'Operational Branch'} size="xs" />
                               </td>
                             )}
-                            <td rowSpan={2} style={{ fontWeight: 700 }}>{act.outputNo || '-'}</td>
-                            <td rowSpan={2} className="text-left" style={{ fontSize: '0.76rem', color: '#334155' }}>{act.customFields?.programme || '-'}</td>
-                            <td rowSpan={2} style={{ fontWeight: 700 }}>{act.activityCode}</td>
+                            {showOutputNo && <td rowSpan={2} style={{ fontWeight: 700 }}>{act.outputNo || '-'}</td>}
+                            {showProgramme && (
+                              <td rowSpan={2} className="text-left" style={{ fontSize: '0.76rem', color: '#334155' }}>
+                                <div style={{ fontWeight: !showActivity ? 700 : 500, color: '#0F172A' }}>
+                                  {act.customFields?.programme || (!showActivity ? act.activity : '-')}
+                                </div>
+                                {!showActivity && act.customFields?.programme && act.activity && act.activity !== act.customFields.programme && (
+                                  <div style={{ fontSize: '0.72rem', color: '#475569', marginTop: '2px' }}>{act.activity}</div>
+                                )}
+                              </td>
+                            )}
+                            {showActivityCode && <td rowSpan={2} style={{ fontWeight: 700 }}>{act.activityCode}</td>}
+                            {showActivity && (
                             <td rowSpan={2} className="text-left" style={{ lineHeight: '1.4' }}>
                               <div style={{ display: 'flex', alignItems: 'center', gap: '4px', flexWrap: 'wrap', marginBottom: '2px' }}>
                                 {act.isAddedByPlanning && (
@@ -4088,9 +4131,13 @@ export default function AnnualPlanPage() {
                                 </div>
                               )}
                             </td>
-                            <td rowSpan={2} className="text-left" style={{ fontSize: '0.76rem', color: '#334155' }}>
-                              {act.customFields?.subActivities || '-'}
-                            </td>
+                            )}
+                            {showSubActivities && (
+                              <td rowSpan={2} className="text-left" style={{ fontSize: '0.76rem', color: '#334155' }}>
+                                {act.customFields?.subActivities || '-'}
+                              </td>
+                            )}
+                            {showVoteNumber && (
                             <td rowSpan={2} style={{ fontSize: '0.75rem', textAlign: 'center' }}>
                               <div
                                 style={{
@@ -4131,18 +4178,23 @@ export default function AnnualPlanPage() {
                                 </button>
                               )}
                             </td>
-                            <td rowSpan={2} style={{ fontSize: '0.74rem', textAlign: 'center' }}>
-                              {act.customFields?.sourceOfFinance ? (
-                                <span style={{ display: 'inline-block', background: '#F1F5F9', color: '#334155', border: '1px solid #CBD5E1', borderRadius: '999px', padding: '2px 7px', fontWeight: 600 }}>
-                                  {act.customFields.sourceOfFinance}
-                                </span>
-                              ) : '-'}
-                            </td>
+                            )}
+                            {showSourceOfFinance && (
+                              <td rowSpan={2} style={{ fontSize: '0.74rem', textAlign: 'center' }}>
+                                {act.customFields?.sourceOfFinance ? (
+                                  <span style={{ display: 'inline-block', background: '#F1F5F9', color: '#334155', border: '1px solid #CBD5E1', borderRadius: '999px', padding: '2px 7px', fontWeight: 600 }}>
+                                    {act.customFields.sourceOfFinance}
+                                  </span>
+                                ) : '-'}
+                              </td>
+                            )}
+                            {showEstimatedCost && (
                             <td rowSpan={2} className="text-right" style={{ padding: '4px 6px' }}>
                               {act.estimatedCost !== undefined && act.estimatedCost !== 0
                                 ? renderMnCell(act.estimatedCost, { align: 'right', bold: true })
                                 : '-'}
                             </td>
+                            )}
                             {/* Column 6: Remark (e.g. CF) */}
                             <td rowSpan={2} style={{ fontSize: '0.78rem', fontWeight: 700, color: '#374151', textAlign: 'center', background: '#fafafa' }}>
                               {act.remarks || '-'}
@@ -4167,17 +4219,23 @@ export default function AnnualPlanPage() {
                             <td style={{ background: '#fef9c3', padding: '3px 4px' }}>{renderMnCell(act.financialQ4, { align: 'center', bold: true, color: '#7a1c2d' })}</td>
 
                             {/* KPI & Indicate R/C/P */}
-                            <td rowSpan={2} className="text-left" style={{ fontSize: '0.76rem', color: '#334155' }}>
-                              {act.customFields?.kpi || '-'}
-                            </td>
-                            <td rowSpan={2} style={{ textAlign: 'center', fontWeight: 800, color: '#7a1c2d', fontSize: '0.76rem' }}>
-                              {act.customFields?.indicateRcp || '-'}
-                            </td>
+                            {showKpi && (
+                              <td rowSpan={2} className="text-left" style={{ fontSize: '0.76rem', color: '#334155' }}>
+                                {act.customFields?.kpi || '-'}
+                              </td>
+                            )}
+                            {showIndicateRcp && (
+                              <td rowSpan={2} style={{ textAlign: 'center', fontWeight: 800, color: '#7a1c2d', fontSize: '0.76rem' }}>
+                                {act.customFields?.indicateRcp || '-'}
+                              </td>
+                            )}
 
                             {/* Responsibility */}
-                            <td rowSpan={2} className="text-left" style={{ fontSize: '0.78rem', lineHeight: '1.3' }}>
-                              {act.responsibleOfficer || '-'}
-                            </td>
+                            {showResponsibility && (
+                              <td rowSpan={2} className="text-left" style={{ fontSize: '0.78rem', lineHeight: '1.3' }}>
+                                {act.responsibleOfficer || '-'}
+                              </td>
+                            )}
 
                             {/* Dynamic Custom Template Columns */}
                             {customColumns.map((col: any) => {
@@ -4440,15 +4498,19 @@ export default function AnnualPlanPage() {
                   <tfoot>
                     {/* Financial Cumulative Total Row */}
                     <tr className="total-row-fin">
-                      <td colSpan={isConsolidated ? 8 : 7} rowSpan={2} style={{ textAlign: 'center', fontWeight: 800, fontSize: '1rem', background: '#f8fafc', verticalAlign: 'middle', borderRight: '1px solid #cbd5e1' }}>
-                        Total
-                      </td>
-                      <td rowSpan={2} className="text-right" style={{ background: '#f8fafc', verticalAlign: 'middle', borderRight: '1px solid #cbd5e1', padding: '4px 6px' }}>
-                        {renderMnCell(totals.totalEstimatedCost, { align: 'right', bold: true })}
-                      </td>
-                      <td rowSpan={2} style={{ background: '#f8fafc', borderRight: '1px solid #cbd5e1' }}></td>
-                      <td rowSpan={2} style={{ background: '#f8fafc', borderRight: '1px solid #cbd5e1' }}></td>
-                      <td rowSpan={2} style={{ background: '#f8fafc', borderRight: '1px solid #cbd5e1' }}></td>
+                      {aipLeftColsCount > 0 && (
+                        <td colSpan={aipLeftColsCount} rowSpan={2} style={{ textAlign: 'center', fontWeight: 800, fontSize: '1rem', background: '#f8fafc', verticalAlign: 'middle', borderRight: '1px solid #cbd5e1' }}>
+                          Total
+                        </td>
+                      )}
+                      {showEstimatedCost && (
+                        <td rowSpan={2} className="text-right" style={{ background: '#f8fafc', verticalAlign: 'middle', borderRight: '1px solid #cbd5e1', padding: '4px 6px' }}>
+                          {renderMnCell(totals.totalEstimatedCost, { align: 'right', bold: true })}
+                        </td>
+                      )}
+                      {showKpi && <td rowSpan={2} style={{ background: '#f8fafc', borderRight: '1px solid #cbd5e1' }}></td>}
+                      {showIndicateRcp && <td rowSpan={2} style={{ background: '#f8fafc', borderRight: '1px solid #cbd5e1' }}></td>}
+                      {showResponsibility && <td rowSpan={2} style={{ background: '#f8fafc', borderRight: '1px solid #cbd5e1' }}></td>}
                       <td style={{ fontWeight: 700, fontSize: '0.75rem', whiteSpace: 'nowrap' }}>Financial (Rs. Mn)</td>
 
                       {/* Monthly financial totals */}
@@ -4465,9 +4527,9 @@ export default function AnnualPlanPage() {
                         </td>
                       ))}
 
-                      <td rowSpan={2} style={{ background: '#f8fafc', borderRight: '1px solid #cbd5e1' }}></td>
-                      <td rowSpan={2} style={{ background: '#f8fafc', borderRight: '1px solid #cbd5e1' }}></td>
-                      <td rowSpan={2} style={{ background: '#f8fafc', borderRight: '1px solid #cbd5e1' }}></td>
+                      {showKpi && <td rowSpan={2} style={{ background: '#f8fafc', borderRight: '1px solid #cbd5e1' }}></td>}
+                      {showIndicateRcp && <td rowSpan={2} style={{ background: '#f8fafc', borderRight: '1px solid #cbd5e1' }}></td>}
+                      {showResponsibility && <td rowSpan={2} style={{ background: '#f8fafc', borderRight: '1px solid #cbd5e1' }}></td>}
 
                       {/* Progress Financial Totals - Only in Amendments */}
                       {selectedAmendmentNumber > 0 && (
@@ -4576,6 +4638,12 @@ export default function AnnualPlanPage() {
                 <div style={{ borderTop: '1px solid #94a3b8', paddingTop: '6px' }}>
                   <div style={{ fontWeight: 800, color: '#0f172a' }}>Approved (Head of Branch):</div>
                   <div style={{ fontSize: '0.75rem', color: '#64748b', marginTop: '2px' }}>{overallResp || 'Director of Education'} • {overallContact || 'Office Phone'}</div>
+                  <div style={{ marginTop: '16px', fontSize: '0.72rem', color: '#94a3b8' }}>Signature: _______________________</div>
+                </div>
+
+                <div style={{ borderTop: '1px solid #94a3b8', paddingTop: '6px' }}>
+                  <div style={{ fontWeight: 800, color: '#0f172a' }}>Additional Secretary:</div>
+                  <div style={{ fontSize: '0.75rem', color: '#64748b', marginTop: '2px' }}>Additional Secretary (Branch Executive Head)</div>
                   <div style={{ marginTop: '16px', fontSize: '0.72rem', color: '#94a3b8' }}>Signature: _______________________</div>
                 </div>
 

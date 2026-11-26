@@ -48,6 +48,17 @@ export default function AipActivityModal({
     .filter((c: any) => !c.isSystemCore && c.visible !== false)
     .sort((a: any, b: any) => (a.order || 0) - (b.order || 0));
 
+  const getCoreCol = (key: string) => {
+    if (!aipTemplate?.columns) return null;
+    return aipTemplate.columns.find((c: any) => c.key === key) || null;
+  };
+  const isCoreVisible = (key: string) => {
+    if (!aipTemplate?.columns) return true;
+    const c = getCoreCol(key);
+    return Boolean(c && c.visible !== false);
+  };
+  const getCoreLabel = (key: string, fallback: string) => getCoreCol(key)?.label || fallback;
+
   const [financialMonths, setFinancialMonths] = useState<number[]>(Array(12).fill(0));
   const [physicalMonths, setPhysicalMonths] = useState<string[]>(Array(12).fill('-'));
 
@@ -166,8 +177,9 @@ export default function AipActivityModal({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!activityDesc.trim()) {
-      setError('Key Activities description is required.');
+    const primaryTitle = isCoreVisible('activity') ? activityDesc.trim() : (programme.trim() || activityDesc.trim());
+    if (!primaryTitle) {
+      setError(`${getCoreLabel('programme', 'Key Activities')} description is required.`);
       return;
     }
 
@@ -185,7 +197,7 @@ export default function AipActivityModal({
           year,
           outputNo: outputNo.trim() || '1',
           activityCode: activityCode.trim() || '1',
-          activity: activityDesc.trim(),
+          activity: primaryTitle,
           voteNumber: voteNumber.trim() || '-',
           estimatedCost: parseFloat(estimatedCost) || financialQ4 || 0,
           financialMonths,
@@ -320,140 +332,163 @@ export default function AipActivityModal({
             </div>
 
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(170px, 1fr))', gap: '0.85rem', marginBottom: '0.85rem' }}>
-              <div>
-                <label className="form-label" style={{ fontSize: '0.78rem', fontWeight: 700, color: '#1E293B' }}>
-                  Outcome / Output No.
-                </label>
-                <input
-                  type="text"
-                  className="form-input"
-                  value={outputNo}
-                  onChange={(e) => setOutputNo(e.target.value)}
-                  placeholder="1"
-                />
-              </div>
-              <div>
-                <label className="form-label" style={{ fontSize: '0.78rem', fontWeight: 700, color: '#1E293B' }}>
-                  * Programme
-                </label>
-                <input
-                  type="text"
-                  className="form-input"
-                  value={programme}
-                  onChange={(e) => setProgramme(e.target.value)}
-                  placeholder="e.g. General Education Quality"
-                />
-              </div>
-              <div>
-                <label className="form-label" style={{ fontSize: '0.78rem', fontWeight: 700, color: '#1E293B' }}>
-                  Vote Number
-                </label>
-                <input
-                  type="text"
-                  className="form-input"
-                  value={voteNumber}
-                  onChange={(e) => setVoteNumber(e.target.value)}
-                  placeholder="e.g. 126-02-03-2502"
-                />
-              </div>
-              <div>
-                <label className="form-label" style={{ fontSize: '0.78rem', fontWeight: 700, color: '#1E293B' }}>
-                  * Source of Finance
-                </label>
-                <input
-                  type="text"
-                  className="form-input"
-                  value={sourceOfFinance}
-                  onChange={(e) => setSourceOfFinance(e.target.value)}
-                  placeholder="e.g. GOSL / Treasury / ADB"
-                />
-              </div>
-              <div>
-                <label className="form-label" style={{ fontSize: '0.78rem', fontWeight: 700, color: '#1E293B' }}>
-                  Allocation / Estimated Cost (Mn)
-                </label>
-                <input
-                  type="number"
-                  step="any"
-                  min="0"
-                  className="form-input"
-                  value={estimatedCost}
-                  onChange={(e) => setEstimatedCost(e.target.value)}
-                  placeholder="e.g. 80.0 or 0.2"
-                />
-              </div>
+              {isCoreVisible('outputNo') && (
+                <div>
+                  <label className="form-label" style={{ fontSize: '0.78rem', fontWeight: 700, color: '#1E293B' }}>
+                    {getCoreLabel('outputNo', 'Outcome / Output No.')}
+                  </label>
+                  <input
+                    type="text"
+                    className="form-input"
+                    value={outputNo}
+                    onChange={(e) => setOutputNo(e.target.value)}
+                    placeholder="1"
+                  />
+                </div>
+              )}
+              {isCoreVisible('programme') && (
+                <div>
+                  <label className="form-label" style={{ fontSize: '0.78rem', fontWeight: 700, color: '#1E293B' }}>
+                    <span style={{ color: '#DC2626' }}>*</span> {getCoreLabel('programme', 'Programme')}
+                  </label>
+                  <input
+                    type="text"
+                    className="form-input"
+                    value={programme}
+                    onChange={(e) => setProgramme(e.target.value)}
+                    required={!isCoreVisible('activity')}
+                    placeholder="e.g. General Education Quality"
+                  />
+                </div>
+              )}
+              {isCoreVisible('voteNumber') && (
+                <div>
+                  <label className="form-label" style={{ fontSize: '0.78rem', fontWeight: 700, color: '#1E293B' }}>
+                    {getCoreLabel('voteNumber', 'Vote Number')}
+                  </label>
+                  <input
+                    type="text"
+                    className="form-input"
+                    value={voteNumber}
+                    onChange={(e) => setVoteNumber(e.target.value)}
+                    placeholder="e.g. 126-02-03-2502"
+                  />
+                </div>
+              )}
+              {isCoreVisible('sourceOfFinance') && (
+                <div>
+                  <label className="form-label" style={{ fontSize: '0.78rem', fontWeight: 700, color: '#1E293B' }}>
+                    <span style={{ color: '#DC2626' }}>*</span> {getCoreLabel('sourceOfFinance', 'Source of Finance')}
+                  </label>
+                  <input
+                    type="text"
+                    className="form-input"
+                    value={sourceOfFinance}
+                    onChange={(e) => setSourceOfFinance(e.target.value)}
+                    placeholder="e.g. GOSL / Treasury / ADB"
+                  />
+                </div>
+              )}
+              {isCoreVisible('estimatedCost') && (
+                <div>
+                  <label className="form-label" style={{ fontSize: '0.78rem', fontWeight: 700, color: '#1E293B' }}>
+                    {getCoreLabel('estimatedCost', 'Allocation / Estimated Cost (Mn)')}
+                  </label>
+                  <input
+                    type="number"
+                    step="any"
+                    min="0"
+                    className="form-input"
+                    value={estimatedCost}
+                    onChange={(e) => setEstimatedCost(e.target.value)}
+                    placeholder="e.g. 80.0 or 0.2"
+                  />
+                </div>
+              )}
             </div>
 
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '0.85rem', marginBottom: '0.85rem' }}>
-              <div>
-                <label className="form-label" style={{ fontSize: '0.78rem', fontWeight: 700, color: '#1E293B' }}>
-                  Key Activities <span style={{ color: '#DC2626' }}>*</span>
-                </label>
-                <textarea
-                  className="form-input"
-                  rows={2}
-                  value={activityDesc}
-                  onChange={(e) => setActivityDesc(e.target.value)}
-                  required
-                  placeholder="Enter key activity description..."
-                  style={{ resize: 'vertical' }}
-                />
+            {(isCoreVisible('activity') || isCoreVisible('subActivities')) && (
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '0.85rem', marginBottom: '0.85rem' }}>
+                {isCoreVisible('activity') && (
+                  <div>
+                    <label className="form-label" style={{ fontSize: '0.78rem', fontWeight: 700, color: '#1E293B' }}>
+                      {getCoreLabel('activity', 'Key Activities')} <span style={{ color: '#DC2626' }}>*</span>
+                    </label>
+                    <textarea
+                      className="form-input"
+                      rows={2}
+                      value={activityDesc}
+                      onChange={(e) => setActivityDesc(e.target.value)}
+                      required
+                      placeholder="Enter key activity description..."
+                      style={{ resize: 'vertical' }}
+                    />
+                  </div>
+                )}
+                {isCoreVisible('subActivities') && (
+                  <div>
+                    <label className="form-label" style={{ fontSize: '0.78rem', fontWeight: 700, color: '#1E293B' }}>
+                      <span style={{ color: '#DC2626' }}>*</span> {getCoreLabel('subActivities', 'Sub Activities')}
+                    </label>
+                    <textarea
+                      className="form-input"
+                      rows={2}
+                      value={subActivities}
+                      onChange={(e) => setSubActivities(e.target.value)}
+                      placeholder="Enter sub-activities..."
+                      style={{ resize: 'vertical' }}
+                    />
+                  </div>
+                )}
               </div>
-              <div>
-                <label className="form-label" style={{ fontSize: '0.78rem', fontWeight: 700, color: '#1E293B' }}>
-                  * Sub Activities
-                </label>
-                <textarea
-                  className="form-input"
-                  rows={2}
-                  value={subActivities}
-                  onChange={(e) => setSubActivities(e.target.value)}
-                  placeholder="Enter sub-activities..."
-                  style={{ resize: 'vertical' }}
-                />
-              </div>
-            </div>
+            )}
 
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(190px, 1fr))', gap: '0.85rem', marginBottom: '1.25rem' }}>
-              <div>
-                <label className="form-label" style={{ fontSize: '0.78rem', fontWeight: 700, color: '#1E293B' }}>
-                  * KPI
-                </label>
-                <input
-                  type="text"
-                  className="form-input"
-                  value={kpi}
-                  onChange={(e) => setKpi(e.target.value)}
-                  placeholder="Key Performance Indicator"
-                />
-              </div>
-              <div>
-                <label className="form-label" style={{ fontSize: '0.78rem', fontWeight: 700, color: '#1E293B' }}>
-                  * Indicate R/C/P
-                </label>
-                <input
-                  type="text"
-                  className="form-input"
-                  value={indicateRcp}
-                  onChange={(e) => setIndicateRcp(e.target.value)}
-                  placeholder="e.g. R1, C1, P1"
-                />
-                <div style={{ fontSize: '0.68rem', color: '#64748B', marginTop: '2px' }}>
-                  R – Reforms, C – Construction, P – Procurement
+              {isCoreVisible('kpi') && (
+                <div>
+                  <label className="form-label" style={{ fontSize: '0.78rem', fontWeight: 700, color: '#1E293B' }}>
+                    <span style={{ color: '#DC2626' }}>*</span> {getCoreLabel('kpi', 'KPI')}
+                  </label>
+                  <input
+                    type="text"
+                    className="form-input"
+                    value={kpi}
+                    onChange={(e) => setKpi(e.target.value)}
+                    placeholder="Key Performance Indicator"
+                  />
                 </div>
-              </div>
-              <div>
-                <label className="form-label" style={{ fontSize: '0.78rem', fontWeight: 700, color: '#1E293B' }}>
-                  Responsibility
-                </label>
-                <input
-                  type="text"
-                  className="form-input"
-                  value={responsibleOfficer}
-                  onChange={(e) => setResponsibleOfficer(e.target.value)}
-                  placeholder="e.g. Director / AD / Subject Officer"
-                />
-              </div>
+              )}
+              {isCoreVisible('indicateRcp') && (
+                <div>
+                  <label className="form-label" style={{ fontSize: '0.78rem', fontWeight: 700, color: '#1E293B' }}>
+                    <span style={{ color: '#DC2626' }}>*</span> {getCoreLabel('indicateRcp', 'Indicate R/C/P')}
+                  </label>
+                  <input
+                    type="text"
+                    className="form-input"
+                    value={indicateRcp}
+                    onChange={(e) => setIndicateRcp(e.target.value)}
+                    placeholder="e.g. R1, C1, P1"
+                  />
+                  <div style={{ fontSize: '0.68rem', color: '#64748B', marginTop: '2px' }}>
+                    R – Reforms, C – Construction, P – Procurement
+                  </div>
+                </div>
+              )}
+              {isCoreVisible('responsibility') && (
+                <div>
+                  <label className="form-label" style={{ fontSize: '0.78rem', fontWeight: 700, color: '#1E293B' }}>
+                    {getCoreLabel('responsibility', 'Responsibility')}
+                  </label>
+                  <input
+                    type="text"
+                    className="form-input"
+                    value={responsibleOfficer}
+                    onChange={(e) => setResponsibleOfficer(e.target.value)}
+                    placeholder="e.g. Director / AD / Subject Officer"
+                  />
+                </div>
+              )}
             </div>
 
             {/* Custom Template Fields (Managed by System Admin) */}

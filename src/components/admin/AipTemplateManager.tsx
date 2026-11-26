@@ -1157,6 +1157,7 @@ export default function AipTemplateManager() {
                           {col.key === 'sourceOfFinance' && 'GOSL / Treasury'}
                           {col.key === 'kpi' && '100% completion'}
                           {col.key === 'indicateRcp' && 'R1'}
+                          {col.key === 'quarterlyTargets' && 'Q1–Q4 Cumulative'}
                           {col.key === 'responsibility' && 'Director / ICT Branch'}
                           {!col.isSystemCore && (col.dataType === 'dropdown' ? (col.options?.[0] || 'Selection') : `[${col.label}]`)}
                         </td>
