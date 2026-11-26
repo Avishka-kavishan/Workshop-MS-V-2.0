@@ -9147,7 +9147,7 @@
       "organizationId": "org-moe-data",
       "roleId": "role-moe-officer",
       "isActive": true,
-      "lastLogin": "2026-11-25T10:03:11.786Z",
+      "lastLogin": "2026-11-26T03:42:20.769Z",
       "createdAt": "2026-09-28T06:03:41.165Z",
       "aliases": [
         "admin",
@@ -9629,7 +9629,7 @@
       "roleId": "role-superadmin",
       "isActive": true,
       "createdAt": "2026-10-01T08:00:00.000Z",
-      "lastLogin": "2026-11-25T06:38:49.272Z",
+      "lastLogin": "2026-11-26T06:41:48.502Z",
       "aliases": [
         "superadmin"
       ],
@@ -11394,7 +11394,7 @@
       "workshopId": "aip-plan",
       "title": "✅ Original Implementation Plan (2027) Approved by Ministry of Education Planning Branch (PPB)",
       "message": "Ministry of Education Planning Branch (PPB) has approved your Original Implementation Plan (2027).",
-      "isRead": false,
+      "isRead": true,
       "createdAt": "2026-11-23T10:24:01.533Z"
     }
   ],
@@ -11426,72 +11426,7 @@
       "approvedBy": "MOE Planning Division Officer (Special)"
     }
   ],
-  "aipActivities": [
-    {
-      "id": "act-d5885b05-6aea-40ab-aeb0-3094c7da3db0",
-      "planId": "plan-org-moe-data-2027",
-      "branchId": "org-moe-data",
-      "branchName": "MOE Data Management Branch",
-      "year": "2027",
-      "amendmentNumber": 0,
-      "outputNo": "1",
-      "activityCode": "5",
-      "activity": "Creating reports to publish in Edu Stat",
-      "voteNumber": "126-01-01-1101",
-      "estimatedCost": 0.1,
-      "financialMonths": [
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0
-      ],
-      "physicalMonths": [
-        "-",
-        "-",
-        "-",
-        "-",
-        "-",
-        "-",
-        "-",
-        "-",
-        "-",
-        "-",
-        "-",
-        "-"
-      ],
-      "financialQ1": 0,
-      "financialQ2": 0,
-      "financialQ3": 0,
-      "financialQ4": 0,
-      "targetQ1": "-",
-      "targetQ2": "-",
-      "targetQ3": "-",
-      "targetQ4": "100%",
-      "responsibleOfficer": "A.B. Silva",
-      "remarks": "",
-      "isAddedByPlanning": false,
-      "isAdjustedByPlanning": true,
-      "originalProposedCost": 0.2,
-      "planningNotes": "",
-      "planningOfficerName": "MOE Planning Division Officer (Special)",
-      "physicalProgress": "",
-      "physicalProgressPct": "",
-      "financialProgressPct": "",
-      "customFields": {},
-      "createdBy": "user-admin",
-      "creatorName": "MOE Data Management Branch",
-      "createdAt": "2026-11-23T09:49:11.618Z",
-      "updatedAt": "2026-11-23T10:23:25.964Z"
-    }
-  ],
+  "aipActivities": [],
   "aipAmendments": [],
   "strategicObjectives": [
     {
@@ -11770,6 +11705,50 @@
   "budgetProposalActivities": [],
   "calendarSubscribers": [],
   "auditLogs": [
+    {
+      "id": "audit-1795675308507-64008223",
+      "timestamp": "2026-11-26T06:41:48.507Z",
+      "userId": "user-superadmin",
+      "username": "superadmin",
+      "userFullName": "Ministry Chief Super Administrator",
+      "organizationId": "org-moe",
+      "organizationName": "Ministry of Education National Headquarters",
+      "category": "Security",
+      "action": "AUTH_LOGIN_SUCCESS",
+      "entityType": "AUTH",
+      "entityId": "user-superadmin",
+      "summary": "User \"Ministry Chief Super Administrator\" (superadmin) authenticated into IPMIS with unified account. Active role: \"Ministry Chief Super Administrator\".",
+      "details": {
+        "role": "Ministry Chief Super Administrator",
+        "organization": "Ministry of Education National Headquarters",
+        "loginTime": "2026-11-26T06:41:48.507Z",
+        "assignedRoleCount": 1,
+        "rememberLastRole": false
+      },
+      "severity": "Info"
+    },
+    {
+      "id": "audit-1795664540777-3475b179",
+      "timestamp": "2026-11-26T03:42:20.776Z",
+      "userId": "user-admin",
+      "username": "admin",
+      "userFullName": "MOE Data Management Branch",
+      "organizationId": "org-moe-data",
+      "organizationName": "MOE Data Management Branch",
+      "category": "Security",
+      "action": "AUTH_LOGIN_SUCCESS",
+      "entityType": "AUTH",
+      "entityId": "user-admin",
+      "summary": "User \"MOE Data Management Branch\" (admin) authenticated into IPMIS with unified account. Active role: \"MOE Data Management Branch (Operational)\".",
+      "details": {
+        "role": "MOE Data Management Branch (Operational)",
+        "organization": "MOE Data Management Branch",
+        "loginTime": "2026-11-26T03:42:20.776Z",
+        "assignedRoleCount": 2,
+        "rememberLastRole": false
+      },
+      "severity": "Info"
+    },
     {
       "id": "audit-1795600991793-89211467",
       "timestamp": "2026-11-25T10:03:11.793Z",

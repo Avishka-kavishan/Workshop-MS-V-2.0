@@ -940,6 +940,10 @@ export interface AipPlan {
   mainContactNo: string;
   overallResponsibility: string;
   overallContactNo: string;
+  outcome?: string;
+  thematicPriorityArea?: string;
+  intermediateOutcome?: string;
+  mainFocusArea?: string;
   amendmentNumber?: number;
   amendmentId?: string;
   progressStartDate?: string;

@@ -1157,7 +1157,7 @@ export default function SuperAdminConsolePage() {
             { id: 'deadlines', label: '⏰ Deadlines & Cutoffs', count: deadlines.length },
             { id: 'announcements', label: '📢 Circulars & Announcements', count: announcements.length },
             ...(adminLevel === 0 ? [
-              { id: 'aip-templates', label: '📑 AIP Plan Templates & Columns', count: undefined },
+              { id: 'aip-templates', label: '📑 AIP & Budget Projection Columns', count: undefined },
               { id: 'settings', label: '👑 Dashboard & System Settings', count: undefined },
             ] : []),
           ].map((tab) => {

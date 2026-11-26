@@ -213,6 +213,10 @@ export default function AnnualPlanPage() {
   const [mainContact, setMainContact] = useState('');
   const [overallResp, setOverallResp] = useState('');
   const [overallContact, setOverallContact] = useState('');
+  const [formOutcome, setFormOutcome] = useState('');
+  const [formThematicPriorityArea, setFormThematicPriorityArea] = useState('');
+  const [formIntermediateOutcome, setFormIntermediateOutcome] = useState('');
+  const [formMainFocusArea, setFormMainFocusArea] = useState('');
   const [formPhaseTitle, setFormPhaseTitle] = useState('3. Implementation Phase');
   const [formTargetTitle, setFormTargetTitle] = useState('');
   const [progressRangeStart, setProgressRangeStart] = useState('2026.01.01');
@@ -555,6 +559,10 @@ export default function AnnualPlanPage() {
           setMainContact(json.plan.mainContactNo || '');
           setOverallResp(json.plan.overallResponsibility || '');
           setOverallContact(json.plan.overallContactNo || '');
+          setFormOutcome(json.plan.outcome || '');
+          setFormThematicPriorityArea(json.plan.thematicPriorityArea || '');
+          setFormIntermediateOutcome(json.plan.intermediateOutcome || '');
+          setFormMainFocusArea(json.plan.mainFocusArea || '');
           setFormPhaseTitle(json.plan.phaseTitle || '3. Implementation Phase');
           setFormTargetTitle(json.plan.targetTitle || '');
           setProgressRangeStart(json.plan.progressStartDate || `${selectedYear}.01.01`);
@@ -662,6 +670,10 @@ export default function AnnualPlanPage() {
           mainContactNo: mainContact,
           overallResponsibility: overallResp,
           overallContactNo: overallContact,
+          outcome: formOutcome,
+          thematicPriorityArea: formThematicPriorityArea,
+          intermediateOutcome: formIntermediateOutcome,
+          mainFocusArea: formMainFocusArea,
           phaseTitle: formPhaseTitle,
           targetTitle: formTargetTitle,
           progressStartDate: progressRangeStart,
@@ -3497,6 +3509,24 @@ export default function AnnualPlanPage() {
                       }}
                     />
                   </div>
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '0.65rem', marginBottom: '0.75rem' }}>
+                    <div style={{ background: '#f8fafc', padding: '0.5rem 0.7rem', borderRadius: '6px', border: '1px solid #e2e8f0' }}>
+                      <label style={{ display: 'block', fontSize: '0.72rem', fontWeight: 700, color: '#334155', marginBottom: '0.2rem' }}>Outcome</label>
+                      <input type="text" value={formOutcome} onChange={(e) => setFormOutcome(e.target.value)} placeholder="Enter Outcome..." style={{ width: '100%', padding: '0.35rem 0.5rem', fontSize: '0.82rem', border: '1px solid #cbd5e1', borderRadius: '4px' }} />
+                    </div>
+                    <div style={{ background: '#f8fafc', padding: '0.5rem 0.7rem', borderRadius: '6px', border: '1px solid #e2e8f0' }}>
+                      <label style={{ display: 'block', fontSize: '0.72rem', fontWeight: 700, color: '#334155', marginBottom: '0.2rem' }}><span style={{ color: '#dc2626' }}>*</span> Thematic Priority Area</label>
+                      <input type="text" value={formThematicPriorityArea} onChange={(e) => setFormThematicPriorityArea(e.target.value)} placeholder="Enter Thematic Priority Area..." style={{ width: '100%', padding: '0.35rem 0.5rem', fontSize: '0.82rem', border: '1px solid #cbd5e1', borderRadius: '4px' }} />
+                    </div>
+                    <div style={{ background: '#f8fafc', padding: '0.5rem 0.7rem', borderRadius: '6px', border: '1px solid #e2e8f0' }}>
+                      <label style={{ display: 'block', fontSize: '0.72rem', fontWeight: 700, color: '#334155', marginBottom: '0.2rem' }}>Intermediate Outcome</label>
+                      <input type="text" value={formIntermediateOutcome} onChange={(e) => setFormIntermediateOutcome(e.target.value)} placeholder="Enter Intermediate Outcome..." style={{ width: '100%', padding: '0.35rem 0.5rem', fontSize: '0.82rem', border: '1px solid #cbd5e1', borderRadius: '4px' }} />
+                    </div>
+                    <div style={{ background: '#f8fafc', padding: '0.5rem 0.7rem', borderRadius: '6px', border: '1px solid #e2e8f0' }}>
+                      <label style={{ display: 'block', fontSize: '0.72rem', fontWeight: 700, color: '#334155', marginBottom: '0.2rem' }}><span style={{ color: '#dc2626' }}>*</span> Main Focus Area</label>
+                      <input type="text" value={formMainFocusArea} onChange={(e) => setFormMainFocusArea(e.target.value)} placeholder="Enter Main Focus Area..." style={{ width: '100%', padding: '0.35rem 0.5rem', fontSize: '0.82rem', border: '1px solid #cbd5e1', borderRadius: '4px' }} />
+                    </div>
+                  </div>
                   <div style={{
                     display: 'grid',
                     gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
@@ -3797,9 +3827,12 @@ export default function AnnualPlanPage() {
                       </th>
                     )}
                     <th rowSpan={3} style={{ width: '60px' }}>Outcome / Output No</th>
+                    <th rowSpan={3} style={{ width: '95px' }}><span style={{ color: '#dc2626' }}>*</span> Programme</th>
                     <th rowSpan={3} style={{ width: '55px' }}>Activity No</th>
-                    <th rowSpan={3} style={{ minWidth: '260px', maxWidth: '360px' }}>Main Activities</th>
+                    <th rowSpan={3} style={{ minWidth: '240px', maxWidth: '340px' }}>Main Activities (Key Activities)</th>
+                    <th rowSpan={3} style={{ minWidth: '140px' }}><span style={{ color: '#dc2626' }}>*</span> Sub Activities</th>
                     <th rowSpan={3} style={{ width: '130px' }}>Vote Number</th>
+                    <th rowSpan={3} style={{ width: '100px' }}><span style={{ color: '#dc2626' }}>*</span> Source of Finance</th>
                     <th rowSpan={3} style={{ width: '90px' }}>Allocation / Estimated Cost (Mn)</th>
                     <th rowSpan={3} style={{ width: '75px' }}>Remark</th>
                     <th rowSpan={3} style={{ width: '115px' }}>Indicator</th>
@@ -3834,6 +3867,8 @@ export default function AnnualPlanPage() {
                         title="Click to edit target heading"
                       />
                     </th>
+                    <th rowSpan={3} style={{ minWidth: '110px' }}><span style={{ color: '#dc2626' }}>*</span> KPI</th>
+                    <th rowSpan={3} style={{ width: '85px' }}><span style={{ color: '#dc2626' }}>*</span> Indicate R/C/P</th>
                     <th rowSpan={3} style={{ minWidth: '160px' }}>Responsibility</th>
                     {customColumns.map((col: any) => (
                       <th
@@ -3953,7 +3988,7 @@ export default function AnnualPlanPage() {
                 <tbody>
                   {activities.length === 0 ? (
                     <tr>
-                      <td colSpan={(viewMode === 'monthly' ? (selectedAmendmentNumber > 0 ? 29 : 25) : (selectedAmendmentNumber > 0 ? 17 : 13)) + (isConsolidated ? 1 : 0)} style={{ padding: '3.5rem 1rem', textAlign: 'center' }}>
+                      <td colSpan={(viewMode === 'monthly' ? (selectedAmendmentNumber > 0 ? 34 : 30) : (selectedAmendmentNumber > 0 ? 22 : 18)) + (isConsolidated ? 1 : 0)} style={{ padding: '3.5rem 1rem', textAlign: 'center' }}>
                         <div style={{ fontSize: '2.2rem', marginBottom: '0.5rem' }}>📋</div>
                         <div style={{ fontWeight: 800, fontSize: '1.05rem', color: '#1e293b', marginBottom: '0.35rem' }}>
                           No activities in this AIP draft yet
@@ -4008,6 +4043,7 @@ export default function AnnualPlanPage() {
                               </td>
                             )}
                             <td rowSpan={2} style={{ fontWeight: 700 }}>{act.outputNo || '-'}</td>
+                            <td rowSpan={2} className="text-left" style={{ fontSize: '0.76rem', color: '#334155' }}>{act.customFields?.programme || '-'}</td>
                             <td rowSpan={2} style={{ fontWeight: 700 }}>{act.activityCode}</td>
                             <td rowSpan={2} className="text-left" style={{ lineHeight: '1.4' }}>
                               <div style={{ display: 'flex', alignItems: 'center', gap: '4px', flexWrap: 'wrap', marginBottom: '2px' }}>
@@ -4052,6 +4088,9 @@ export default function AnnualPlanPage() {
                                 </div>
                               )}
                             </td>
+                            <td rowSpan={2} className="text-left" style={{ fontSize: '0.76rem', color: '#334155' }}>
+                              {act.customFields?.subActivities || '-'}
+                            </td>
                             <td rowSpan={2} style={{ fontSize: '0.75rem', textAlign: 'center' }}>
                               <div
                                 style={{
@@ -4092,6 +4131,13 @@ export default function AnnualPlanPage() {
                                 </button>
                               )}
                             </td>
+                            <td rowSpan={2} style={{ fontSize: '0.74rem', textAlign: 'center' }}>
+                              {act.customFields?.sourceOfFinance ? (
+                                <span style={{ display: 'inline-block', background: '#F1F5F9', color: '#334155', border: '1px solid #CBD5E1', borderRadius: '999px', padding: '2px 7px', fontWeight: 600 }}>
+                                  {act.customFields.sourceOfFinance}
+                                </span>
+                              ) : '-'}
+                            </td>
                             <td rowSpan={2} className="text-right" style={{ padding: '4px 6px' }}>
                               {act.estimatedCost !== undefined && act.estimatedCost !== 0
                                 ? renderMnCell(act.estimatedCost, { align: 'right', bold: true })
@@ -4119,6 +4165,14 @@ export default function AnnualPlanPage() {
                             <td style={{ background: '#fef9c3', padding: '3px 4px' }}>{renderMnCell(act.financialQ2, { align: 'center', bold: true })}</td>
                             <td style={{ background: '#fef9c3', padding: '3px 4px' }}>{renderMnCell(act.financialQ3, { align: 'center', bold: true })}</td>
                             <td style={{ background: '#fef9c3', padding: '3px 4px' }}>{renderMnCell(act.financialQ4, { align: 'center', bold: true, color: '#7a1c2d' })}</td>
+
+                            {/* KPI & Indicate R/C/P */}
+                            <td rowSpan={2} className="text-left" style={{ fontSize: '0.76rem', color: '#334155' }}>
+                              {act.customFields?.kpi || '-'}
+                            </td>
+                            <td rowSpan={2} style={{ textAlign: 'center', fontWeight: 800, color: '#7a1c2d', fontSize: '0.76rem' }}>
+                              {act.customFields?.indicateRcp || '-'}
+                            </td>
 
                             {/* Responsibility */}
                             <td rowSpan={2} className="text-left" style={{ fontSize: '0.78rem', lineHeight: '1.3' }}>
@@ -4386,12 +4440,14 @@ export default function AnnualPlanPage() {
                   <tfoot>
                     {/* Financial Cumulative Total Row */}
                     <tr className="total-row-fin">
-                      <td colSpan={isConsolidated ? 5 : 4} rowSpan={2} style={{ textAlign: 'center', fontWeight: 800, fontSize: '1rem', background: '#f8fafc', verticalAlign: 'middle', borderRight: '1px solid #cbd5e1' }}>
+                      <td colSpan={isConsolidated ? 8 : 7} rowSpan={2} style={{ textAlign: 'center', fontWeight: 800, fontSize: '1rem', background: '#f8fafc', verticalAlign: 'middle', borderRight: '1px solid #cbd5e1' }}>
                         Total
                       </td>
                       <td rowSpan={2} className="text-right" style={{ background: '#f8fafc', verticalAlign: 'middle', borderRight: '1px solid #cbd5e1', padding: '4px 6px' }}>
                         {renderMnCell(totals.totalEstimatedCost, { align: 'right', bold: true })}
                       </td>
+                      <td rowSpan={2} style={{ background: '#f8fafc', borderRight: '1px solid #cbd5e1' }}></td>
+                      <td rowSpan={2} style={{ background: '#f8fafc', borderRight: '1px solid #cbd5e1' }}></td>
                       <td rowSpan={2} style={{ background: '#f8fafc', borderRight: '1px solid #cbd5e1' }}></td>
                       <td style={{ fontWeight: 700, fontSize: '0.75rem', whiteSpace: 'nowrap' }}>Financial (Rs. Mn)</td>
 
@@ -4409,6 +4465,8 @@ export default function AnnualPlanPage() {
                         </td>
                       ))}
 
+                      <td rowSpan={2} style={{ background: '#f8fafc', borderRight: '1px solid #cbd5e1' }}></td>
+                      <td rowSpan={2} style={{ background: '#f8fafc', borderRight: '1px solid #cbd5e1' }}></td>
                       <td rowSpan={2} style={{ background: '#f8fafc', borderRight: '1px solid #cbd5e1' }}></td>
 
                       {/* Progress Financial Totals - Only in Amendments */}
@@ -4463,6 +4521,18 @@ export default function AnnualPlanPage() {
                   </tfoot>
                 )}
               </table>
+            </div>
+
+            {/* R / C / P Legend Bar */}
+            <div style={{ padding: '0.85rem 1.25rem', background: '#F8FAFC', borderTop: '1px solid #E2E8F0', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '0.75rem' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', flexWrap: 'wrap' }}>
+                <span style={{ background: '#EEF2FF', color: '#3730A3', border: '1px solid #C7D2FE', padding: '3px 10px', borderRadius: '999px', fontSize: '0.74rem', fontWeight: 700 }}>R – Reforms</span>
+                <span style={{ background: '#FEF3C7', color: '#92400E', border: '1px solid #FDE68A', padding: '3px 10px', borderRadius: '999px', fontSize: '0.74rem', fontWeight: 700 }}>C – Construction</span>
+                <span style={{ background: '#ECFDF5', color: '#065F46', border: '1px solid #A7F3D0', padding: '3px 10px', borderRadius: '999px', fontSize: '0.74rem', fontWeight: 700 }}>P – Procurement</span>
+              </div>
+              <div style={{ fontSize: '0.75rem', color: '#475569', fontStyle: 'italic' }}>
+                (Use different serial numbers for different activities within the same category. Ex. R1, R2, R3, etc.)
+              </div>
             </div>
 
             {/* Official Institutional Hard Copy Filing Section (Landscape Print & Filing Dossier) */}
@@ -5421,7 +5491,7 @@ export default function AnnualPlanPage() {
       )}
 
       {isModalOpen && (() => {
-        const isBaselineLocked = (selectedAmendmentNumber > 0 && !isPrivileged) || (selectedAmendmentNumber === 0 && plan?.status === 'Approved' && !isPrivileged);
+        const isBaselineLocked = Boolean(editingActivity) && ((selectedAmendmentNumber > 0 && !isPrivileged) || (selectedAmendmentNumber === 0 && plan?.status === 'Approved' && !isPrivileged));
         return (
         <div style={{
           position: 'fixed',
@@ -5589,19 +5659,89 @@ export default function AnnualPlanPage() {
                   </div>
                 </div>
 
-                <div style={{ marginBottom: '1rem' }}>
-                  <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 600, color: '#374151', marginBottom: '0.2rem' }}>
-                    Main Activities Description <span style={{ color: '#dc2626' }}>*</span>
-                  </label>
-                  <textarea
-                    required
-                    rows={2}
-                    disabled={isBaselineLocked}
-                    value={formActivity}
-                    onChange={(e) => setFormActivity(e.target.value)}
-                    placeholder="Enter detailed activity description..."
-                    style={{ width: '100%', padding: '0.5rem', border: '1px solid #d1d5db', borderRadius: '6px', fontSize: '0.85rem' }}
-                  />
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '0.75rem', marginBottom: '1rem' }}>
+                  <div>
+                    <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 600, color: '#374151', marginBottom: '0.2rem' }}>
+                      Main Activities Description (Key Activities) <span style={{ color: '#dc2626' }}>*</span>
+                    </label>
+                    <textarea
+                      required
+                      rows={2}
+                      disabled={isBaselineLocked}
+                      value={formActivity}
+                      onChange={(e) => setFormActivity(e.target.value)}
+                      placeholder="Enter detailed activity description..."
+                      style={{ width: '100%', padding: '0.5rem', border: '1px solid #d1d5db', borderRadius: '6px', fontSize: '0.85rem' }}
+                    />
+                  </div>
+                  <div>
+                    <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 600, color: '#374151', marginBottom: '0.2rem' }}>
+                      <span style={{ color: '#dc2626' }}>*</span> Sub Activities
+                    </label>
+                    <textarea
+                      rows={2}
+                      disabled={isBaselineLocked}
+                      value={formCustomFields.subActivities || ''}
+                      onChange={(e) => setFormCustomFields({ ...formCustomFields, subActivities: e.target.value })}
+                      placeholder="Enter sub-activities..."
+                      style={{ width: '100%', padding: '0.5rem', border: '1px solid #d1d5db', borderRadius: '6px', fontSize: '0.85rem' }}
+                    />
+                  </div>
+                </div>
+
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '0.75rem', marginBottom: '1rem' }}>
+                  <div>
+                    <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 600, color: '#374151', marginBottom: '0.2rem' }}>
+                      <span style={{ color: '#dc2626' }}>*</span> Programme
+                    </label>
+                    <input
+                      type="text"
+                      disabled={isBaselineLocked}
+                      value={formCustomFields.programme || ''}
+                      onChange={(e) => setFormCustomFields({ ...formCustomFields, programme: e.target.value })}
+                      placeholder="e.g. General Education Quality"
+                      style={{ width: '100%', padding: '0.45rem', border: '1px solid #d1d5db', borderRadius: '6px', fontSize: '0.85rem' }}
+                    />
+                  </div>
+                  <div>
+                    <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 600, color: '#374151', marginBottom: '0.2rem' }}>
+                      <span style={{ color: '#dc2626' }}>*</span> Source of Finance
+                    </label>
+                    <input
+                      type="text"
+                      disabled={isBaselineLocked}
+                      value={formCustomFields.sourceOfFinance || 'GOSL / Treasury'}
+                      onChange={(e) => setFormCustomFields({ ...formCustomFields, sourceOfFinance: e.target.value })}
+                      placeholder="e.g. GOSL / Treasury / ADB"
+                      style={{ width: '100%', padding: '0.45rem', border: '1px solid #d1d5db', borderRadius: '6px', fontSize: '0.85rem' }}
+                    />
+                  </div>
+                  <div>
+                    <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 600, color: '#374151', marginBottom: '0.2rem' }}>
+                      <span style={{ color: '#dc2626' }}>*</span> KPI
+                    </label>
+                    <input
+                      type="text"
+                      disabled={isBaselineLocked}
+                      value={formCustomFields.kpi || ''}
+                      onChange={(e) => setFormCustomFields({ ...formCustomFields, kpi: e.target.value })}
+                      placeholder="Key Performance Indicator"
+                      style={{ width: '100%', padding: '0.45rem', border: '1px solid #d1d5db', borderRadius: '6px', fontSize: '0.85rem' }}
+                    />
+                  </div>
+                  <div>
+                    <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 600, color: '#374151', marginBottom: '0.2rem' }}>
+                      <span style={{ color: '#dc2626' }}>*</span> Indicate R/C/P
+                    </label>
+                    <input
+                      type="text"
+                      disabled={isBaselineLocked}
+                      value={formCustomFields.indicateRcp || ''}
+                      onChange={(e) => setFormCustomFields({ ...formCustomFields, indicateRcp: e.target.value })}
+                      placeholder="e.g. R1, C1, P1"
+                      style={{ width: '100%', padding: '0.45rem', border: '1px solid #d1d5db', borderRadius: '6px', fontSize: '0.85rem' }}
+                    />
+                  </div>
                 </div>
 
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '0.75rem', marginBottom: '1.25rem' }}>

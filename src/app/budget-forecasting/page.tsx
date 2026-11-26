@@ -5,6 +5,8 @@ import { useSession } from 'next-auth/react';
 import AppShell from '@/components/layout/AppShell';
 import BranchBadge, { getBranchAbbreviation } from '@/components/common/BranchBadge';
 import SearchableSelect from '@/components/common/SearchableSelect';
+import AipMatrixView from '@/components/planning/AipMatrixView';
+import AipActivityModal from '@/components/planning/AipActivityModal';
 import TileActionMenu, { TileExportData } from '@/components/dashboard/TileActionMenu';
 import { formatMillion, formatRupees, formatDualDeclaration, roundToCentInMn, format2DecMn, formatExactMn } from '@/lib/financialFormat';
 import { MOE_STANDARD_VOTE_NUMBERS, getVoteDetails } from '@/lib/sriLankanVotes';
@@ -134,7 +136,7 @@ export default function BudgetPlanningWorkspacePage() {
 
   // Active Tab:
   // 'branch-planning' (Stage 1) | 'formulation' (Stage 2) | 'budget-speech' (Outputs) | 'allocations' (Post-Appropriation)
-  const [activeTab, setActiveTab] = useState<'branch-planning' | 'aip-form' | 'formulation' | 'budget-speech' | 'allocations'>('branch-planning');
+  const [activeTab, setActiveTab] = useState<'branch-planning' | 'aip-form' | 'formulation' | 'budget-speech' | 'allocations'>('aip-form');
 
   // Server Data
   const [proposals, setProposals] = useState<BudgetProposalActivity[]>([]);
@@ -151,21 +153,11 @@ export default function BudgetPlanningWorkspacePage() {
   const [enableBranchApprovalChain, setEnableBranchApprovalChain] = useState<boolean>(true);
   const [aipPlan, setAipPlan] = useState<any>(null);
   const [aipTabActivities, setAipTabActivities] = useState<any[]>([]);
+  const [aipTemplate, setAipTemplate] = useState<any>(null);
   const [aipLoading, setAipLoading] = useState(false);
   const [aipSubmitting, setAipSubmitting] = useState(false);
-  const [aipForm, setAipForm] = useState({
-    outputNo: '1',
-    activityCode: '1.1',
-    activity: '',
-    voteNumber: '',
-    estimatedCost: '',
-    targetQ1: '-',
-    targetQ2: '-',
-    targetQ3: '-',
-    targetQ4: '100%',
-    responsibleOfficer: '',
-    remarks: '',
-  });
+  const [isAipActivityModalOpen, setIsAipActivityModalOpen] = useState(false);
+  const [editingAipActivity, setEditingAipActivity] = useState<any | null>(null);
 
   // Filter states
   const [selectedDivisionFilter, setSelectedDivisionFilter] = useState<string>('all');
@@ -297,13 +289,13 @@ export default function BudgetPlanningWorkspacePage() {
 
         if (!isPlanning && !isMonitoring) {
           setBranchWorkspaceDivId(data.userContext?.divisionId || 'org-moe-ict');
-          setActiveTab('branch-planning');
+          setActiveTab('aip-form');
         } else {
           if (!branchWorkspaceDivId) {
             setBranchWorkspaceDivId('org-moe-ict');
           }
           if (!userContext) {
-            setActiveTab(isPlanning ? 'formulation' : 'branch-planning');
+            setActiveTab(isPlanning ? 'formulation' : 'aip-form');
           }
         }
       }
@@ -322,11 +314,19 @@ export default function BudgetPlanningWorkspacePage() {
     if (!branchWorkspaceDivId) return;
     try {
       setAipLoading(true);
-      const res = await fetch(`/api/annual-plan?branchId=${encodeURIComponent(branchWorkspaceDivId)}&year=${encodeURIComponent(selectedYear)}`);
+      const [res, tmplRes] = await Promise.all([
+        fetch(`/api/annual-plan?branchId=${encodeURIComponent(branchWorkspaceDivId)}&year=${encodeURIComponent(selectedYear)}`),
+        fetch(`/api/admin/aip-templates?year=${encodeURIComponent(selectedYear)}`),
+      ]);
       if (res.ok) {
         const json = await res.json();
         setAipPlan(json.plan || null);
         setAipTabActivities(json.activities || []);
+        if (json.aipTemplate) setAipTemplate(json.aipTemplate);
+      }
+      if (tmplRes.ok) {
+        const tmplJson = await tmplRes.json();
+        if (tmplJson.activeTemplate) setAipTemplate(tmplJson.activeTemplate);
       }
     } catch (err) {
       console.error('Failed to fetch AIP form data:', err);
@@ -341,47 +341,24 @@ export default function BudgetPlanningWorkspacePage() {
     }
   }, [activeTab, branchWorkspaceDivId, selectedYear]);
 
-  const handleSaveAipFormActivity = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!aipForm.activity.trim()) {
-      showToast('error', 'Main Activity description is required.');
-      return;
-    }
+  const handleEditAipActivity = (act: any) => {
+    setEditingAipActivity(act);
+    setIsAipActivityModalOpen(true);
+  };
+
+  const handleDeleteAipActivity = async (act: any) => {
+    if (!window.confirm(`Remove AIP activity "${act.activity}"?`)) return;
     try {
       setAipSubmitting(true);
-      const res = await fetch('/api/annual-plan/activities', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          branchId: branchWorkspaceDivId,
-          branchName: currentBranchName,
-          year: selectedYear,
-          outputNo: aipForm.outputNo,
-          activityCode: aipForm.activityCode,
-          activity: aipForm.activity.trim(),
-          voteNumber: aipForm.voteNumber.trim() || '-',
-          estimatedCost: Number(aipForm.estimatedCost) || 0,
-          targetQ1: aipForm.targetQ1 || '-',
-          targetQ2: aipForm.targetQ2 || '-',
-          targetQ3: aipForm.targetQ3 || '-',
-          targetQ4: aipForm.targetQ4 || '100%',
-          responsibleOfficer: aipForm.responsibleOfficer.trim(),
-          remarks: aipForm.remarks.trim(),
-        }),
+      const res = await fetch(`/api/annual-plan/activities?id=${encodeURIComponent(act.id)}`, {
+        method: 'DELETE',
       });
       const json = await res.json();
       if (res.ok) {
-        showToast('success', 'AIP activity added successfully!');
-        setAipForm((prev) => ({
-          ...prev,
-          activityCode: `1.${aipTabActivities.length + 2}`,
-          activity: '',
-          estimatedCost: '',
-          remarks: '',
-        }));
+        showToast('success', 'AIP activity removed successfully!');
         fetchBranchAip();
       } else {
-        showToast('error', json.error || 'Failed to add AIP activity');
+        showToast('error', json.error || 'Failed to remove AIP activity');
       }
     } catch (err: any) {
       showToast('error', err.message || 'Network error');
@@ -412,6 +389,69 @@ export default function BudgetPlanningWorkspacePage() {
       }
     } catch (err: any) {
       showToast('error', err.message || 'Network error');
+    } finally {
+      setAipSubmitting(false);
+    }
+  };
+
+  const handleSubmitBudgetProjectionToPlanning = async () => {
+    if (
+      !window.confirm(
+        `Submit Budget Projection for ${currentBranchName} (FY ${selectedYear}) to the Planning Branch?`
+      )
+    ) {
+      return;
+    }
+
+    try {
+      setAipSubmitting(true);
+      const messages: string[] = [];
+
+      if (branchStats.draftsCount > 0) {
+        const budgetRes = await fetch('/api/planning/budget', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            action: 'submit_branch_plan',
+            divisionId: branchWorkspaceDivId,
+            financialYear: selectedYear,
+          }),
+        });
+        const budgetJson = await budgetRes.json();
+        if (!budgetRes.ok) {
+          throw new Error(budgetJson.error || 'Failed to submit budget projection');
+        }
+        if (budgetJson.message) messages.push(budgetJson.message);
+      }
+
+      if (aipTabActivities.length > 0 && (!aipPlan?.status || aipPlan?.status === 'Draft')) {
+        const aipRes = await fetch('/api/annual-plan/submit', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            planId: aipPlan?.id,
+            branchId: branchWorkspaceDivId,
+            year: selectedYear,
+            amendmentNumber: 0,
+          }),
+        });
+        const aipJson = await aipRes.json();
+        if (!aipRes.ok) {
+          throw new Error(aipJson.error || 'Failed to submit AIP form');
+        }
+        if (aipJson.message) messages.push(aipJson.message);
+      }
+
+      showToast(
+        'success',
+        messages.length > 0
+          ? messages.join(' ')
+          : 'Budget Projection submitted to Planning Branch!'
+      );
+      fetchBudgetData();
+      fetchBranchAip();
+    } catch (err: any) {
+      showToast('error', err.message || 'Failed to submit to Planning Branch');
     } finally {
       setAipSubmitting(false);
     }
@@ -462,8 +502,8 @@ export default function BudgetPlanningWorkspacePage() {
       if (userContext.divisionId && branchWorkspaceDivId !== userContext.divisionId) {
         setBranchWorkspaceDivId(userContext.divisionId);
       }
-      if (activeTab !== 'branch-planning' && activeTab !== 'aip-form') {
-        setActiveTab('branch-planning');
+      if (activeTab !== 'aip-form') {
+        setActiveTab('aip-form');
       }
     }
   }, [userContext, isPlanningOfficer, isMonitoringOfficer, branchWorkspaceDivId, activeTab]);
@@ -688,8 +728,8 @@ export default function BudgetPlanningWorkspacePage() {
       const finalCost = proposalForm.noBudgetRequired
         ? 0
         : (proposalForm.estimatedCostMn === ('' as any) || isNaN(Number(proposalForm.estimatedCostMn)))
-        ? 0
-        : Number(proposalForm.estimatedCostMn);
+          ? 0
+          : Number(proposalForm.estimatedCostMn);
 
       const payload: any = {
         financialYear: selectedYear,
@@ -1179,7 +1219,7 @@ export default function BudgetPlanningWorkspacePage() {
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
               <span style={{ fontSize: '1.5rem' }}>📈</span>
               <h1 className="page-title" style={{ margin: 0 }}>
-                Budgetary Planning & Annual Budget Formulation
+                Budget Projection
               </h1>
             </div>
           </div>
@@ -1593,9 +1633,8 @@ export default function BudgetPlanningWorkspacePage() {
               style={{
                 padding: '0.75rem 1rem',
                 border: activeTileFilter === 'rejected' ? '2px solid #DC2626' : '1px solid #E2E8F0',
-                borderLeft: `4px solid ${
-                  branchStats.rejectedCount > 0 ? '#DC2626' : branchStats.underReviewCount > 0 ? '#D97706' : '#16A34A'
-                }`,
+                borderLeft: `4px solid ${branchStats.rejectedCount > 0 ? '#DC2626' : branchStats.underReviewCount > 0 ? '#D97706' : '#16A34A'
+                  }`,
                 borderRadius: '10px',
                 boxShadow: activeTileFilter === 'rejected' ? '0 0 0 2px rgba(220, 38, 38, 0.25), 0 4px 12px rgba(220, 38, 38, 0.12)' : '0 2px 6px rgba(0,0,0,0.03)',
                 background: activeTileFilter === 'rejected' ? '#FEF2F2' : 'var(--white)',
@@ -1621,16 +1660,16 @@ export default function BudgetPlanningWorkspacePage() {
                 {branchStats.rejectedCount > 0
                   ? `${branchStats.rejectedCount} Rejected`
                   : branchStats.underReviewCount > 0
-                  ? `${branchStats.underReviewCount} Under Review`
-                  : 'All In Order'}
+                    ? `${branchStats.underReviewCount} Under Review`
+                    : 'All In Order'}
               </div>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: '0.72rem', color: '#64748B', marginTop: '0.25rem' }}>
                 <span>
                   {branchStats.rejectedCount > 0
                     ? '⚠️ Requires edit & re-submission'
                     : branchStats.adjustedCount > 0
-                    ? `${branchStats.adjustedCount} cost-adjusted`
-                    : 'No revision queries'}
+                      ? `${branchStats.adjustedCount} cost-adjusted`
+                      : 'No revision queries'}
                 </span>
                 {activeTileFilter === 'rejected' ? (
                   <span style={{ fontSize: '0.64rem', fontWeight: 700, color: '#B91C1C', background: 'rgba(220, 38, 38, 0.15)', padding: '0.1rem 0.35rem', borderRadius: '4px' }}>
@@ -1646,27 +1685,6 @@ export default function BudgetPlanningWorkspacePage() {
 
         {/* ── WORKSPACE TABS ─────────────────────────────────────────────── */}
         <div style={{ display: 'flex', gap: '0.5rem', borderBottom: '2px solid #E2E8F0', marginBottom: '1.5rem', flexWrap: 'wrap' }}>
-          <button
-            type="button"
-            onClick={() => setActiveTab('branch-planning')}
-            style={{
-              padding: '0.75rem 1.25rem',
-              fontWeight: 700,
-              fontSize: '0.9rem',
-              border: 'none',
-              background: 'none',
-              cursor: 'pointer',
-              borderBottom: activeTab === 'branch-planning' ? '3px solid var(--primary)' : '3px solid transparent',
-              color: activeTab === 'branch-planning' ? 'var(--primary)' : 'var(--text-secondary)',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '0.4rem',
-            }}
-          >
-            <span>🏢</span>
-            <span>Branch Budgetary Planning Workspace</span>
-          </button>
-
           <button
             type="button"
             onClick={() => setActiveTab('aip-form')}
@@ -1685,7 +1703,7 @@ export default function BudgetPlanningWorkspacePage() {
             }}
           >
             <span>📋</span>
-            <span>AIP Form (Annual Implementation Plan)</span>
+            <span>Budget Projection Form</span>
           </button>
 
           {(isPlanningOfficer || isMonitoringOfficer) && (
@@ -2036,7 +2054,7 @@ export default function BudgetPlanningWorkspacePage() {
                             </div>
 
                             <div style={{ fontWeight: 700, color: 'var(--text-primary)' }}>{p.activityTitle}</div>
-                            
+
                             {/* Previous AIP Extension Badge */}
                             {p.isExtensionOfPreviousAip && (
                               <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', marginTop: '0.2rem' }}>
@@ -2219,26 +2237,26 @@ export default function BudgetPlanningWorkspacePage() {
                                   p.isEditedFromAccepted && p.status === 'Draft'
                                     ? '#FEF3C7'
                                     : p.status === 'Accepted'
-                                    ? '#E6FFFA'
-                                    : p.status === 'Adjusted'
-                                    ? '#EBF8FF'
-                                    : p.status === 'Rejected'
-                                    ? '#FFF5F5'
-                                    : p.status === 'Submitted'
-                                    ? '#FEFCBF'
-                                    : '#EDF2F7',
+                                      ? '#E6FFFA'
+                                      : p.status === 'Adjusted'
+                                        ? '#EBF8FF'
+                                        : p.status === 'Rejected'
+                                          ? '#FFF5F5'
+                                          : p.status === 'Submitted'
+                                            ? '#FEFCBF'
+                                            : '#EDF2F7',
                                 color:
                                   p.isEditedFromAccepted && p.status === 'Draft'
                                     ? '#92400E'
                                     : p.status === 'Accepted'
-                                    ? '#00534E'
-                                    : p.status === 'Adjusted'
-                                    ? '#2B6CB0'
-                                    : p.status === 'Rejected'
-                                    ? '#C53030'
-                                    : p.status === 'Submitted'
-                                    ? '#B7791F'
-                                    : '#4A5568',
+                                      ? '#00534E'
+                                      : p.status === 'Adjusted'
+                                        ? '#2B6CB0'
+                                        : p.status === 'Rejected'
+                                          ? '#C53030'
+                                          : p.status === 'Submitted'
+                                            ? '#B7791F'
+                                            : '#4A5568',
                                 border:
                                   p.isEditedFromAccepted && p.status === 'Draft'
                                     ? '1px solid #F59E0B'
@@ -2479,13 +2497,13 @@ export default function BudgetPlanningWorkspacePage() {
                       background: deadlineStatus?.isExpired
                         ? '#9CA3AF'
                         : branchStats.draftsCount === 0
-                        ? '#10B981'
-                        : '#00534E',
+                          ? '#10B981'
+                          : '#00534E',
                       borderColor: deadlineStatus?.isExpired
                         ? '#9CA3AF'
                         : branchStats.draftsCount === 0
-                        ? '#10B981'
-                        : '#00534E',
+                          ? '#10B981'
+                          : '#00534E',
                       color: '#FFFFFF',
                       cursor: deadlineStatus?.isExpired || branchStats.draftsCount === 0 ? 'not-allowed' : 'pointer',
                       transition: 'all 0.2s ease',
@@ -2494,10 +2512,10 @@ export default function BudgetPlanningWorkspacePage() {
                       deadlineStatus?.isExpired
                         ? `Cannot submit: Deadline announced by PPB expired on ${deadlineStatus.formattedDueDate}`
                         : branchStats.draftsCount === 0
-                        ? 'All proposed activities for this branch are already submitted or accepted by PPB'
-                        : enableBranchApprovalChain && !isPlanningOfficer && !isBranchDirector && !isBranchAddSec
-                        ? `Submit ${branchStats.draftsCount} draft activity proposals to Branch Director for approval`
-                        : `Submit ${branchStats.draftsCount} draft activity proposals to Policy Planning Branch`
+                          ? 'All proposed activities for this branch are already submitted or accepted by PPB'
+                          : enableBranchApprovalChain && !isPlanningOfficer && !isBranchDirector && !isBranchAddSec
+                            ? `Submit ${branchStats.draftsCount} draft activity proposals to Branch Director for approval`
+                            : `Submit ${branchStats.draftsCount} draft activity proposals to Policy Planning Branch`
                     }
                   >
                     <span style={{ fontSize: '1.2rem' }}>
@@ -2507,10 +2525,10 @@ export default function BudgetPlanningWorkspacePage() {
                       {deadlineStatus?.isExpired
                         ? 'Submissions Closed (Deadline Expired)'
                         : branchStats.draftsCount === 0
-                        ? 'All Proposals Submitted'
-                        : enableBranchApprovalChain && !isPlanningOfficer && !isBranchDirector && !isBranchAddSec
-                        ? `Submit to Branch Director (${branchStats.draftsCount})`
-                        : `Direct Submit to PPB (${branchStats.draftsCount})`}
+                          ? 'All Proposals Submitted'
+                          : enableBranchApprovalChain && !isPlanningOfficer && !isBranchDirector && !isBranchAddSec
+                            ? `Submit to Branch Director (${branchStats.draftsCount})`
+                            : `Direct Submit to PPB (${branchStats.draftsCount})`}
                     </span>
                   </button>
 
@@ -2518,8 +2536,8 @@ export default function BudgetPlanningWorkspacePage() {
                     {deadlineStatus?.isExpired
                       ? 'Locked by PPB system deadline policy'
                       : branchStats.draftsCount === 0
-                      ? 'No pending draft items requiring submission'
-                      : `Applies to all ${branchStats.draftsCount} draft proposals for ${currentBranchName}`}
+                        ? 'No pending draft items requiring submission'
+                        : `Applies to all ${branchStats.draftsCount} draft proposals for ${currentBranchName}`}
                   </div>
                 </div>
               </div>
@@ -2550,22 +2568,22 @@ export default function BudgetPlanningWorkspacePage() {
                           aipPlan?.status === 'Approved'
                             ? '#DCFCE7'
                             : aipPlan?.status === 'Submitted'
-                            ? '#FEF3C7'
-                            : aipPlan?.status === 'Pending Director Approval'
-                            ? '#FFEDD5'
-                            : aipPlan?.status === 'Pending Additional Secretary Approval'
-                            ? '#F3E8FF'
-                            : '#F1F5F9',
+                              ? '#FEF3C7'
+                              : aipPlan?.status === 'Pending Director Approval'
+                                ? '#FFEDD5'
+                                : aipPlan?.status === 'Pending Additional Secretary Approval'
+                                  ? '#F3E8FF'
+                                  : '#F1F5F9',
                         color:
                           aipPlan?.status === 'Approved'
                             ? '#166534'
                             : aipPlan?.status === 'Submitted'
-                            ? '#92400E'
-                            : aipPlan?.status === 'Pending Director Approval'
-                            ? '#9A3412'
-                            : aipPlan?.status === 'Pending Additional Secretary Approval'
-                            ? '#6B21A8'
-                            : '#334155',
+                              ? '#92400E'
+                              : aipPlan?.status === 'Pending Director Approval'
+                                ? '#9A3412'
+                                : aipPlan?.status === 'Pending Additional Secretary Approval'
+                                  ? '#6B21A8'
+                                  : '#334155',
                       }}
                     >
                       Status: {aipPlan?.status || 'Draft'}
@@ -2634,155 +2652,62 @@ export default function BudgetPlanningWorkspacePage() {
                         : '🚀 Submit AIP to Planning Branch'}
                     </button>
                   )}
-                  <a
-                    href="/annual-plan"
-                    className="btn"
-                    style={{ background: '#F8FAFC', border: '1px solid #CBD5E1', color: '#1E293B', fontSize: '0.82rem', textDecoration: 'none' }}
+                  <button
+                    type="button"
+                    onClick={handleSubmitBudgetProjectionToPlanning}
+                    disabled={aipSubmitting || (branchStats.draftsCount === 0 && aipTabActivities.length === 0)}
+                    className="btn btn-primary"
+                    style={{
+                      background: '#00534E',
+                      borderColor: '#00534E',
+                      color: '#FFFFFF',
+                      fontSize: '0.84rem',
+                      fontWeight: 700,
+                    }}
                   >
-                    Open Full AIP Matrix →
-                  </a>
-                </div>
-              </div>
-            </div>
-
-            {/* AIP Activity Entry Form */}
-            <div className="card" style={{ padding: '1.35rem 1.5rem', marginBottom: '1.25rem' }}>
-              <h4 style={{ margin: '0 0 1rem', fontSize: '0.96rem', fontWeight: 800, color: 'var(--primary)' }}>
-                ➕ Add New AIP Activity
-              </h4>
-              <form onSubmit={handleSaveAipFormActivity}>
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '0.85rem', marginBottom: '0.85rem' }}>
-                  <div>
-                    <label className="form-label" style={{ fontSize: '0.78rem', fontWeight: 700 }}>Output No</label>
-                    <input
-                      type="text"
-                      className="form-input"
-                      value={aipForm.outputNo}
-                      onChange={(e) => setAipForm({ ...aipForm, outputNo: e.target.value })}
-                      placeholder="e.g. 1"
-                    />
-                  </div>
-                  <div>
-                    <label className="form-label" style={{ fontSize: '0.78rem', fontWeight: 700 }}>Activity Code</label>
-                    <input
-                      type="text"
-                      className="form-input"
-                      value={aipForm.activityCode}
-                      onChange={(e) => setAipForm({ ...aipForm, activityCode: e.target.value })}
-                      placeholder="e.g. 1.1"
-                    />
-                  </div>
-                  <div>
-                    <label className="form-label" style={{ fontSize: '0.78rem', fontWeight: 700 }}>Vote Number</label>
-                    <input
-                      type="text"
-                      className="form-input"
-                      value={aipForm.voteNumber}
-                      onChange={(e) => setAipForm({ ...aipForm, voteNumber: e.target.value })}
-                      placeholder="e.g. 126-02-03-2502"
-                    />
-                  </div>
-                  <div>
-                    <label className="form-label" style={{ fontSize: '0.78rem', fontWeight: 700 }}>Estimated Cost (Rs. Mn)</label>
-                    <input
-                      type="number"
-                      step="0.01"
-                      min="0"
-                      className="form-input"
-                      value={aipForm.estimatedCost}
-                      onChange={(e) => setAipForm({ ...aipForm, estimatedCost: e.target.value })}
-                      placeholder="0.00"
-                    />
-                  </div>
-                </div>
-
-                <div style={{ marginBottom: '0.85rem' }}>
-                  <label className="form-label" style={{ fontSize: '0.78rem', fontWeight: 700 }}>Main Activity Description *</label>
-                  <input
-                    type="text"
-                    className="form-input"
-                    value={aipForm.activity}
-                    onChange={(e) => setAipForm({ ...aipForm, activity: e.target.value })}
-                    placeholder="Enter the AIP activity title / description..."
-                    required
-                  />
-                </div>
-
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))', gap: '0.75rem', marginBottom: '0.95rem' }}>
-                  <div>
-                    <label className="form-label" style={{ fontSize: '0.75rem', fontWeight: 700 }}>Q1 Target</label>
-                    <input type="text" className="form-input" value={aipForm.targetQ1} onChange={(e) => setAipForm({ ...aipForm, targetQ1: e.target.value })} />
-                  </div>
-                  <div>
-                    <label className="form-label" style={{ fontSize: '0.75rem', fontWeight: 700 }}>Q2 Target</label>
-                    <input type="text" className="form-input" value={aipForm.targetQ2} onChange={(e) => setAipForm({ ...aipForm, targetQ2: e.target.value })} />
-                  </div>
-                  <div>
-                    <label className="form-label" style={{ fontSize: '0.75rem', fontWeight: 700 }}>Q3 Target</label>
-                    <input type="text" className="form-input" value={aipForm.targetQ3} onChange={(e) => setAipForm({ ...aipForm, targetQ3: e.target.value })} />
-                  </div>
-                  <div>
-                    <label className="form-label" style={{ fontSize: '0.75rem', fontWeight: 700 }}>Q4 Target</label>
-                    <input type="text" className="form-input" value={aipForm.targetQ4} onChange={(e) => setAipForm({ ...aipForm, targetQ4: e.target.value })} />
-                  </div>
-                  <div>
-                    <label className="form-label" style={{ fontSize: '0.75rem', fontWeight: 700 }}>Responsible Officer</label>
-                    <input type="text" className="form-input" value={aipForm.responsibleOfficer} onChange={(e) => setAipForm({ ...aipForm, responsibleOfficer: e.target.value })} placeholder="Officer name / role" />
-                  </div>
-                </div>
-
-                <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
-                  <button type="submit" disabled={aipSubmitting} className="btn btn-primary" style={{ fontWeight: 700 }}>
-                    {aipSubmitting ? 'Saving...' : '➕ Add Activity to AIP'}
+                    📤 Submit to Planning
                   </button>
                 </div>
-              </form>
+              </div>
             </div>
 
-            {/* Current AIP Activities Table */}
-            <div className="card" style={{ padding: '1.25rem' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.75rem' }}>
-                <h4 style={{ margin: 0, fontSize: '0.96rem', fontWeight: 800 }}>
-                  Branch AIP Activities ({aipTabActivities.length})
-                </h4>
-              </div>
-              {aipLoading ? (
-                <div style={{ padding: '1.5rem', textAlign: 'center', color: '#64748B' }}>Loading AIP activities...</div>
-              ) : aipTabActivities.length === 0 ? (
-                <div style={{ padding: '1.5rem', textAlign: 'center', color: '#64748B', background: '#F8FAFC', borderRadius: '8px' }}>
-                  No AIP activities recorded yet for {currentBranchName} ({selectedYear}). Use the form above to add your first activity.
-                </div>
-              ) : (
-                <div style={{ overflowX: 'auto' }}>
-                  <table className="table" style={{ width: '100%', fontSize: '0.82rem' }}>
-                    <thead>
-                      <tr>
-                        <th>Output</th>
-                        <th>Code</th>
-                        <th>Main Activity</th>
-                        <th>Vote No</th>
-                        <th>Est. Cost (Rs. Mn)</th>
-                        <th>Q4 Target</th>
-                        <th>Responsible Officer</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {aipTabActivities.map((act: any) => (
-                        <tr key={act.id}>
-                          <td>{act.outputNo || '-'}</td>
-                          <td><strong>{act.activityCode || '-'}</strong></td>
-                          <td>{act.activity}</td>
-                          <td>{act.voteNumber || '-'}</td>
-                          <td>{formatMillion(Number(act.estimatedCost) || 0)}</td>
-                          <td>{act.targetQ4 || '-'}</td>
-                          <td>{act.responsibleOfficer || '-'}</td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              )}
-            </div>
+            {/* Official AIP Matrix Table */}
+            <AipMatrixView
+              activities={aipTabActivities}
+              plan={aipPlan}
+              year={selectedYear}
+              branchId={branchWorkspaceDivId}
+              branchName={currentBranchName}
+              branchCode={getBranchAbbreviation(currentBranchName)}
+              aipTemplate={aipTemplate}
+              loading={aipLoading}
+              onAddActivityClick={() => {
+                setEditingAipActivity(null);
+                setIsAipActivityModalOpen(true);
+              }}
+              onEditActivity={handleEditAipActivity}
+              onDeleteActivity={handleDeleteAipActivity}
+              onPlanUpdated={fetchBranchAip}
+            />
+
+            {/* Add / Edit Activity Modal */}
+            <AipActivityModal
+              isOpen={isAipActivityModalOpen}
+              onClose={() => {
+                setIsAipActivityModalOpen(false);
+                setEditingAipActivity(null);
+              }}
+              onSaved={() => {
+                showToast('success', editingAipActivity ? 'AIP activity updated!' : 'AIP activity added!');
+                fetchBranchAip();
+              }}
+              branchId={branchWorkspaceDivId}
+              branchName={currentBranchName}
+              year={selectedYear}
+              activityCount={aipTabActivities.length}
+              editingActivity={editingAipActivity}
+              aipTemplate={aipTemplate}
+            />
           </div>
         )}
 
@@ -3063,22 +2988,22 @@ export default function BudgetPlanningWorkspacePage() {
                                 p.status === 'Accepted'
                                   ? '#E6FFFA'
                                   : p.status === 'Adjusted'
-                                  ? '#EBF8FF'
-                                  : p.status === 'Rejected'
-                                  ? '#FFF5F5'
-                                  : p.status === 'Submitted'
-                                  ? '#FEFCBF'
-                                  : '#EDF2F7',
+                                    ? '#EBF8FF'
+                                    : p.status === 'Rejected'
+                                      ? '#FFF5F5'
+                                      : p.status === 'Submitted'
+                                        ? '#FEFCBF'
+                                        : '#EDF2F7',
                               color:
                                 p.status === 'Accepted'
                                   ? '#00534E'
                                   : p.status === 'Adjusted'
-                                  ? '#2B6CB0'
-                                  : p.status === 'Rejected'
-                                  ? '#C53030'
-                                  : p.status === 'Submitted'
-                                  ? '#B7791F'
-                                  : '#4A5568',
+                                    ? '#2B6CB0'
+                                    : p.status === 'Rejected'
+                                      ? '#C53030'
+                                      : p.status === 'Submitted'
+                                        ? '#B7791F'
+                                        : '#4A5568',
                             }}
                           >
                             {p.status}
