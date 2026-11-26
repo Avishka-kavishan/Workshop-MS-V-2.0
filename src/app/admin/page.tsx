@@ -598,14 +598,27 @@ export default function SuperAdminConsolePage() {
 
   useEffect(() => {
     loadData();
-    if (typeof window !== 'undefined') {
+    const syncTabFromUrl = () => {
+      if (typeof window === 'undefined') return;
       const tabParam = new URLSearchParams(window.location.search).get('tab');
-      if (tabParam === 'aip-templates') {
-        setActiveTab('aip-templates');
-      } else if (tabParam === 'settings') {
-        setActiveTab('settings');
+      if (
+        tabParam &&
+        ['access-control', 'branches', 'years', 'deadlines', 'announcements', 'aip-templates', 'settings'].includes(tabParam)
+      ) {
+        setActiveTab(tabParam as any);
       }
-    }
+    };
+    syncTabFromUrl();
+    const onTabChange = (e: Event) => {
+      const detail = (e as CustomEvent<string>).detail;
+      if (detail) setActiveTab(detail as any);
+    };
+    window.addEventListener('admin:tab-change', onTabChange);
+    window.addEventListener('popstate', syncTabFromUrl);
+    return () => {
+      window.removeEventListener('admin:tab-change', onTabChange);
+      window.removeEventListener('popstate', syncTabFromUrl);
+    };
   }, []);
 
   const triggerFeedback = (msg: string, isError = false) => {
@@ -1145,7 +1158,8 @@ export default function SuperAdminConsolePage() {
           </div>
         </div>
 
-        {/* Tab Navigation Navigation */}
+        {/* Tab Navigation (hidden for Super Admin since sections are in the hamburger menu) */}
+        {adminLevel !== 0 && (
         <div style={{
           display: 'flex', gap: '0.5rem', borderBottom: '2px solid var(--border-light)', marginBottom: '1.5rem',
           flexWrap: 'wrap',
@@ -1233,6 +1247,7 @@ export default function SuperAdminConsolePage() {
             </Link>
           )}
         </div>
+        )}
 
         {/* ══════════════════════════════════════════════════════════════ */}
         {/* TAB 0: CENTRALIZED ROLE & ACCESS CONTROL (AUTH-01 – AUTH-12)  */}

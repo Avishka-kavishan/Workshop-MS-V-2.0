@@ -288,10 +288,16 @@ export default function AppShell({ children }: AppShellProps) {
           : []),
       ];
 
-  // Secondary Operational Navigation Items (Super Admin sees only Admin Console & System Audit Logs)
+  // Secondary Operational Navigation Items (Super Admin sees each Admin Console section separately + System Audit Logs)
   const operationalNavItems = isSuperAdmin
     ? [
-        { href: '/admin', label: 'Admin Console', icon: AdminConsoleIcon, adminOnly: true },
+        { href: '/admin?tab=access-control', label: 'Role & Access Control', icon: AdminConsoleIcon, adminOnly: true },
+        { href: '/admin?tab=branches', label: 'Branches & Hierarchy', icon: HierarchyIcon, adminOnly: true },
+        { href: '/admin?tab=years', label: 'Financial Years', icon: AnnualPlanIcon, adminOnly: true },
+        { href: '/admin?tab=deadlines', label: 'Deadlines & Cutoffs', icon: MonitoringIcon, adminOnly: true },
+        { href: '/admin?tab=announcements', label: 'Circulars & Announcements', icon: ReportsIcon, adminOnly: true },
+        { href: '/admin?tab=aip-templates', label: 'AIP & Budget Projection Columns', icon: BudgetPlanningIcon, adminOnly: true },
+        { href: '/admin?tab=settings', label: 'Dashboard & System Settings', icon: AdminConsoleIcon, adminOnly: true },
         { href: '/admin/audit-logs', label: 'System Audit Logs', icon: AuditVaultIcon, superAdminOnly: true, badge: 'Super' },
       ]
     : [
@@ -307,6 +313,12 @@ export default function AppShell({ children }: AppShellProps) {
   const isActive = (href: string, exact = false) => {
     if (exact) return pathname === href;
     if (href === '/admin/audit-logs') return pathname.startsWith('/admin/audit-logs') || pathname.startsWith('/audit-logs');
+    if (href.startsWith('/admin?tab=')) {
+      if (pathname !== '/admin' || typeof window === 'undefined') return false;
+      const targetTab = href.split('tab=')[1];
+      const currentTab = new URLSearchParams(window.location.search).get('tab') || 'access-control';
+      return currentTab === targetTab;
+    }
     if (href === '/workshops') return pathname.startsWith('/workshops') && pathname !== '/workshops/new';
     if (href === '/vote-management') return pathname.startsWith('/vote-management');
     if (href === '/annual-plan') return pathname.startsWith('/annual-plan');
@@ -798,7 +810,13 @@ export default function AppShell({ children }: AppShellProps) {
                         <Link
                           key={item.href}
                           href={item.href}
-                          onClick={() => setShowNavMenu(false)}
+                          onClick={() => {
+                            setShowNavMenu(false);
+                            if (item.href.startsWith('/admin?tab=') && typeof window !== 'undefined') {
+                              const tab = item.href.split('tab=')[1];
+                              window.dispatchEvent(new CustomEvent('admin:tab-change', { detail: tab }));
+                            }
+                          }}
                           style={{
                             display: 'flex',
                             alignItems: 'center',
@@ -868,7 +886,13 @@ export default function AppShell({ children }: AppShellProps) {
                         <Link
                           key={item.href}
                           href={item.href}
-                          onClick={() => setShowNavMenu(false)}
+                          onClick={() => {
+                            setShowNavMenu(false);
+                            if (item.href.startsWith('/admin?tab=') && typeof window !== 'undefined') {
+                              const tab = item.href.split('tab=')[1];
+                              window.dispatchEvent(new CustomEvent('admin:tab-change', { detail: tab }));
+                            }
+                          }}
                           style={{
                             display: 'flex',
                             alignItems: 'center',

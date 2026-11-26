@@ -9629,7 +9629,7 @@
       "roleId": "role-superadmin",
       "isActive": true,
       "createdAt": "2026-10-01T08:00:00.000Z",
-      "lastLogin": "2026-11-26T06:41:48.502Z",
+      "lastLogin": "2026-11-26T07:07:14.886Z",
       "aliases": [
         "superadmin"
       ],
@@ -11706,6 +11706,28 @@
   "calendarSubscribers": [],
   "auditLogs": [
     {
+      "id": "audit-1795676834895-f13903b9",
+      "timestamp": "2026-11-26T07:07:14.895Z",
+      "userId": "user-superadmin",
+      "username": "superadmin",
+      "userFullName": "Ministry Chief Super Administrator",
+      "organizationId": "org-moe",
+      "organizationName": "Ministry of Education National Headquarters",
+      "category": "Security",
+      "action": "AUTH_LOGIN_SUCCESS",
+      "entityType": "AUTH",
+      "entityId": "user-superadmin",
+      "summary": "User \"Ministry Chief Super Administrator\" (superadmin) authenticated into IPMIS with unified account. Active role: \"Ministry Chief Super Administrator\".",
+      "details": {
+        "role": "Ministry Chief Super Administrator",
+        "organization": "Ministry of Education National Headquarters",
+        "loginTime": "2026-11-26T07:07:14.894Z",
+        "assignedRoleCount": 1,
+        "rememberLastRole": false
+      },
+      "severity": "Info"
+    },
+    {
       "id": "audit-1795675308507-64008223",
       "timestamp": "2026-11-26T06:41:48.507Z",
       "userId": "user-superadmin",
@@ -12612,19 +12634,19 @@
       "id": "tmpl-moe-standard",
       "name": "National Standard MoE AIP Template",
       "code": "MOE-NAT-STD",
-      "description": "Official Ministry of Education Annual Implementation Plan format (Circular MOE/PL/AIP/2027). Prescribes standard Outcome No, Activity Code, Main Activity description, Vote Number, Allocation, Remarks, Indicators, Targets, and Responsibility.",
+      "description": "Official Ministry of Education Annual Implementation Plan & Budget Projection format. Prescribes Outcome/Output No., Programme, Key Activities, Sub Activities, Vote Number, Source of Finance, Allocation/Estimated Cost, Time Frame (J–D), KPI, Indicate R/C/P, and Responsibility.",
       "financialYear": "all",
       "isDefault": true,
       "status": "Active",
       "createdAt": "2026-01-01T08:00:00.000Z",
-      "updatedAt": "2026-11-19T09:15:04.697Z",
+      "updatedAt": "2026-11-26T08:00:00.000Z",
       "createdBy": "user-superadmin",
       "columns": [
         {
           "id": "col-output-no",
           "key": "outputNo",
-          "label": "Outcome / Output No",
-          "description": "Strategic Outcome or Output numbering reference (e.g. 1.1, 2.3)",
+          "label": "Outcome / Output No.",
+          "description": "Strategic Outcome or Output numbering reference (e.g. 1, 1.1)",
           "dataType": "text",
           "width": "70px",
           "textAlign": "center",
@@ -12634,13 +12656,13 @@
           "isSystemCore": true
         },
         {
-          "id": "col-activity-code",
-          "key": "activityCode",
-          "label": "Activity No",
-          "description": "Sequential activity code identifier (e.g. 1.1.1, ACT-01)",
+          "id": "col-programme",
+          "key": "programme",
+          "label": "Programme",
+          "description": "Ministry or branch programme classification",
           "dataType": "text",
-          "width": "65px",
-          "textAlign": "center",
+          "width": "105px",
+          "textAlign": "left",
           "required": true,
           "visible": true,
           "order": 2,
@@ -12649,14 +12671,27 @@
         {
           "id": "col-main-activity",
           "key": "activity",
-          "label": "Main Activities",
-          "description": "Full narrative title and operational description of the implementation activity",
+          "label": "Key Activities",
+          "description": "Full narrative title and operational description of the key activity",
           "dataType": "textarea",
-          "width": "280px",
+          "width": "220px",
           "textAlign": "left",
           "required": true,
           "visible": true,
           "order": 3,
+          "isSystemCore": true
+        },
+        {
+          "id": "col-sub-activities",
+          "key": "subActivities",
+          "label": "Sub Activities",
+          "description": "Detailed breakdown of sub-activities under the key activity",
+          "dataType": "textarea",
+          "width": "180px",
+          "textAlign": "left",
+          "required": true,
+          "visible": true,
+          "order": 4,
           "isSystemCore": true
         },
         {
@@ -12675,11 +12710,24 @@
             "126-02-03-2502",
             "126-01-01-1101"
           ],
-          "width": "120px",
+          "width": "115px",
           "textAlign": "center",
           "required": true,
           "visible": true,
-          "order": 4,
+          "order": 5,
+          "isSystemCore": true
+        },
+        {
+          "id": "col-source-of-finance",
+          "key": "sourceOfFinance",
+          "label": "Source of Finance",
+          "description": "Funding source (e.g. GOSL / Treasury, ADB-ESDP, World Bank)",
+          "dataType": "text",
+          "width": "110px",
+          "textAlign": "center",
+          "required": true,
+          "visible": true,
+          "order": 6,
           "isSystemCore": true
         },
         {
@@ -12692,33 +12740,33 @@
           "textAlign": "right",
           "required": true,
           "visible": true,
-          "order": 5,
+          "order": 7,
           "isSystemCore": true
         },
         {
-          "id": "col-remark",
-          "key": "remark",
-          "label": "Remark",
-          "description": "Operational notes, procurement conditions, or executing remarks",
-          "dataType": "text",
-          "width": "85px",
-          "textAlign": "left",
-          "required": false,
-          "visible": true,
-          "order": 6,
-          "isSystemCore": true
-        },
-        {
-          "id": "col-indicator",
-          "key": "indicator",
-          "label": "Indicator",
-          "description": "Performance measurement metric or deliverable indicator",
+          "id": "col-kpi",
+          "key": "kpi",
+          "label": "KPI",
+          "description": "Key Performance Indicator for measuring activity delivery",
           "dataType": "text",
           "width": "120px",
           "textAlign": "left",
-          "required": false,
+          "required": true,
           "visible": true,
-          "order": 7,
+          "order": 8,
+          "isSystemCore": true
+        },
+        {
+          "id": "col-indicate-rcp",
+          "key": "indicateRcp",
+          "label": "Indicate R/C/P",
+          "description": "R – Reforms, C – Construction, P – Procurement (e.g. R1, C1, P1)",
+          "dataType": "text",
+          "width": "90px",
+          "textAlign": "center",
+          "required": true,
+          "visible": true,
+          "order": 9,
           "isSystemCore": true
         },
         {
@@ -12727,11 +12775,11 @@
           "label": "Responsibility",
           "description": "Designated implementing officer or desk officer designation",
           "dataType": "text",
-          "width": "160px",
+          "width": "140px",
           "textAlign": "left",
           "required": true,
           "visible": true,
-          "order": 8,
+          "order": 10,
           "isSystemCore": true
         }
       ]

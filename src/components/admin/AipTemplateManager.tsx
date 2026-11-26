@@ -1152,6 +1152,11 @@ export default function AipTemplateManager() {
                           {col.key === 'estimatedCost' && '12.50'}
                           {col.key === 'remark' && 'MoE directive'}
                           {col.key === 'indicator' && 'Number of workshops'}
+                          {col.key === 'programme' && 'General Education Quality'}
+                          {col.key === 'subActivities' && 'Conduct 5 provincial workshops'}
+                          {col.key === 'sourceOfFinance' && 'GOSL / Treasury'}
+                          {col.key === 'kpi' && '100% completion'}
+                          {col.key === 'indicateRcp' && 'R1'}
                           {col.key === 'responsibility' && 'Director / ICT Branch'}
                           {!col.isSystemCore && (col.dataType === 'dropdown' ? (col.options?.[0] || 'Selection') : `[${col.label}]`)}
                         </td>
