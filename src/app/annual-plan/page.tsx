@@ -3792,12 +3792,52 @@ export default function AnnualPlanPage() {
                   </div>
                 </div>
 
-                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap' }}>
                   {headerSavedSuccess && (
                     <span style={{ fontSize: '0.75rem', color: '#166534', fontWeight: 600 }}>
                       ✅ Saved
                     </span>
                   )}
+                  <button
+                    type="button"
+                    onClick={handleExportCSV}
+                    style={{
+                      background: '#f8fafc',
+                      border: '1px solid #cbd5e1',
+                      color: '#0f172a',
+                      padding: '4px 10px',
+                      borderRadius: '6px',
+                      fontSize: '0.75rem',
+                      fontWeight: 700,
+                      cursor: 'pointer',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '0.3rem',
+                    }}
+                    title="Export full form data to Excel / CSV"
+                  >
+                    <span>📥</span> Export Form (Excel/CSV)
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handleExportLandscapePdf}
+                    style={{
+                      background: '#00534E',
+                      border: 'none',
+                      color: '#ffffff',
+                      padding: '4px 10px',
+                      borderRadius: '6px',
+                      fontSize: '0.75rem',
+                      fontWeight: 700,
+                      cursor: 'pointer',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '0.3rem',
+                    }}
+                    title="Export full official AIP form as Landscape PDF"
+                  >
+                    <span>🖨️</span> Export Form (PDF)
+                  </button>
                   <button
                     type="button"
                     onClick={handleOpenAddModal}
