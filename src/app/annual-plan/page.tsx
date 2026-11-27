@@ -11,6 +11,7 @@ import { downloadAsPdfReport } from '@/lib/dashboardExport';
 import { broadcastDataChange } from '@/lib/broadcastSync';
 import { formatMillion, formatRupees, formatDualDeclaration, roundToCentInMn, parseAmountToMn } from '@/lib/financialFormat';
 import { MOE_STANDARD_VOTE_NUMBERS, getVoteDetails, MoeStandardVote } from '@/lib/sriLankanVotes';
+import { OFFICIAL_MOE_DIVISIONS_DATA } from '@/lib/hierarchyData';
 
 interface AipAmendment {
   id: string;
@@ -295,7 +296,7 @@ export default function AnnualPlanPage() {
   const [formTargetQ1, setFormTargetQ1] = useState('-');
   const [formTargetQ2, setFormTargetQ2] = useState('-');
   const [formTargetQ3, setFormTargetQ3] = useState('-');
-  const [formTargetQ4, setFormTargetQ4] = useState('100%');
+  const [formTargetQ4, setFormTargetQ4] = useState('-');
 
   // Interactive Tile Filter State (filters the AIP Matrix table below)
   const [activeTileFilter, setActiveTileFilter] = useState<'all' | 'completed' | 'in_progress' | 'scheduled' | 'high_budget'>('all');
@@ -450,6 +451,126 @@ export default function AnnualPlanPage() {
     const q = branchSearch.toLowerCase();
     return moeBranches.filter((b) => b.name.toLowerCase().includes(q) || (b.code && b.code.toLowerCase().includes(q)));
   }, [moeBranches, branchSearch]);
+
+  const groupedMoeHierarchy = useMemo(() => {
+    const WING_HEAD_LABELS: Record<string, { headTitle: string; shortTitle: string }> = {
+      'org-moe-div-it': { headTitle: 'Add. Sec. IT & Digital Education', shortTitle: 'IT & Digital Edu.' },
+      'org-moe-div-reforms': { headTitle: 'Add. Sec. Education Reforms (SLEAS)', shortTitle: 'Education Reforms' },
+      'org-moe-div-primary': { headTitle: 'Add. Sec. Co-cur. & Primary Edu. Dev. (SLEAS)', shortTitle: 'Co-cur. & Primary' },
+      'org-moe-div-planning': { headTitle: 'Add. Sec. Policy Planning Perform. Review (SLEAS)', shortTitle: 'Policy Planning' },
+      'org-moe-div-eqd': { headTitle: 'Add. Sec. Education Quality Development (SLEAS)', shortTitle: 'Quality Dev. (EQD)' },
+      'org-moe-div-schools': { headTitle: 'Add. Sec. School Affairs (SLEAS)', shortTitle: 'School Affairs' },
+      'org-moe-div-teach-est': { headTitle: 'Add. Sec. Teacher Establishment (SLAS)', shortTitle: 'Teacher Estab.' },
+      'org-moe-div-ed-serv': { headTitle: 'Add. Sec. Education Service Establishment (SLEAS)', shortTitle: 'Edu. Service Estab.' },
+      'org-moe-div-admin': { headTitle: 'Add. Sec. Administration (SLAS)', shortTitle: 'Administration' },
+      'org-moe-div-comb-serv': { headTitle: 'Add. Sec. Non-aca. & Combined Service (SLAS)', shortTitle: 'Non-Aca. & Comb.' },
+      'org-moe-div-proc': { headTitle: 'Add. Sec. Procurement (SLAS)', shortTitle: 'Procurement' },
+      'org-moe-div-eng': { headTitle: 'Add. Sec. Engineering (SLEngS)', shortTitle: 'Engineering' },
+      'org-moe-div-disc': { headTitle: 'Add. Sec. Disciplinary & Investigation (SLAS)', shortTitle: 'Disciplinary & Inv.' },
+      'org-moe-div-pir-adm': { headTitle: 'Add. Sec. Piriven Admin. (SLAS)', shortTitle: 'Piriven Admin.' },
+      'org-moe-div-pir-dev': { headTitle: 'Add. Sec. Piriven Dev. (SLEAS)', shortTitle: 'Piriven Dev.' },
+      'org-moe-div-gen-plan': { headTitle: 'Director General Planning (SLPS)', shortTitle: 'DG Planning' },
+      'org-moe-div-fin-1': { headTitle: 'Chief Finance Officer 1 (SLACS)', shortTitle: 'CFO 1 (Finance)' },
+      'org-moe-div-fin-2': { headTitle: 'Chief Finance Officer 2 (SLACS)', shortTitle: 'CFO 2 (Assets)' },
+      'org-moe-div-tea-adm': { headTitle: 'Chief Commissioner (Teacher Edu.)', shortTitle: 'Teacher Edu.' },
+      'org-moe-div-audit': { headTitle: 'Chief Inter. Auditor', shortTitle: 'Internal Audit' },
+    };
+
+    const branchById = new Map<string, MoeBranch>();
+    for (const b of filteredMoeBranches) {
+      branchById.set(b.id, b);
+    }
+    const divisionIdSet = new Set(OFFICIAL_MOE_DIVISIONS_DATA.map((d) => d.id));
+    const assignedIds = new Set<string>();
+    const q = branchSearch.trim().toLowerCase();
+
+    const groups: Array<{
+      id: string;
+      headTitle: string;
+      divisionName: string;
+      branches: MoeBranch[];
+    }> = [];
+
+    for (const div of OFFICIAL_MOE_DIVISIONS_DATA) {
+      const meta = WING_HEAD_LABELS[div.id] || { headTitle: div.division, shortTitle: div.division };
+      const matched: MoeBranch[] = [];
+
+      // Include division-level sheet itself if present in scoped branches and matching search
+      const divAsBranch = branchById.get(div.id);
+      if (divAsBranch) {
+        assignedIds.add(div.id);
+      }
+
+      for (const child of div.branches) {
+        const found = branchById.get(child.id);
+        if (found) {
+          matched.push(found);
+          assignedIds.add(child.id);
+        }
+      }
+
+      // If search matches the division head title itself, show all its moeBranches
+      const headMatches = q && (meta.headTitle.toLowerCase().includes(q) || div.division.toLowerCase().includes(q));
+      if (headMatches && matched.length === 0) {
+        for (const child of div.branches) {
+          const raw = moeBranches.find((b) => b.id === child.id);
+          if (raw) {
+            matched.push(raw);
+            assignedIds.add(child.id);
+          }
+        }
+      }
+
+      if (matched.length > 0) {
+        groups.push({
+          id: div.id,
+          headTitle: meta.headTitle,
+          divisionName: div.division,
+          branches: matched,
+        });
+      }
+    }
+
+    const doeBranches: MoeBranch[] = [];
+    const otherBranches: MoeBranch[] = [];
+    for (const b of filteredMoeBranches) {
+      if (assignedIds.has(b.id) || divisionIdSet.has(b.id)) continue;
+      if (b.id.startsWith('org-doe')) {
+        doeBranches.push(b);
+      } else {
+        otherBranches.push(b);
+      }
+    }
+
+    if (otherBranches.length > 0) {
+      groups.push({
+        id: 'org-moe-other',
+        headTitle: 'Ministry HQ & General Branches',
+        divisionName: 'Other Ministry Branches',
+        branches: otherBranches,
+      });
+    }
+    if (doeBranches.length > 0) {
+      groups.push({
+        id: 'org-doe-group',
+        headTitle: 'Department of Examinations (DOE)',
+        divisionName: 'Commissioner General of Examinations',
+        branches: doeBranches,
+      });
+    }
+
+    return groups;
+  }, [filteredMoeBranches, moeBranches, branchSearch]);
+
+  const activeWingGroup = useMemo(() => {
+    const activeId = selectedBranchId || branchInfo?.id || '';
+    if (!activeId || activeId === 'all') return null;
+    return (
+      groupedMoeHierarchy.find(
+        (w) => w.id === activeId || w.branches.some((b) => b.id === activeId)
+      ) || null
+    );
+  }, [groupedMoeHierarchy, selectedBranchId, branchInfo?.id]);
 
   // Filtered activities based on tile click and origin filter
   const displayedActivities = useMemo(() => {
@@ -741,11 +862,11 @@ export default function AnnualPlanPage() {
       });
     });
 
-    // 3. Quarterly Cumulative Financial Totals
+    // 3. Quarterly Financial Totals (Per Quarter: J-M, A-J, J-S, O-D)
     const q1Fin = roundToCentInMn(monthlyFinancial[0] + monthlyFinancial[1] + monthlyFinancial[2]);
-    const q2Fin = roundToCentInMn(q1Fin + monthlyFinancial[3] + monthlyFinancial[4] + monthlyFinancial[5]);
-    const q3Fin = roundToCentInMn(q2Fin + monthlyFinancial[6] + monthlyFinancial[7] + monthlyFinancial[8]);
-    const q4Fin = roundToCentInMn(q3Fin + monthlyFinancial[9] + monthlyFinancial[10] + monthlyFinancial[11]);
+    const q2Fin = roundToCentInMn(monthlyFinancial[3] + monthlyFinancial[4] + monthlyFinancial[5]);
+    const q3Fin = roundToCentInMn(monthlyFinancial[6] + monthlyFinancial[7] + monthlyFinancial[8]);
+    const q4Fin = roundToCentInMn(monthlyFinancial[9] + monthlyFinancial[10] + monthlyFinancial[11]);
     const quarterlyFinancial = [q1Fin, q2Fin, q3Fin, q4Fin];
 
     // 4. Monthly Physical Progress Totals
@@ -763,11 +884,11 @@ export default function AnnualPlanPage() {
 
     const monthlyPhysical = monthlyPhysicalSums.map((sum) => Math.round((sum / n) * 10) / 10);
 
-    // 5. Quarterly Cumulative Physical Targets
+    // 5. Quarterly Physical Targets (Per Quarter: J-M, A-J, J-S, O-D)
     const q1Phys = Math.round((monthlyPhysical[0] + monthlyPhysical[1] + monthlyPhysical[2]) * 10) / 10;
-    const q2Phys = Math.round((q1Phys + monthlyPhysical[3] + monthlyPhysical[4] + monthlyPhysical[5]) * 10) / 10;
-    const q3Phys = Math.round((q2Phys + monthlyPhysical[6] + monthlyPhysical[7] + monthlyPhysical[8]) * 10) / 10;
-    const q4Phys = activities.length > 0 ? 100 : 0;
+    const q2Phys = Math.round((monthlyPhysical[3] + monthlyPhysical[4] + monthlyPhysical[5]) * 10) / 10;
+    const q3Phys = Math.round((monthlyPhysical[6] + monthlyPhysical[7] + monthlyPhysical[8]) * 10) / 10;
+    const q4Phys = Math.round((monthlyPhysical[9] + monthlyPhysical[10] + monthlyPhysical[11]) * 10) / 10;
     const quarterlyPhysical = [q1Phys, q2Phys, q3Phys, q4Phys];
 
     // 6. Progress Totals
@@ -1089,7 +1210,7 @@ export default function AnnualPlanPage() {
     setFormTargetQ1('-');
     setFormTargetQ2('-');
     setFormTargetQ3('-');
-    setFormTargetQ4('100%');
+    setFormTargetQ4('-');
     setFormPhysicalProgress('');
     setFormPhysicalProgressPct('');
     setFormFinancialProgress('');
@@ -1130,15 +1251,48 @@ export default function AnnualPlanPage() {
       : Array(12).fill('-');
     setFormPhysicalMonths(phys);
 
-    setFormFinancialQ1(act.financialQ1 || 0);
-    setFormFinancialQ2(act.financialQ2 || 0);
-    setFormFinancialQ3(act.financialQ3 || 0);
-    setFormFinancialQ4(act.financialQ4 || 0);
+    const hasMonthlyFin = fin.some((v) => Number(v) > 0);
+    setFormFinancialQ1(hasMonthlyFin ? roundToCentInMn((Number(fin[0]) || 0) + (Number(fin[1]) || 0) + (Number(fin[2]) || 0)) : (act.financialQ1 || 0));
+    setFormFinancialQ2(hasMonthlyFin ? roundToCentInMn((Number(fin[3]) || 0) + (Number(fin[4]) || 0) + (Number(fin[5]) || 0)) : (act.financialQ2 || 0));
+    setFormFinancialQ3(hasMonthlyFin ? roundToCentInMn((Number(fin[6]) || 0) + (Number(fin[7]) || 0) + (Number(fin[8]) || 0)) : (act.financialQ3 || 0));
+    setFormFinancialQ4(hasMonthlyFin ? roundToCentInMn((Number(fin[9]) || 0) + (Number(fin[10]) || 0) + (Number(fin[11]) || 0)) : (act.financialQ4 || 0));
 
-    setFormTargetQ1(act.targetQ1 || '-');
-    setFormTargetQ2(act.targetQ2 || '-');
-    setFormTargetQ3(act.targetQ3 || '-');
-    setFormTargetQ4(act.targetQ4 || '100%');
+    const parseP = (v: string) => {
+      const n = parseFloat(String(v || '').replace('%', '').trim());
+      return isNaN(n) ? 0 : n;
+    };
+    const fmtQ = (n: number) => (n > 0 ? `${Math.round(n * 100) / 100}%` : '-');
+    const hasMonthlyPhys = phys.some((v) => parseP(v) > 0);
+    if (hasMonthlyPhys) {
+      setFormTargetQ1(fmtQ(parseP(phys[0]) + parseP(phys[1]) + parseP(phys[2])));
+      setFormTargetQ2(fmtQ(parseP(phys[3]) + parseP(phys[4]) + parseP(phys[5])));
+      setFormTargetQ3(fmtQ(parseP(phys[6]) + parseP(phys[7]) + parseP(phys[8])));
+      setFormTargetQ4(fmtQ(parseP(phys[9]) + parseP(phys[10]) + parseP(phys[11])));
+    } else {
+      const fq1 = hasMonthlyFin ? roundToCentInMn((Number(fin[0]) || 0) + (Number(fin[1]) || 0) + (Number(fin[2]) || 0)) : (act.financialQ1 || 0);
+      const fq2 = hasMonthlyFin ? roundToCentInMn((Number(fin[3]) || 0) + (Number(fin[4]) || 0) + (Number(fin[5]) || 0)) : (act.financialQ2 || 0);
+      const fq3 = hasMonthlyFin ? roundToCentInMn((Number(fin[6]) || 0) + (Number(fin[7]) || 0) + (Number(fin[8]) || 0)) : (act.financialQ3 || 0);
+      const fq4 = hasMonthlyFin ? roundToCentInMn((Number(fin[9]) || 0) + (Number(fin[10]) || 0) + (Number(fin[11]) || 0)) : (act.financialQ4 || 0);
+      const totalFin = fq1 + fq2 + fq3 + fq4;
+      const hasSavedTarget =
+        (act.targetQ1 && act.targetQ1 !== '-') ||
+        (act.targetQ2 && act.targetQ2 !== '-') ||
+        (act.targetQ3 && act.targetQ3 !== '-') ||
+        (act.targetQ4 && act.targetQ4 !== '-' && act.targetQ4 !== '100%');
+
+      if (!hasSavedTarget && totalFin > 0) {
+        const fmtPct = (v: number) => (v > 0 ? `${Math.round((v / totalFin) * 1000) / 10}%` : '-');
+        setFormTargetQ1(fmtPct(fq1));
+        setFormTargetQ2(fmtPct(fq2));
+        setFormTargetQ3(fmtPct(fq3));
+        setFormTargetQ4(fmtPct(fq4));
+      } else {
+        setFormTargetQ1(act.targetQ1 || '-');
+        setFormTargetQ2(act.targetQ2 || '-');
+        setFormTargetQ3(act.targetQ3 || '-');
+        setFormTargetQ4(act.targetQ4 && act.targetQ4 !== '100%' ? act.targetQ4 : '-');
+      }
+    }
     setFormPhysicalProgress(act.physicalProgress || '');
     setFormPhysicalProgressPct(act.physicalProgressPct || '');
     setFormFinancialProgress(act.financialProgress !== undefined && act.financialProgress !== null ? String(act.financialProgress) : '');
@@ -1150,20 +1304,42 @@ export default function AnnualPlanPage() {
   };
 
   // Live calculation of quarters in the form when user updates monthly numbers
+  const syncPhysicalQuartersFromFinancial = (q1: number, q2: number, q3: number, q4: number) => {
+    const hasManualPhys = formPhysicalMonths.some((v) => {
+      const n = parseFloat(String(v || '').replace('%', '').trim());
+      return !isNaN(n) && n > 0;
+    });
+    if (hasManualPhys) return;
+    const total = q1 + q2 + q3 + q4;
+    if (total <= 0) {
+      setFormTargetQ1('-');
+      setFormTargetQ2('-');
+      setFormTargetQ3('-');
+      setFormTargetQ4('-');
+      return;
+    }
+    const fmtPct = (v: number) => (v > 0 ? `${Math.round((v / total) * 1000) / 10}%` : '-');
+    setFormTargetQ1(fmtPct(q1));
+    setFormTargetQ2(fmtPct(q2));
+    setFormTargetQ3(fmtPct(q3));
+    setFormTargetQ4(fmtPct(q4));
+  };
+
   const handleFinancialMonthChange = (monthIdx: number, valStr: string) => {
     const num = parseFloat(valStr) || 0;
     const updated = [...formFinancialMonths];
     updated[monthIdx] = num;
     setFormFinancialMonths(updated);
 
-    const q1 = updated[0] + updated[1] + updated[2];
-    const q2 = q1 + updated[3] + updated[4] + updated[5];
-    const q3 = q2 + updated[6] + updated[7] + updated[8];
-    const q4 = q3 + updated[9] + updated[10] + updated[11];
-    setFormFinancialQ1(roundToCentInMn(q1));
-    setFormFinancialQ2(roundToCentInMn(q2));
-    setFormFinancialQ3(roundToCentInMn(q3));
-    setFormFinancialQ4(roundToCentInMn(q4));
+    const q1 = roundToCentInMn(updated[0] + updated[1] + updated[2]);
+    const q2 = roundToCentInMn(updated[3] + updated[4] + updated[5]);
+    const q3 = roundToCentInMn(updated[6] + updated[7] + updated[8]);
+    const q4 = roundToCentInMn(updated[9] + updated[10] + updated[11]);
+    setFormFinancialQ1(q1);
+    setFormFinancialQ2(q2);
+    setFormFinancialQ3(q3);
+    setFormFinancialQ4(q4);
+    syncPhysicalQuartersFromFinancial(q1, q2, q3, q4);
   };
 
   const handlePhysicalMonthChange = (monthIdx: number, valStr: string) => {
@@ -1177,14 +1353,15 @@ export default function AnnualPlanPage() {
     };
 
     const q1 = parseP(updated[0]) + parseP(updated[1]) + parseP(updated[2]);
-    const q2 = q1 + parseP(updated[3]) + parseP(updated[4]) + parseP(updated[5]);
-    const q3 = q2 + parseP(updated[6]) + parseP(updated[7]) + parseP(updated[8]);
-    const q4 = q3 + parseP(updated[9]) + parseP(updated[10]) + parseP(updated[11]);
+    const q2 = parseP(updated[3]) + parseP(updated[4]) + parseP(updated[5]);
+    const q3 = parseP(updated[6]) + parseP(updated[7]) + parseP(updated[8]);
+    const q4 = parseP(updated[9]) + parseP(updated[10]) + parseP(updated[11]);
+    const fmtQ = (n: number) => (n > 0 ? `${Math.round(n * 100) / 100}%` : '-');
 
-    if (q1 > 0) setFormTargetQ1(`${q1}%`);
-    if (q2 > 0) setFormTargetQ2(`${q2}%`);
-    if (q3 > 0) setFormTargetQ3(`${q3}%`);
-    if (q4 > 0) setFormTargetQ4(`${q4}%`);
+    setFormTargetQ1(fmtQ(q1));
+    setFormTargetQ2(fmtQ(q2));
+    setFormTargetQ3(fmtQ(q3));
+    setFormTargetQ4(fmtQ(q4));
   };
 
   // Submit Activity Form (Add or Edit)
@@ -2776,10 +2953,10 @@ export default function AnnualPlanPage() {
                 </span>
               </div>
 
-              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap' }}>
                 <input
                   type="text"
-                  placeholder="🔍 Filter branch..."
+                  placeholder="🔍 Filter branch or wing..."
                   value={branchSearch}
                   onChange={(e) => setBranchSearch(e.target.value)}
                   style={{
@@ -2787,7 +2964,7 @@ export default function AnnualPlanPage() {
                     fontSize: '0.75rem',
                     border: '1px solid #cbd5e1',
                     borderRadius: '6px',
-                    width: '150px',
+                    width: '170px',
                     outline: 'none',
                     background: '#ffffff',
                   }}
@@ -2809,6 +2986,147 @@ export default function AnnualPlanPage() {
                   {showBranchTabs ? '▲ Hide Tabs' : '▼ Show Tabs'}
                 </button>
               </div>
+            </div>
+
+            {/* Select Branches by Additional Secretary (User-Friendly Cascading Selector) */}
+            <div style={{
+              background: '#f8fafc',
+              padding: '0.75rem 1rem',
+              borderBottom: '1px solid #e2e8f0',
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '0.6rem',
+            }}>
+              <div style={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
+                gap: '0.85rem',
+                alignItems: 'end',
+              }}>
+                {/* Step 1: Additional Secretary / Wing */}
+                <div style={{ minWidth: 0, display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
+                  <label style={{ fontSize: '0.7rem', fontWeight: 700, color: '#475569', textTransform: 'uppercase', letterSpacing: '0.03em' }}>
+                    1. Additional Secretary / Wing
+                  </label>
+                  <select
+                    value={activeWingGroup ? activeWingGroup.id : 'all'}
+                    onChange={(e) => handleBranchChange(e.target.value)}
+                    style={{
+                      width: '100%',
+                      minWidth: 0,
+                      boxSizing: 'border-box',
+                      padding: '0.45rem 0.7rem',
+                      fontSize: '0.8rem',
+                      fontWeight: 600,
+                      color: '#0f172a',
+                      background: '#ffffff',
+                      border: '1.5px solid #cbd5e1',
+                      borderRadius: '8px',
+                      outline: 'none',
+                      cursor: 'pointer',
+                      textOverflow: 'ellipsis',
+                    }}
+                  >
+                    <option value="all">🏛️ Secretary of Education — All Branches ({moeBranches.length} Units)</option>
+                    {groupedMoeHierarchy.map((w) => (
+                      <option key={w.id} value={w.id}>
+                        {w.headTitle} ({w.branches.length} {w.branches.length === 1 ? 'Unit' : 'Units'})
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                {/* Step 2: Branch / Unit under selected Wing */}
+                {activeWingGroup ? (
+                  <div style={{ minWidth: 0, display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
+                    <label style={{ fontSize: '0.7rem', fontWeight: 700, color: '#475569', textTransform: 'uppercase', letterSpacing: '0.03em' }}>
+                      2. Branch / Unit under {activeWingGroup.headTitle}
+                    </label>
+                    <div style={{ display: 'flex', gap: '0.45rem', alignItems: 'center', minWidth: 0 }}>
+                      <select
+                        value={
+                          selectedBranchId === activeWingGroup.id
+                            ? activeWingGroup.id
+                            : (branchInfo?.id || selectedBranchId)
+                        }
+                        onChange={(e) => handleBranchChange(e.target.value)}
+                        style={{
+                          flex: 1,
+                          minWidth: 0,
+                          boxSizing: 'border-box',
+                          padding: '0.45rem 0.7rem',
+                          fontSize: '0.8rem',
+                          fontWeight: 600,
+                          color: '#0f172a',
+                          background: '#ffffff',
+                          border: '1.5px solid #cbd5e1',
+                          borderRadius: '8px',
+                          outline: 'none',
+                          cursor: 'pointer',
+                          textOverflow: 'ellipsis',
+                        }}
+                      >
+                        <option value={activeWingGroup.id}>
+                          📊 Overall Wing View — All {activeWingGroup.branches.length} Units
+                        </option>
+                        {activeWingGroup.branches.map((br) => (
+                          <option key={br.id} value={br.id}>
+                            {br.name.replace(/^MOE\s+/i, '')} ({br.code})
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                  </div>
+                ) : (
+                  <div style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '0.5rem',
+                    padding: '0.45rem 0.75rem',
+                    background: '#ecfdf5',
+                    border: '1px solid #a7f3d0',
+                    borderRadius: '8px',
+                    fontSize: '0.76rem',
+                    color: '#065f46',
+                    fontWeight: 600,
+                  }}>
+                    <span>💡</span>
+                    <span>Select an Additional Secretary / Wing on the left to view its overall details or pick its branches.</span>
+                  </div>
+                )}
+              </div>
+
+              {activeWingGroup && selectedBranchId === activeWingGroup.id && (
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '0.5rem' }}>
+                  <span style={{
+                    fontSize: '0.73rem',
+                    fontWeight: 700,
+                    padding: '3px 10px',
+                    borderRadius: '12px',
+                    background: '#dcfce7',
+                    color: '#166534',
+                    border: '1px solid #86efac',
+                  }}>
+                    📊 Viewing Overall Consolidated Details for {activeWingGroup.headTitle} ({activeWingGroup.branches.length} Units)
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => handleBranchChange('all')}
+                    style={{
+                      fontSize: '0.72rem',
+                      fontWeight: 700,
+                      padding: '3px 9px',
+                      borderRadius: '6px',
+                      background: '#ffffff',
+                      color: '#334155',
+                      border: '1px solid #cbd5e1',
+                      cursor: 'pointer',
+                    }}
+                  >
+                    🌐 Back to All Ministry
+                  </button>
+                </div>
+              )}
             </div>
 
             {/* Scrollable sheet tabs row */}
@@ -5985,7 +6303,11 @@ export default function AnnualPlanPage() {
                           step="any"
                           disabled={isBaselineLocked}
                           value={formFinancialQ1}
-                          onChange={(e) => setFormFinancialQ1(parseFloat(e.target.value) || 0)}
+                          onChange={(e) => {
+                            const v = parseFloat(e.target.value) || 0;
+                            setFormFinancialQ1(v);
+                            syncPhysicalQuartersFromFinancial(v, formFinancialQ2, formFinancialQ3, formFinancialQ4);
+                          }}
                           style={{ width: '100%', padding: '3px', fontSize: '0.75rem', border: '1px solid #d1d5db', borderRadius: '4px', textAlign: 'center', background: isBaselineLocked ? '#f1f5f9' : '#fff' }}
                         />
                       </div>
@@ -5996,7 +6318,11 @@ export default function AnnualPlanPage() {
                           step="any"
                           disabled={isBaselineLocked}
                           value={formFinancialQ2}
-                          onChange={(e) => setFormFinancialQ2(parseFloat(e.target.value) || 0)}
+                          onChange={(e) => {
+                            const v = parseFloat(e.target.value) || 0;
+                            setFormFinancialQ2(v);
+                            syncPhysicalQuartersFromFinancial(formFinancialQ1, v, formFinancialQ3, formFinancialQ4);
+                          }}
                           style={{ width: '100%', padding: '3px', fontSize: '0.75rem', border: '1px solid #d1d5db', borderRadius: '4px', textAlign: 'center', background: isBaselineLocked ? '#f1f5f9' : '#fff' }}
                         />
                       </div>
@@ -6007,7 +6333,11 @@ export default function AnnualPlanPage() {
                           step="any"
                           disabled={isBaselineLocked}
                           value={formFinancialQ3}
-                          onChange={(e) => setFormFinancialQ3(parseFloat(e.target.value) || 0)}
+                          onChange={(e) => {
+                            const v = parseFloat(e.target.value) || 0;
+                            setFormFinancialQ3(v);
+                            syncPhysicalQuartersFromFinancial(formFinancialQ1, formFinancialQ2, v, formFinancialQ4);
+                          }}
                           style={{ width: '100%', padding: '3px', fontSize: '0.75rem', border: '1px solid #d1d5db', borderRadius: '4px', textAlign: 'center', background: isBaselineLocked ? '#f1f5f9' : '#fff' }}
                         />
                       </div>
@@ -6018,7 +6348,11 @@ export default function AnnualPlanPage() {
                           step="any"
                           disabled={isBaselineLocked}
                           value={formFinancialQ4}
-                          onChange={(e) => setFormFinancialQ4(parseFloat(e.target.value) || 0)}
+                          onChange={(e) => {
+                            const v = parseFloat(e.target.value) || 0;
+                            setFormFinancialQ4(v);
+                            syncPhysicalQuartersFromFinancial(formFinancialQ1, formFinancialQ2, formFinancialQ3, v);
+                          }}
                           style={{ width: '100%', padding: '3px', fontSize: '0.75rem', border: '1px solid #d1d5db', borderRadius: '4px', textAlign: 'center', background: isBaselineLocked ? '#f1f5f9' : '#fff' }}
                         />
                       </div>

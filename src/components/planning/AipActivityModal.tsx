@@ -70,7 +70,7 @@ export default function AipActivityModal({
   const [targetQ1, setTargetQ1] = useState('-');
   const [targetQ2, setTargetQ2] = useState('-');
   const [targetQ3, setTargetQ3] = useState('-');
-  const [targetQ4, setTargetQ4] = useState('100%');
+  const [targetQ4, setTargetQ4] = useState('-');
 
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
@@ -104,19 +104,52 @@ export default function AipActivityModal({
       setFinancialMonths(fm);
       setPhysicalMonths(pm);
 
-      const q1 = Number(editingActivity.financialQ1 ?? (fm[0] + fm[1] + fm[2])) || 0;
-      const q2 = Number(editingActivity.financialQ2 ?? (q1 + fm[3] + fm[4] + fm[5])) || 0;
-      const q3 = Number(editingActivity.financialQ3 ?? (q2 + fm[6] + fm[7] + fm[8])) || 0;
-      const q4 = Number(editingActivity.financialQ4 ?? (q3 + fm[9] + fm[10] + fm[11])) || 0;
-      setFinancialQ1(q1);
-      setFinancialQ2(q2);
-      setFinancialQ3(q3);
-      setFinancialQ4(q4);
+      const q1 = Math.round((fm[0] + fm[1] + fm[2]) * 1e6) / 1e6;
+      const q2 = Math.round((fm[3] + fm[4] + fm[5]) * 1e6) / 1e6;
+      const q3 = Math.round((fm[6] + fm[7] + fm[8]) * 1e6) / 1e6;
+      const q4 = Math.round((fm[9] + fm[10] + fm[11]) * 1e6) / 1e6;
+      const hasMonthlyFin = fm.some((v: number) => v > 0);
+      setFinancialQ1(hasMonthlyFin ? q1 : (Number(editingActivity.financialQ1) || 0));
+      setFinancialQ2(hasMonthlyFin ? q2 : (Number(editingActivity.financialQ2) || 0));
+      setFinancialQ3(hasMonthlyFin ? q3 : (Number(editingActivity.financialQ3) || 0));
+      setFinancialQ4(hasMonthlyFin ? q4 : (Number(editingActivity.financialQ4) || 0));
 
-      setTargetQ1(editingActivity.targetQ1 || '-');
-      setTargetQ2(editingActivity.targetQ2 || '-');
-      setTargetQ3(editingActivity.targetQ3 || '-');
-      setTargetQ4(editingActivity.targetQ4 || '100%');
+      const parseP = (v: string) => {
+        const n = parseFloat(String(v || '').replace('%', '').trim());
+        return isNaN(n) ? 0 : n;
+      };
+      const fmtQ = (n: number) => (n > 0 ? `${Math.round(n * 100) / 100}%` : '-');
+      const hasMonthlyPhys = pm.some((v: string) => parseP(v) > 0);
+      if (hasMonthlyPhys) {
+        setTargetQ1(fmtQ(parseP(pm[0]) + parseP(pm[1]) + parseP(pm[2])));
+        setTargetQ2(fmtQ(parseP(pm[3]) + parseP(pm[4]) + parseP(pm[5])));
+        setTargetQ3(fmtQ(parseP(pm[6]) + parseP(pm[7]) + parseP(pm[8])));
+        setTargetQ4(fmtQ(parseP(pm[9]) + parseP(pm[10]) + parseP(pm[11])));
+      } else {
+        const finQ1 = hasMonthlyFin ? q1 : (Number(editingActivity.financialQ1) || 0);
+        const finQ2 = hasMonthlyFin ? q2 : (Number(editingActivity.financialQ2) || 0);
+        const finQ3 = hasMonthlyFin ? q3 : (Number(editingActivity.financialQ3) || 0);
+        const finQ4 = hasMonthlyFin ? q4 : (Number(editingActivity.financialQ4) || 0);
+        const totalFin = finQ1 + finQ2 + finQ3 + finQ4;
+        const hasSavedTarget =
+          (editingActivity.targetQ1 && editingActivity.targetQ1 !== '-') ||
+          (editingActivity.targetQ2 && editingActivity.targetQ2 !== '-') ||
+          (editingActivity.targetQ3 && editingActivity.targetQ3 !== '-') ||
+          (editingActivity.targetQ4 && editingActivity.targetQ4 !== '-' && editingActivity.targetQ4 !== '100%');
+
+        if (!hasSavedTarget && totalFin > 0) {
+          const fmtPct = (v: number) => (v > 0 ? `${Math.round((v / totalFin) * 1000) / 10}%` : '-');
+          setTargetQ1(fmtPct(finQ1));
+          setTargetQ2(fmtPct(finQ2));
+          setTargetQ3(fmtPct(finQ3));
+          setTargetQ4(fmtPct(finQ4));
+        } else {
+          setTargetQ1(editingActivity.targetQ1 && editingActivity.targetQ1 !== '-' ? editingActivity.targetQ1 : '-');
+          setTargetQ2(editingActivity.targetQ2 && editingActivity.targetQ2 !== '-' ? editingActivity.targetQ2 : '-');
+          setTargetQ3(editingActivity.targetQ3 && editingActivity.targetQ3 !== '-' ? editingActivity.targetQ3 : '-');
+          setTargetQ4(editingActivity.targetQ4 && editingActivity.targetQ4 !== '-' && editingActivity.targetQ4 !== '100%' ? editingActivity.targetQ4 : '-');
+        }
+      }
       setCustomValues(editingActivity.customFields || {});
     } else {
       setOutputNo('1');
@@ -140,7 +173,7 @@ export default function AipActivityModal({
       setTargetQ1('-');
       setTargetQ2('-');
       setTargetQ3('-');
-      setTargetQ4('100%');
+      setTargetQ4('-');
       const initCustom: Record<string, any> = {};
       (aipTemplate?.columns || []).forEach((c: any) => {
         if (!c.isSystemCore && c.defaultValue !== undefined) {
@@ -153,6 +186,27 @@ export default function AipActivityModal({
 
   if (!isOpen) return null;
 
+  const syncPhysicalQuartersFromFinancial = (q1: number, q2: number, q3: number, q4: number) => {
+    const hasManualPhys = physicalMonths.some((v) => {
+      const n = parseFloat(String(v || '').replace('%', '').trim());
+      return !isNaN(n) && n > 0;
+    });
+    if (hasManualPhys) return;
+    const total = q1 + q2 + q3 + q4;
+    if (total <= 0) {
+      setTargetQ1('-');
+      setTargetQ2('-');
+      setTargetQ3('-');
+      setTargetQ4('-');
+      return;
+    }
+    const fmtPct = (v: number) => (v > 0 ? `${Math.round((v / total) * 1000) / 10}%` : '-');
+    setTargetQ1(fmtPct(q1));
+    setTargetQ2(fmtPct(q2));
+    setTargetQ3(fmtPct(q3));
+    setTargetQ4(fmtPct(q4));
+  };
+
   const handleFinancialMonthChange = (idx: number, rawVal: string) => {
     const val = parseFloat(rawVal);
     const next = [...financialMonths];
@@ -160,19 +214,36 @@ export default function AipActivityModal({
     setFinancialMonths(next);
 
     const q1 = Math.round((next[0] + next[1] + next[2]) * 1e6) / 1e6;
-    const q2 = Math.round((q1 + next[3] + next[4] + next[5]) * 1e6) / 1e6;
-    const q3 = Math.round((q2 + next[6] + next[7] + next[8]) * 1e6) / 1e6;
-    const q4 = Math.round((q3 + next[9] + next[10] + next[11]) * 1e6) / 1e6;
+    const q2 = Math.round((next[3] + next[4] + next[5]) * 1e6) / 1e6;
+    const q3 = Math.round((next[6] + next[7] + next[8]) * 1e6) / 1e6;
+    const q4 = Math.round((next[9] + next[10] + next[11]) * 1e6) / 1e6;
     setFinancialQ1(q1);
     setFinancialQ2(q2);
     setFinancialQ3(q3);
     setFinancialQ4(q4);
+    syncPhysicalQuartersFromFinancial(q1, q2, q3, q4);
   };
 
   const handlePhysicalMonthChange = (idx: number, val: string) => {
     const next = [...physicalMonths];
     next[idx] = val;
     setPhysicalMonths(next);
+
+    const parseP = (v: string) => {
+      const n = parseFloat(String(v || '').replace('%', '').trim());
+      return isNaN(n) ? 0 : n;
+    };
+    const fmtQ = (n: number) => (n > 0 ? `${Math.round(n * 100) / 100}%` : '-');
+
+    const q1 = parseP(next[0]) + parseP(next[1]) + parseP(next[2]);
+    const q2 = parseP(next[3]) + parseP(next[4]) + parseP(next[5]);
+    const q3 = parseP(next[6]) + parseP(next[7]) + parseP(next[8]);
+    const q4 = parseP(next[9]) + parseP(next[10]) + parseP(next[11]);
+
+    setTargetQ1(fmtQ(q1));
+    setTargetQ2(fmtQ(q2));
+    setTargetQ3(fmtQ(q3));
+    setTargetQ4(fmtQ(q4));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -209,7 +280,7 @@ export default function AipActivityModal({
           targetQ1: targetQ1.trim() || '-',
           targetQ2: targetQ2.trim() || '-',
           targetQ3: targetQ3.trim() || '-',
-          targetQ4: targetQ4.trim() || '100%',
+          targetQ4: targetQ4.trim() || '-',
           responsibleOfficer: responsibleOfficer.trim(),
           remarks: remarks.trim(),
           customFields: {
@@ -643,10 +714,10 @@ export default function AipActivityModal({
                 </div>
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '0.5rem' }}>
                   {[
-                    { label: 'Q1', val: financialQ1, set: setFinancialQ1 },
-                    { label: 'Q2', val: financialQ2, set: setFinancialQ2 },
-                    { label: 'Q3', val: financialQ3, set: setFinancialQ3 },
-                    { label: 'Q4', val: financialQ4, set: setFinancialQ4 },
+                    { label: 'Q1', val: financialQ1, set: setFinancialQ1, idx: 0 },
+                    { label: 'Q2', val: financialQ2, set: setFinancialQ2, idx: 1 },
+                    { label: 'Q3', val: financialQ3, set: setFinancialQ3, idx: 2 },
+                    { label: 'Q4', val: financialQ4, set: setFinancialQ4, idx: 3 },
                   ].map((q) => (
                     <div key={`fq-${q.label}`}>
                       <div style={{ fontSize: '0.72rem', fontWeight: 700, color: '#78350F', marginBottom: '2px' }}>{q.label}</div>
@@ -655,7 +726,13 @@ export default function AipActivityModal({
                         step="any"
                         min="0"
                         value={q.val}
-                        onChange={(e) => q.set(parseFloat(e.target.value) || 0)}
+                        onChange={(e) => {
+                          const nextVal = parseFloat(e.target.value) || 0;
+                          q.set(nextVal);
+                          const qs = [financialQ1, financialQ2, financialQ3, financialQ4];
+                          qs[q.idx] = nextVal;
+                          syncPhysicalQuartersFromFinancial(qs[0], qs[1], qs[2], qs[3]);
+                        }}
                         style={{
                           width: '100%',
                           background: '#FFFFFF',

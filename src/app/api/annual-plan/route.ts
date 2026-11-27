@@ -4,6 +4,7 @@ import { authOptions } from '@/lib/auth';
 import { getDb, updateDb, AipPlan, AipActivity } from '@/lib/db';
 import { randomUUID } from 'crypto';
 import { roundToCentInMn } from '@/lib/financialFormat';
+import { OFFICIAL_MOE_DIVISIONS_DATA } from '@/lib/hierarchyData';
 import { getRelevantPlanningBranch, getRelevantMonitoringBranch, getScopedBranchOptions, canUserReviewPlan } from '@/lib/planningHierarchy';
 
 export const dynamic = 'force-dynamic';
@@ -45,23 +46,45 @@ export async function GET(request: NextRequest) {
     }
 
     let branchId = (isPrivileged && reqBranchId) ? reqBranchId : (user?.organizationId || reqBranchId || defaultBranchId);
-    const isConsolidated = isPrivileged && branchId === 'all';
+    const isMinistryConsolidated = isPrivileged && branchId === 'all';
+    const matchedDivision = isPrivileged ? OFFICIAL_MOE_DIVISIONS_DATA.find((d) => d.id === branchId) : undefined;
+    const isWingConsolidated = Boolean(matchedDivision);
+    const isConsolidated = isMinistryConsolidated || isWingConsolidated;
 
-    const currentBranch = isConsolidated
+    const consolidatedBranchIds = new Set<string>(
+      isMinistryConsolidated
+        ? moeBranches.map((b) => b.id)
+        : matchedDivision
+          ? matchedDivision.branches.map((b) => b.id)
+          : []
+    );
+
+    const currentBranch = isMinistryConsolidated
       ? {
           id: 'all',
           name: 'Consolidated Ministry-Level AIP',
           code: 'MINISTRY',
         }
-      : organizations.find((o) => o.id === branchId) || {
-          id: branchId,
-          name: user?.organizationName || 'Operational Branch',
-          code: branchId.replace(/^org-/, '').toUpperCase(),
-        };
+      : matchedDivision
+        ? {
+            id: matchedDivision.id,
+            name: `${matchedDivision.division} (Additional Secretary Overall)`,
+            code: matchedDivision.code,
+          }
+        : organizations.find((o) => o.id === branchId) || {
+            id: branchId,
+            name: user?.organizationName || 'Operational Branch',
+            code: branchId.replace(/^org-/, '').toUpperCase(),
+          };
 
     // Determine relevant Planning Branch reviewing authority for this branch
-    const relevantPlanningBranch = getRelevantPlanningBranch(isConsolidated ? 'org-moe-ict' : branchId, organizations as any);
-    const relevantMonitoringBranch = getRelevantMonitoringBranch(isConsolidated ? 'org-moe-ict' : branchId);
+    const planningSampleBranchId = isMinistryConsolidated
+      ? 'org-moe-ict'
+      : matchedDivision
+        ? (matchedDivision.branches[0]?.id || 'org-moe-ict')
+        : branchId;
+    const relevantPlanningBranch = getRelevantPlanningBranch(planningSampleBranchId, organizations as any);
+    const relevantMonitoringBranch = getRelevantMonitoringBranch(planningSampleBranchId);
 
     // Find all amendments for this year
     const allAmendments = (data.aipAmendments || []).filter((a) => a.year === year);
@@ -80,8 +103,12 @@ export async function GET(request: NextRequest) {
     let plan: any = null;
 
     if (isConsolidated) {
-      // Build a consolidated plan representing the entire Ministry
-      const branchPlans = moeBranches.map((br) =>
+      // Build a consolidated plan representing either the entire Ministry or a specific Additional Secretary Wing
+      const targetBranchesForPlan = isMinistryConsolidated
+        ? moeBranches
+        : moeBranches.filter((b) => consolidatedBranchIds.has(b.id));
+
+      const branchPlans = targetBranchesForPlan.map((br) =>
         allPlans.find(
           (p) => p.branchId === br.id && p.year === year && Number(p.amendmentNumber || 0) === amendmentNumber
         )
@@ -92,20 +119,32 @@ export async function GET(request: NextRequest) {
       const allDispatched = branchPlans.length > 0 && branchPlans.every((p) => p?.isDispatchedToBranch);
 
       plan = {
-        id: `plan-consolidated-${year}-amend-${amendmentNumber}`,
-        branchId: 'all',
-        branchName: 'Consolidated Ministry-Level AIP',
+        id: isMinistryConsolidated
+          ? `plan-consolidated-${year}-amend-${amendmentNumber}`
+          : `plan-wing-${matchedDivision!.id}-${year}-amend-${amendmentNumber}`,
+        branchId: isMinistryConsolidated ? 'all' : matchedDivision!.id,
+        branchName: isMinistryConsolidated
+          ? 'Consolidated Ministry-Level AIP'
+          : `${matchedDivision!.division} (Additional Secretary Overall)`,
         year,
         amendmentNumber,
         phaseTitle: '3. Implementation Phase',
-        targetTitle: `Consolidated Ministry Physical and Financial Targets ${year}`,
-        mainResponsibility: 'Policy & Planning Branch (PPB) Directorate',
+        targetTitle: isMinistryConsolidated
+          ? `Consolidated Ministry Physical and Financial Targets ${year}`
+          : `${matchedDivision!.division} — Overall Physical and Financial Targets ${year}`,
+        mainResponsibility: isMinistryConsolidated
+          ? 'Policy & Planning Branch (PPB) Directorate'
+          : `${matchedDivision!.division} (${targetBranchesForPlan.length} Units)`,
         mainContactNo: '0112785617',
-        overallResponsibility: 'Ministry of Education Planning Division',
+        overallResponsibility: isMinistryConsolidated
+          ? 'Ministry of Education Planning Division'
+          : `Additional Secretary — ${matchedDivision!.division}`,
         overallContactNo: '0112785618',
         status: allApproved ? 'Approved' : anySubmitted ? 'Submitted' : 'Draft',
         isDispatchedToBranch: allDispatched,
         isConsolidated: true,
+        isWingConsolidated,
+        wingBranchCount: targetBranchesForPlan.length,
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
       };
@@ -215,7 +254,7 @@ export async function GET(request: NextRequest) {
         if (isConsolidated) {
           const matchYear = a.year === year || !a.year;
           const matchAmend = Number(a.amendmentNumber || 0) === amendmentNumber;
-          const isScopedBranch = moeBranches.some((b) => b.id === a.branchId);
+          const isScopedBranch = consolidatedBranchIds.has(a.branchId);
           return matchYear && matchAmend && isScopedBranch;
         }
         return (
@@ -247,9 +286,9 @@ export async function GET(request: NextRequest) {
     });
 
     const q1Fin = monthlyFinancialTotals[0] + monthlyFinancialTotals[1] + monthlyFinancialTotals[2];
-    const q2Fin = q1Fin + monthlyFinancialTotals[3] + monthlyFinancialTotals[4] + monthlyFinancialTotals[5];
-    const q3Fin = q2Fin + monthlyFinancialTotals[6] + monthlyFinancialTotals[7] + monthlyFinancialTotals[8];
-    const q4Fin = q3Fin + monthlyFinancialTotals[9] + monthlyFinancialTotals[10] + monthlyFinancialTotals[11];
+    const q2Fin = monthlyFinancialTotals[3] + monthlyFinancialTotals[4] + monthlyFinancialTotals[5];
+    const q3Fin = monthlyFinancialTotals[6] + monthlyFinancialTotals[7] + monthlyFinancialTotals[8];
+    const q4Fin = monthlyFinancialTotals[9] + monthlyFinancialTotals[10] + monthlyFinancialTotals[11];
     const quarterlyFinancialCumulative = [q1Fin, q2Fin, q3Fin, q4Fin];
 
     const monthlyPhysicalSums = Array(12).fill(0);
@@ -270,9 +309,9 @@ export async function GET(request: NextRequest) {
 
     const monthlyPhysicalTotals = monthlyPhysicalSums.map((sum) => Math.round((sum / n) * 10) / 10);
     const q1Phys = Math.round((monthlyPhysicalTotals[0] + monthlyPhysicalTotals[1] + monthlyPhysicalTotals[2]) * 10) / 10;
-    const q2Phys = Math.round((q1Phys + monthlyPhysicalTotals[3] + monthlyPhysicalTotals[4] + monthlyPhysicalTotals[5]) * 10) / 10;
-    const q3Phys = Math.round((q2Phys + monthlyPhysicalTotals[6] + monthlyPhysicalTotals[7] + monthlyPhysicalTotals[8]) * 10) / 10;
-    const q4Phys = activities.length > 0 ? 100 : 0;
+    const q2Phys = Math.round((monthlyPhysicalTotals[3] + monthlyPhysicalTotals[4] + monthlyPhysicalTotals[5]) * 10) / 10;
+    const q3Phys = Math.round((monthlyPhysicalTotals[6] + monthlyPhysicalTotals[7] + monthlyPhysicalTotals[8]) * 10) / 10;
+    const q4Phys = Math.round((monthlyPhysicalTotals[9] + monthlyPhysicalTotals[10] + monthlyPhysicalTotals[11]) * 10) / 10;
     const quarterlyPhysicalCumulative = [q1Phys, q2Phys, q3Phys, q4Phys];
 
     // Compute live submission stats for all amendments + original plan 0
@@ -349,7 +388,7 @@ export async function GET(request: NextRequest) {
     // Monthly Progress Returns for this branch & year (or consolidated)
     const monthlyReturns = (data.monthlyProgressReturns || []).filter(
       (r) =>
-        (isConsolidated ? moeBranches.some((b) => b.id === r.branchId) : r.branchId === branchId) &&
+        (isConsolidated ? consolidatedBranchIds.has(r.branchId) : r.branchId === branchId) &&
         (r.year === String(year) || !r.year)
     );
 
